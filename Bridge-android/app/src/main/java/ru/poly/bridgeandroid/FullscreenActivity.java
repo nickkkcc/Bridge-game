@@ -5,8 +5,10 @@ import android.annotation.SuppressLint;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -108,7 +110,10 @@ public class FullscreenActivity extends AppCompatActivity {
         mContentView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                toggle();
+//                toggle();
+                Intent intent = new Intent(FullscreenActivity.this, GameActivity.class);
+                startActivity(intent);
+                finish();
             }
         });
 
@@ -137,6 +142,7 @@ public class FullscreenActivity extends AppCompatActivity {
     }
 
     private void hide() {
+        Log.i("Debug", "hide");
         // Hide UI first
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -151,6 +157,7 @@ public class FullscreenActivity extends AppCompatActivity {
     }
 
     private void show() {
+        Log.i("Debug", "show");
         // Show the system bar
         mContentView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                 | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
@@ -166,6 +173,7 @@ public class FullscreenActivity extends AppCompatActivity {
      * previously scheduled calls.
      */
     private void delayedHide(int delayMillis) {
+        Log.i("Debug", "delayedHide");
         mHideHandler.removeCallbacks(mHideRunnable);
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
     }

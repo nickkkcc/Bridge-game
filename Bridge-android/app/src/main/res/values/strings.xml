@@ -2,4 +2,6 @@
     <string name="app_name">Bridge Android</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="nav_open">Open</string>
+    <string name="nav_close">Close</string>
 </resources>
