@@ -15,7 +15,8 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 public class GameActivity extends AppCompatActivity {
     public DrawerLayout drawerLayout;
-    public ActionBarDrawerToggle actionBarDrawerToggle;
+    public ActionBarDrawerToggle actionBarDrawerToggleMenu;
+    public ActionBarDrawerToggle actionBarDrawerToggleChat;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -26,22 +27,22 @@ public class GameActivity extends AppCompatActivity {
         hideSystemBars();
 
         drawerLayout = findViewById(R.id.game_drawer_layout);
-        actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout,
+        actionBarDrawerToggleMenu = new ActionBarDrawerToggle(this, drawerLayout,
                 R.string.nav_open, R.string.nav_close);
 
-        drawerLayout.addDrawerListener(actionBarDrawerToggle);
-        actionBarDrawerToggle.syncState();
+        drawerLayout.addDrawerListener(actionBarDrawerToggleMenu);
+        actionBarDrawerToggleMenu.syncState();
 
         Toolbar toolbar = findViewById(R.id.game_toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_baseline_menu_24);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
+//        getSupportActionBar().setDisplayShowTitleEnabled(false);
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (actionBarDrawerToggle.onOptionsItemSelected(item)) {
+        if (actionBarDrawerToggleMenu.onOptionsItemSelected(item)) {
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -60,5 +61,4 @@ public class GameActivity extends AppCompatActivity {
         // Hide both the status bar and the navigation bar
         windowInsetsController.hide(WindowInsetsCompat.Type.systemBars());
     }
-
 }
