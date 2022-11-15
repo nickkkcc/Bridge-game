@@ -9,7 +9,7 @@
     android:theme="@style/Theme.BridgeAndroid.FullscreenGameNoActionBar"
     tools:context=".GameActivity">
 
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
@@ -21,18 +21,114 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
             android:minHeight="?attr/actionBarSize"
             android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-            app:title="Робберный бридж"/>
+            app:layout_constraintTop_toTopOf="parent"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
-        <!-- FrameLayout for our fragments -->
-        <FrameLayout
-            android:id="@+id/game_frame_layout"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-    </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:orientation="horizontal"
+                android:layout_weight="1">
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="3">
+                </Space>
+
+                <TableLayout
+                    android:id="@+id/game_table_teammate"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="5"
+                    android:background="@drawable/table_background"/>
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="3">
+                </Space>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:orientation="horizontal"
+                android:layout_weight="2">
+
+                <TableLayout
+                    android:id="@+id/game_table_enemy_left"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="2"
+                    android:background="@drawable/table_background"/>
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+                </Space>
+
+                <androidx.fragment.app.FragmentContainerView
+                    android:id="@+id/game_fragment"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="5"
+                    android:name="ru.poly.bridgeandroid.BargainingFragment">
+                </androidx.fragment.app.FragmentContainerView>
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+                </Space>
+
+                <TableLayout
+                    android:id="@+id/game_table_enemy_right"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="2"
+                    android:background="@drawable/table_background"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:orientation="horizontal"
+                android:layout_weight="1">
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="3">
+                </Space>
+
+                <TableLayout
+                    android:id="@+id/game_table_player"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="5"
+                    android:background="@drawable/table_background"/>
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="3">
+                </Space>
+            </LinearLayout>
+        </LinearLayout>
+
+
+
+
+    </FrameLayout>
 
     <!-- 2 | NavigationView -->
     <com.google.android.material.navigation.NavigationView

@@ -16,7 +16,6 @@ import androidx.drawerlayout.widget.DrawerLayout;
 public class GameActivity extends AppCompatActivity {
     public DrawerLayout drawerLayout;
     public ActionBarDrawerToggle actionBarDrawerToggleMenu;
-    public ActionBarDrawerToggle actionBarDrawerToggleChat;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -37,7 +36,7 @@ public class GameActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_baseline_menu_24);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-//        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
     }
 
     @Override
