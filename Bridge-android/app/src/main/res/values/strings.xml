@@ -16,4 +16,5 @@
     <string name="contra">Contra</string>
     <string name="recontra">Recontra</string>
     <string name="pass">Pass</string>
+    <string name="chat">Чат</string>
 </resources>
