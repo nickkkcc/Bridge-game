@@ -27,6 +27,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import ru.poly.bridgeandroid.GameActivity;
+import ru.poly.bridgeandroid.MenuActivity;
 import ru.poly.bridgeandroid.R;
 import ru.poly.bridgeandroid.ui.login.LoginViewModel;
 import ru.poly.bridgeandroid.ui.login.LoginViewModelFactory;
@@ -121,7 +122,7 @@ public class LoginActivity extends AppCompatActivity {
 //                loginViewModel.login(usernameEditText.getText().toString(),
 //                        passwordEditText.getText().toString());
 
-                Intent intent = new Intent(LoginActivity.this, GameActivity.class);
+                Intent intent = new Intent(LoginActivity.this, MenuActivity.class);
                 startActivity(intent);
                 finish();
             }
