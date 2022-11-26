@@ -17,4 +17,9 @@
     <string name="recontra">Recontra</string>
     <string name="pass">Pass</string>
     <string name="chat">Чат</string>
+    <string name="login_login">Логин</string>
+    <string name="login_password">Пароль</string>
+    <string name="registration_answer">Ответ на вопрос</string>
+    <string name="login_sign_in">Войти</string>
+    <string name="registration">Регистрация</string>
 </resources>

@@ -2,58 +2,68 @@ package ru.poly.bridgeandroid.ui.login;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.weiwangcn.betterspinner.library.material.MaterialBetterSpinner;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import ru.poly.bridgeandroid.MenuActivity;
 import ru.poly.bridgeandroid.R;
-import ru.poly.bridgeandroid.client.TcpClient;
 import ru.poly.bridgeandroid.model.LoginToClient;
-import ru.poly.bridgeandroid.model.LoginToServer;
 
-public class LoginActivity extends AppCompatActivity {
+public class RegistrationActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     private LoginViewModel loginViewModel;
-    private TcpClient tcpClient;
-    private int id = 0;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.activity_registration);
+
         loginViewModel = new ViewModelProvider(this, new LoginViewModelFactory())
                 .get(LoginViewModel.class);
 
-        final EditText usernameEditText = findViewById(R.id.username);
-        final EditText passwordEditText = findViewById(R.id.password);
-        final Button loginButton = findViewById(R.id.login);
-        final Button registrationButton = findViewById(R.id.registration);
-        final ProgressBar loadingProgressBar = findViewById(R.id.loading);
+        final EditText usernameEditText = findViewById(R.id.registration_username);
+        final EditText passwordEditText = findViewById(R.id.registration_password);
+        final MaterialBetterSpinner spinner = findViewById(R.id.registration_question_spinner);
+        final EditText answerEditText = findViewById(R.id.registration_answer);
+        final Button registrationButton = findViewById(R.id.registration_registration);
+        final ProgressBar loadingProgressBar = findViewById(R.id.registration_loading);
+
+        List<String> list = Arrays.asList("Ну как там с деньгами?", "На Руси жить хорошо?",
+                "Быть или не быть?", "Сколько существует основных законов Ньютона?");
+
+        spinner.setOnItemSelectedListener(this);
+
+        ArrayAdapter<String> adapter = new ArrayAdapter(this, R.layout.spinner_item, list);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
 
         loginViewModel.getLoginFormState().observe(this, new Observer<LoginFormState>() {
             @Override
@@ -61,7 +71,7 @@ public class LoginActivity extends AppCompatActivity {
                 if (loginFormState == null) {
                     return;
                 }
-                loginButton.setEnabled(loginFormState.isDataValid());
+                registrationButton.setEnabled(loginFormState.isDataValid());
                 if (loginFormState.getUsernameError() != null) {
                     usernameEditText.setError(getString(loginFormState.getUsernameError()));
                 }
@@ -122,40 +132,28 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        loginButton.setOnClickListener(new View.OnClickListener() {
+        registrationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                loadingProgressBar.setVisibility(View.VISIBLE);
-//                loginViewModel.login(usernameEditText.getText().toString(),
-//                        passwordEditText.getText().toString());
-
-//                new ConnectTask().execute("");
-//                LoginToServer loginToServer = new LoginToServer(id, "LOG_REQ",
-//                        passwordEditText.getText().toString(), usernameEditText.getText().toString());
-//                GsonBuilder builder = new GsonBuilder();
-//                Gson gson = builder.create();
-//                if (tcpClient != null) {
-//                    tcpClient.sendMessage(gson.toJson(loginToServer));
-//                }
-
-                Intent intent = new Intent(LoginActivity.this, MenuActivity.class);
+                Intent intent = new Intent(RegistrationActivity.this, MenuActivity.class);
                 startActivity(intent);
                 finish();
 
                 Toast toast = Toast.makeText(getBaseContext(),
-                        "Вы успешно авторизовались", Toast.LENGTH_SHORT);
+                        "Вы успешно зарегистрировались", Toast.LENGTH_SHORT);
                 toast.show();
             }
         });
+    }
 
-        registrationButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(LoginActivity.this, RegistrationActivity.class);
-                startActivity(intent);
-                finish();
-            }
-        });
+    @Override
+    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) {
+
     }
 
     @Override
@@ -183,59 +181,5 @@ public class LoginActivity extends AppCompatActivity {
     @Subscribe
     public void handleRealTimeMessage(LoginToClient loginToClient) {
         // processing of all real-time events
-    }
-
-    private class ConnectTask extends AsyncTask<String, String, TcpClient> {
-
-        @RequiresApi(api = Build.VERSION_CODES.N)
-        @Override
-        protected TcpClient doInBackground(String... message) {
-
-            //we create a TCPClient object
-            tcpClient = new TcpClient(new TcpClient.OnMessageReceived() {
-                @Override
-                //here the messageReceived method is implemented
-                public void messageReceived(String message) {
-                    //this method calls the onProgressUpdate
-                    Log.d("RESPONSE FROM SERVER", "S: Received Message: '" + message + "'");
-                    publishProgress(message);
-
-//                    System.out.println(message);
-                }
-            });
-            tcpClient.run();
-
-            return null;
-        }
-
-        @Override
-        protected void onProgressUpdate(String... values) {
-            super.onProgressUpdate(values);
-            //response received from server
-            Log.d("test", "response " + values[0]);
-            GsonBuilder builder = new GsonBuilder();
-            Gson gson = builder.create();
-            LoginToClient loginToClient = gson.fromJson(values[0], LoginToClient.class);
-            Toast toast;
-            if (loginToClient.isLoginSuccessful()) {
-                toast = Toast.makeText(getBaseContext(),
-                        "Вы успешно авторизовались", Toast.LENGTH_SHORT);
-                toast.show();
-
-                Intent intent = new Intent(LoginActivity.this, MenuActivity.class);
-                startActivity(intent);
-                finish();
-            } else {
-                toast = Toast.makeText(getBaseContext(),
-                        loginToClient.getReason(), Toast.LENGTH_SHORT);
-                toast.show();
-
-                if (tcpClient != null) {
-                    tcpClient.stopClient();
-                    tcpClient = null;
-                    cancel(true);
-                }
-            }
-        }
     }
 }
