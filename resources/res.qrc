@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/res">
+        <file>fon</file>
+        <file>fonName</file>
+    </qresource>
+</RCC>
