@@ -2,12 +2,10 @@ package ru.poly.bridgeandroid.ui.login;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.os.AsyncTask;
-import android.os.Build;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -18,29 +16,31 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import ru.poly.bridgeandroid.MenuActivity;
 import ru.poly.bridgeandroid.R;
-import ru.poly.bridgeandroid.client.TcpClient;
 import ru.poly.bridgeandroid.model.LoginToClient;
 import ru.poly.bridgeandroid.model.LoginToServer;
+import ru.poly.bridgeandroid.model.Message;
+import ru.poly.bridgeandroid.model.RegistrationQuestionsToClient;
 
 public class LoginActivity extends AppCompatActivity {
 
+    private static final String KEY = "token";
+    private static final String PREFERENCE = "preference";
+    private Gson gson;
     private LoginViewModel loginViewModel;
-    private TcpClient tcpClient;
-    private int id = 0;
+    private ProgressBar loadingProgressBar;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -48,12 +48,13 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         loginViewModel = new ViewModelProvider(this, new LoginViewModelFactory())
                 .get(LoginViewModel.class);
+        gson = new Gson();
 
         final EditText usernameEditText = findViewById(R.id.username);
         final EditText passwordEditText = findViewById(R.id.password);
         final Button loginButton = findViewById(R.id.login);
         final Button registrationButton = findViewById(R.id.registration);
-        final ProgressBar loadingProgressBar = findViewById(R.id.loading);
+        loadingProgressBar = findViewById(R.id.loading);
 
         loginViewModel.getLoginFormState().observe(this, new Observer<LoginFormState>() {
             @Override
@@ -125,35 +126,23 @@ public class LoginActivity extends AppCompatActivity {
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                loadingProgressBar.setVisibility(View.VISIBLE);
-//                loginViewModel.login(usernameEditText.getText().toString(),
-//                        passwordEditText.getText().toString());
+                loadingProgressBar.setVisibility(View.VISIBLE);
+                loginViewModel.login(usernameEditText.getText().toString(),
+                        passwordEditText.getText().toString());
 
-//                new ConnectTask().execute("");
-//                LoginToServer loginToServer = new LoginToServer(id, "LOG_REQ",
-//                        passwordEditText.getText().toString(), usernameEditText.getText().toString());
-//                GsonBuilder builder = new GsonBuilder();
-//                Gson gson = builder.create();
-//                if (tcpClient != null) {
-//                    tcpClient.sendMessage(gson.toJson(loginToServer));
-//                }
-
-                Intent intent = new Intent(LoginActivity.this, MenuActivity.class);
-                startActivity(intent);
-                finish();
-
-                Toast toast = Toast.makeText(getBaseContext(),
-                        "Вы успешно авторизовались", Toast.LENGTH_SHORT);
-                toast.show();
+                LoginToServer loginToServer = new LoginToServer(usernameEditText.getText().toString(),
+                        passwordEditText.getText().toString());
+                JsonObject jsonObject = (JsonObject) gson.toJsonTree(loginToServer);
+                Message message = new Message("0", "login", jsonObject);
+                EventBus.getDefault().post(gson.toJson(message));
             }
         });
 
         registrationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(LoginActivity.this, RegistrationActivity.class);
-                startActivity(intent);
-                finish();
+                Message message = new Message("0", "registration_questions");
+                EventBus.getDefault().post(gson.toJson(message));
             }
         });
     }
@@ -181,61 +170,42 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     @Subscribe
-    public void handleRealTimeMessage(LoginToClient loginToClient) {
-        // processing of all real-time events
-    }
-
-    private class ConnectTask extends AsyncTask<String, String, TcpClient> {
-
-        @RequiresApi(api = Build.VERSION_CODES.N)
-        @Override
-        protected TcpClient doInBackground(String... message) {
-
-            //we create a TCPClient object
-            tcpClient = new TcpClient(new TcpClient.OnMessageReceived() {
-                @Override
-                //here the messageReceived method is implemented
-                public void messageReceived(String message) {
-                    //this method calls the onProgressUpdate
-                    Log.d("RESPONSE FROM SERVER", "S: Received Message: '" + message + "'");
-                    publishProgress(message);
-
-//                    System.out.println(message);
-                }
-            });
-            tcpClient.run();
-
-            return null;
+    public void onMessage(Message message) {
+        if (message.getType().equals("registration_questions")) {
+            RegistrationQuestionsToClient questions = message.getData(
+                    RegistrationQuestionsToClient.class);
+            Intent intent = new Intent(LoginActivity.this, RegistrationActivity.class);
+            intent.putParcelableArrayListExtra("questions", questions.getQuestions());
+            startActivity(intent);
+            finish();
+            return;
         }
+        if (!message.getType().equals("login")) {
+            throw new RuntimeException();
+        }
+        runOnUiThread(() -> loadingProgressBar.setVisibility(View.GONE));
 
-        @Override
-        protected void onProgressUpdate(String... values) {
-            super.onProgressUpdate(values);
-            //response received from server
-            Log.d("test", "response " + values[0]);
-            GsonBuilder builder = new GsonBuilder();
-            Gson gson = builder.create();
-            LoginToClient loginToClient = gson.fromJson(values[0], LoginToClient.class);
-            Toast toast;
-            if (loginToClient.isLoginSuccessful()) {
-                toast = Toast.makeText(getBaseContext(),
+        LoginToClient loginToClient = message.getData(LoginToClient.class);
+        if (loginToClient.isSuccessful()) {
+            SharedPreferences sharedPreferences = getSharedPreferences(PREFERENCE, MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString(KEY, loginToClient.getToken());
+            editor.apply();
+
+            Intent intent = new Intent(LoginActivity.this, MenuActivity.class);
+            startActivity(intent);
+            finish();
+
+            runOnUiThread(() -> {
+                Toast toast = Toast.makeText(getBaseContext(),
                         "Вы успешно авторизовались", Toast.LENGTH_SHORT);
                 toast.show();
-
-                Intent intent = new Intent(LoginActivity.this, MenuActivity.class);
-                startActivity(intent);
-                finish();
-            } else {
-                toast = Toast.makeText(getBaseContext(),
-                        loginToClient.getReason(), Toast.LENGTH_SHORT);
+            });
+        } else {
+            runOnUiThread(() -> {
+                Toast toast = Toast.makeText(getBaseContext(), loginToClient.getError(), Toast.LENGTH_SHORT);
                 toast.show();
-
-                if (tcpClient != null) {
-                    tcpClient.stopClient();
-                    tcpClient = null;
-                    cancel(true);
-                }
-            }
+            });
         }
     }
 }

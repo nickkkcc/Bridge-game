@@ -2,7 +2,9 @@ package ru.poly.bridgeandroid.ui.login;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
@@ -24,6 +26,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.weiwangcn.betterspinner.library.material.MaterialBetterSpinner;
 
 import org.greenrobot.eventbus.EventBus;
@@ -36,10 +40,24 @@ import java.util.List;
 import ru.poly.bridgeandroid.MenuActivity;
 import ru.poly.bridgeandroid.R;
 import ru.poly.bridgeandroid.model.LoginToClient;
+import ru.poly.bridgeandroid.model.LoginToServer;
+import ru.poly.bridgeandroid.model.Message;
+import ru.poly.bridgeandroid.model.Question;
+import ru.poly.bridgeandroid.model.RegistrationQuestionsToClient;
+import ru.poly.bridgeandroid.model.RegistrationToClient;
+import ru.poly.bridgeandroid.model.RegistrationToServer;
 
 public class RegistrationActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
+    private static final String KEY = "token";
+    private static final String PREFERENCE = "preference";
     private LoginViewModel loginViewModel;
+    private Gson gson;
+    private ProgressBar loadingProgressBar;
+    private EditText usernameEditText;
+    private EditText passwordEditText;
+    private Button registrationButton;
+    private int questionIndex;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -48,20 +66,26 @@ public class RegistrationActivity extends AppCompatActivity implements AdapterVi
 
         loginViewModel = new ViewModelProvider(this, new LoginViewModelFactory())
                 .get(LoginViewModel.class);
+        gson = new Gson();
 
-        final EditText usernameEditText = findViewById(R.id.registration_username);
-        final EditText passwordEditText = findViewById(R.id.registration_password);
+        usernameEditText = findViewById(R.id.registration_username);
+        passwordEditText = findViewById(R.id.registration_password);
         final MaterialBetterSpinner spinner = findViewById(R.id.registration_question_spinner);
         final EditText answerEditText = findViewById(R.id.registration_answer);
-        final Button registrationButton = findViewById(R.id.registration_registration);
-        final ProgressBar loadingProgressBar = findViewById(R.id.registration_loading);
+        registrationButton = findViewById(R.id.registration_registration);
+        loadingProgressBar = findViewById(R.id.registration_loading);
 
-        List<String> list = Arrays.asList("Ну как там с деньгами?", "На Руси жить хорошо?",
-                "Быть или не быть?", "Сколько существует основных законов Ньютона?");
+        Intent myIntent = getIntent();
+        List<Question> questions =
+                myIntent.getParcelableArrayListExtra("questions");
+        List<String> questionsList = new ArrayList<>();
+        for (Question question : questions) {
+            questionsList.add(question.getQuestion());
+        }
 
         spinner.setOnItemSelectedListener(this);
 
-        ArrayAdapter<String> adapter = new ArrayAdapter(this, R.layout.spinner_item, list);
+        ArrayAdapter<String> adapter = new ArrayAdapter(this, R.layout.spinner_item, questionsList);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
 
@@ -135,20 +159,23 @@ public class RegistrationActivity extends AppCompatActivity implements AdapterVi
         registrationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(RegistrationActivity.this, MenuActivity.class);
-                startActivity(intent);
-                finish();
+                loadingProgressBar.setVisibility(View.VISIBLE);
 
-                Toast toast = Toast.makeText(getBaseContext(),
-                        "Вы успешно зарегистрировались", Toast.LENGTH_SHORT);
-                toast.show();
+                RegistrationToServer registrationToServer = new RegistrationToServer(
+                        usernameEditText.getText().toString(),
+                        passwordEditText.getText().toString(),
+                        questions.get(questionIndex).getQuestionId(),
+                        answerEditText.getText().toString());
+                JsonObject jsonObject = (JsonObject) gson.toJsonTree(registrationToServer);
+                Message message = new Message("0", "registration", jsonObject);
+                EventBus.getDefault().post(gson.toJson(message));
             }
         });
     }
 
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-
+        questionIndex = i;
     }
 
     @Override
@@ -179,7 +206,56 @@ public class RegistrationActivity extends AppCompatActivity implements AdapterVi
     }
 
     @Subscribe
-    public void handleRealTimeMessage(LoginToClient loginToClient) {
-        // processing of all real-time events
+    public void onMessage(Message message) {
+        switch (message.getType()) {
+            case "registration":
+                runOnUiThread(() -> {
+                    loadingProgressBar.setVisibility(View.GONE);
+                    registrationButton.setEnabled(false);
+                });
+
+                RegistrationToClient registrationToClient = message.getData(RegistrationToClient.class);
+                if (registrationToClient.isSuccessful()) {
+                    LoginToServer loginToServer = new LoginToServer(usernameEditText.getText().toString(),
+                            passwordEditText.getText().toString());
+                    JsonObject jsonObject = (JsonObject) gson.toJsonTree(loginToServer);
+                    Message loginMessage = new Message("0", "login", jsonObject);
+                    EventBus.getDefault().post(gson.toJson(loginMessage));
+                } else {
+                    runOnUiThread(() -> {
+                        Toast toast = Toast.makeText(getBaseContext(), registrationToClient.getError(),
+                                Toast.LENGTH_SHORT);
+                        toast.show();
+                    });
+                    runOnUiThread(() -> registrationButton.setEnabled(true));
+                }
+                break;
+            case "login":
+                LoginToClient loginToClient = message.getData(LoginToClient.class);
+                if (loginToClient.isSuccessful()) {
+                    SharedPreferences sharedPreferences = getSharedPreferences(PREFERENCE, MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString(KEY, loginToClient.getToken());
+                    editor.apply();
+
+                    Intent intent = new Intent(RegistrationActivity.this, MenuActivity.class);
+                    startActivity(intent);
+                    finish();
+
+                    runOnUiThread(() -> {
+                        Toast toast = Toast.makeText(getBaseContext(),
+                                "Вы успешно зарегестрировались", Toast.LENGTH_SHORT);
+                        toast.show();
+                    });
+                } else {
+                    runOnUiThread(() -> {
+                        Toast toast = Toast.makeText(getBaseContext(), loginToClient.getError(), Toast.LENGTH_SHORT);
+                        toast.show();
+                    });
+                }
+                break;
+            default:
+                throw new RuntimeException();
+        }
     }
 }

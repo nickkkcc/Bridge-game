@@ -5,19 +5,19 @@ package ru.poly.bridgeandroid.data.model;
  */
 public class LoggedInUser {
 
-    private String userId;
-    private String displayName;
+    private final String login;
+    private final String password;
 
-    public LoggedInUser(String userId, String displayName) {
-        this.userId = userId;
-        this.displayName = displayName;
+    public LoggedInUser(String login, String password) {
+        this.login = login;
+        this.password = password;
     }
 
-    public String getUserId() {
-        return userId;
+    public String getLogin() {
+        return login;
     }
 
-    public String getDisplayName() {
-        return displayName;
+    public String getPassword() {
+        return password;
     }
 }

@@ -1,5 +1,7 @@
 package ru.poly.bridgeandroid.data;
 
+import android.content.SharedPreferences;
+
 import ru.poly.bridgeandroid.data.model.LoggedInUser;
 
 /**
@@ -8,13 +10,11 @@ import ru.poly.bridgeandroid.data.model.LoggedInUser;
  */
 public class LoginRepository {
 
-    private static volatile LoginRepository instance;
-
-    private LoginDataSource dataSource;
-
-    // If user credentials will be cached in local storage, it is recommended it be encrypted
-    // @see https://developer.android.com/training/articles/keystore
+    private static final String SP_NAME = "userData";
+    private static LoginRepository instance;
+    private final LoginDataSource dataSource;
     private LoggedInUser user = null;
+    private SharedPreferences userLocalDatabase;
 
     // private constructor : singleton access
     private LoginRepository(LoginDataSource dataSource) {

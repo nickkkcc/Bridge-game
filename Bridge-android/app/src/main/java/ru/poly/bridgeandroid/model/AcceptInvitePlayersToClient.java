@@ -2,10 +2,10 @@ package ru.poly.bridgeandroid.model;
 
 import com.google.gson.annotations.SerializedName;
 
-public class LoginToClient {
+public class AcceptInvitePlayersToClient {
 
-    @SerializedName("token")
-    private final String token;
+    @SerializedName("lobby_id")
+    private final int lobbyId;
 
     @SerializedName("successful")
     private final boolean isSuccessful;
@@ -13,14 +13,14 @@ public class LoginToClient {
     @SerializedName("error")
     private final String error;
 
-    public LoginToClient(String token, boolean isSuccessful, String error) {
-        this.token = token;
+    public AcceptInvitePlayersToClient(int lobbyId, boolean isSuccessful, String error) {
+        this.lobbyId = lobbyId;
         this.isSuccessful = isSuccessful;
         this.error = error;
     }
 
-    public String getToken() {
-        return token;
+    public int getLobbyId() {
+        return lobbyId;
     }
 
     public boolean isSuccessful() {
