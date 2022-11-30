@@ -5,9 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ListView;
 
 public class MenuActivity extends AppCompatActivity {
 
@@ -16,26 +14,22 @@ public class MenuActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu);
 
-        final Button create_game_btn = findViewById(R.id.create_btn);
-        final Button join_game_btn = findViewById(R.id.join_btn);
+        final Button createButton = findViewById(R.id.createButton);
+        final Button joinButton = findViewById(R.id.joinButton);
 
-        ListView listView = findViewById(R.id.listView);
-
-        final String[] catNames = new String[] {
-                "Рыжик", "Барсик", "Мурзик", "Мурка", "Васька",
-                "Томасина", "Кристина", "Пушок", "Дымка", "Кузя",
-                "Китти", "Масяня", "Симба"
-        };
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_list_item_1, catNames);
-
-        listView.setAdapter(adapter);
-
-        create_game_btn.setOnClickListener(new View.OnClickListener() {
+        createButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MenuActivity.this, GameActivity.class);
+                Intent intent = new Intent(MenuActivity.this, CreateGameActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
+
+        joinButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MenuActivity.this, JoinGameActivity.class);
                 startActivity(intent);
                 finish();
             }

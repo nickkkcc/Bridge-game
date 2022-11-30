@@ -7,11 +7,11 @@
     android:orientation="vertical" >
 
     <TextView
-        android:layout_width="320dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="50dp"
         android:layout_marginTop="40dp"
-        android:text="Робберный бридж"
+        android:text="Выберите собачье место"
         android:textSize="30dp"
         android:gravity="left"
         android:textColor="#aaaaaa"
@@ -28,9 +28,9 @@
         android:paddingBottom="0dp"
         android:orientation="vertical" >
         <Button
-            android:id="@+id/createButton"
+            android:id="@+id/NS"
             android:layout_gravity="right"
-            android:text="СОЗДАТЬ КОМНАТУ"
+            android:text="СЕВЕР-ЮГ"
             android:textColor="#BDBDBD"
             android:textSize="12sp"
             android:layout_width="200dp"
@@ -43,9 +43,9 @@
             android:layout_marginBottom="20dp"
             />
         <Button
-            android:id="@+id/joinButton"
+            android:id="@+id/EW"
             android:layout_gravity="right"
-            android:text="ПРИСОЕДИНИТЬСЯ"
+            android:text="ЗАПАД-ВОСТОК"
             android:textColor="#BDBDBD"
             android:textSize="12sp"
             android:layout_width="200dp"
@@ -56,19 +56,6 @@
             android:shadowDy="0"
             android:shadowRadius="5"
             android:layout_marginBottom="20dp"
-            />
-        <Button
-            android:layout_gravity="right"
-            android:text="ВЫЙТИ ИЗ АККАУНТА"
-            android:textColor="#BDBDBD"
-            android:textSize="12sp"
-            android:layout_width="200dp"
-            android:layout_height="55dp"
-            android:background="@drawable/button_style"
-            android:shadowColor="#A8A8A8"
-            android:shadowDx="0"
-            android:shadowDy="0"
-            android:shadowRadius="5"
             />
 
     </LinearLayout>

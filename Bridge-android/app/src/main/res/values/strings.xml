@@ -4,7 +4,13 @@
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="nav_open">Open</string>
     <string name="nav_close">Close</string>
+
     <string name="title_activity_login">LoginActivity</string>
+    <string name="title_activity_menu">MenuActivity</string>
+    <string name="title_activity_create_game">CreateGameActivity</string>
+    <string name="title_activity_join_game">JoinGameActivity</string>
+    <string name="title_activity_choose_place">ChoosePlaceActivity</string>
+
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password</string>
     <string name="action_sign_in">Sign in or register</string>
@@ -22,4 +28,6 @@
     <string name="registration_answer">Ответ на вопрос</string>
     <string name="login_sign_in">Войти</string>
     <string name="registration">Регистрация</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
