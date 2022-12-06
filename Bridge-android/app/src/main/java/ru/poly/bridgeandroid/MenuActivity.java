@@ -39,6 +39,7 @@ public class MenuActivity extends AppCompatActivity {
     private static final String LOBBY = "lobby";
     private static final String PREFERENCE = "preference";
     private String token;
+    private boolean isAccepted;
     private Gson gson;
     private TextView loadingTextView;
     private ProgressBar loadingProgressBar;
@@ -147,8 +148,9 @@ public class MenuActivity extends AppCompatActivity {
                     builder.setMessage("Присоединиться в лобби?");
                     builder.setNegativeButton("Нет", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
+                            isAccepted = false;
                             AcceptInvitePlayersToServer acceptInvite =
-                                    new AcceptInvitePlayersToServer(invitePlayers.getLobbyId(), false);
+                                    new AcceptInvitePlayersToServer(invitePlayers.getLobbyId(), isAccepted);
                             JsonObject jsonObject = (JsonObject) gson.toJsonTree(acceptInvite);
                             Message message = new Message(token, "accept_invite_players", jsonObject);
                             EventBus.getDefault().post(gson.toJson(message));
@@ -156,8 +158,9 @@ public class MenuActivity extends AppCompatActivity {
                     });
                     builder.setPositiveButton("Да", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
+                            isAccepted = true;
                             AcceptInvitePlayersToServer acceptInvite =
-                                    new AcceptInvitePlayersToServer(invitePlayers.getLobbyId(), true);
+                                    new AcceptInvitePlayersToServer(invitePlayers.getLobbyId(), isAccepted);
                             JsonObject jsonObject = (JsonObject) gson.toJsonTree(acceptInvite);
                             Message message = new Message(token, "accept_invite_players", jsonObject);
                             EventBus.getDefault().post(gson.toJson(message));
@@ -169,7 +172,7 @@ public class MenuActivity extends AppCompatActivity {
                 break;
             case "accept_invite_players":
                 AcceptInvitePlayersToClient acceptInvite = message.getData(AcceptInvitePlayersToClient.class);
-                if (acceptInvite.isSuccessful()) {
+                if (acceptInvite.isSuccessful() && isAccepted) {
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putString(LOBBY, acceptInvite.getLobbyId());
                     editor.apply();

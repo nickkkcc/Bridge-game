@@ -2,24 +2,24 @@ package ru.poly.bridgeandroid.model;
 
 import com.google.gson.annotations.SerializedName;
 
-public class InvitePlayersToServer {
+public class SelectTeamAdminToServer {
 
     @SerializedName("lobby_id")
     private final String lobbyId;
 
-    @SerializedName("login")
-    private final String login;
+    @SerializedName("team")
+    private final int team;
 
-    public InvitePlayersToServer(String lobbyId, String login) {
+    public SelectTeamAdminToServer(String lobbyId, int team) {
         this.lobbyId = lobbyId;
-        this.login = login;
+        this.team = team;
     }
 
     public String getLobbyId() {
         return lobbyId;
     }
 
-    public String getLogin() {
-        return login;
+    public int getTeam() {
+        return team;
     }
 }

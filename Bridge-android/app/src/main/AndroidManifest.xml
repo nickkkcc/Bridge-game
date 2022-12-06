@@ -18,7 +18,7 @@
             android:name=".ChoosePlaceActivity"
             android:label="@string/title_activity_choose_place"
             android:exported="true"
-            android:theme="@style/Theme.BridgeAndroid.FullscreenGameNoActionBar">>
+            android:theme="@style/Theme.BridgeAndroid.FullscreenGameNoActionBar">
         </activity>
 
         <activity
@@ -69,6 +69,18 @@
 
         <activity
             android:name=".MenuActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:exported="true"
+            android:label="@string/title_activity_login"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.BridgeAndroid.FullscreenGameNoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".WaitGameActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:exported="true"
             android:label="@string/title_activity_login"

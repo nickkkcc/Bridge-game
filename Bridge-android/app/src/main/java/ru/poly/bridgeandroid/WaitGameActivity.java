@@ -17,6 +17,7 @@ import com.google.gson.JsonObject;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
+import ru.poly.bridgeandroid.model.ExitLobbyToClient;
 import ru.poly.bridgeandroid.model.ExitLobbyToServer;
 import ru.poly.bridgeandroid.model.Message;
 import ru.poly.bridgeandroid.model.PlayersCountLobbyToClient;
@@ -29,6 +30,7 @@ public class WaitGameActivity extends AppCompatActivity {
     private static final String PREFERENCE = "preference";
     private String token;
     private String lobbyId;
+    private int playersCount;
     private Gson gson;
     private TextView playersCountTextView;
     private SharedPreferences sharedPreferences;
@@ -39,7 +41,12 @@ public class WaitGameActivity extends AppCompatActivity {
         setContentView(R.layout.activity_wait_game);
 
         playersCountTextView = findViewById(R.id.textView_players_count);
-        final Button exitButton = findViewById(R.id.fetchTeam);
+        final Button exitButton = findViewById(R.id.exit_to_menu_button);
+
+        Intent myIntent = getIntent();
+        playersCount = myIntent.getIntExtra("playersCount", 0);
+
+        updatePlayersCountTextView();
 
         gson = new Gson();
 
@@ -54,14 +61,6 @@ public class WaitGameActivity extends AppCompatActivity {
                 JsonObject jsonObject = (JsonObject) gson.toJsonTree(exitGame);
                 Message message = new Message(token, "exit_lobby", jsonObject);
                 EventBus.getDefault().post(gson.toJson(message));
-
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.remove(LOBBY);
-                editor.apply();
-
-                Intent intent = new Intent(WaitGameActivity.this, MenuActivity.class);
-                startActivity(intent);
-                finish();
             }
         });
     }
@@ -84,10 +83,7 @@ public class WaitGameActivity extends AppCompatActivity {
             case "players_count_lobby":
                 PlayersCountLobbyToClient playersCountLobby = message.getData(PlayersCountLobbyToClient.class);
                 if (playersCountLobby.getError().equals("")) {
-                    runOnUiThread(() -> {
-                        String playersCountText = "Ожидание игроков\n Игроков в лобби: " + playersCountLobby.getPlayersInLobby();
-                        playersCountTextView.setText(playersCountText);
-                    });
+                    updatePlayersCountTextView();
                 } else {
                     runOnUiThread(() -> {
                         Toast toast = Toast.makeText(getBaseContext(), playersCountLobby.getError(), Toast.LENGTH_SHORT);
@@ -108,8 +104,30 @@ public class WaitGameActivity extends AppCompatActivity {
                     });
                 }
                 break;
+            case "exit_lobby":
+                ExitLobbyToClient exitLobby = message.getData(ExitLobbyToClient.class);
+                if (exitLobby.isSuccessful()) {
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.remove(LOBBY);
+                    editor.apply();
+
+                    Intent intent = new Intent(WaitGameActivity.this, MenuActivity.class);
+                    startActivity(intent);
+                    finish();
+                } else {
+                    runOnUiThread(() -> {
+                        Toast toast = Toast.makeText(getBaseContext(), exitLobby.getError(), Toast.LENGTH_SHORT);
+                        toast.show();
+                    });
+                }
+                break;
             default:
                 throw new RuntimeException();
         }
+    }
+
+    private void updatePlayersCountTextView() {
+        String playersCountString = "Ожидание игроков\n Игроков в лобби: " + playersCount;
+        runOnUiThread(() -> playersCountTextView.setText(playersCountString));
     }
 }

@@ -1,7 +1,6 @@
 package ru.poly.bridgeandroid;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentManager;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -16,17 +15,16 @@ import com.google.gson.JsonObject;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
+import java.util.ArrayList;
+
 import ru.poly.bridgeandroid.model.AcceptSelectTeamToClient;
-import ru.poly.bridgeandroid.model.CreateLobbyToClient;
-import ru.poly.bridgeandroid.model.LoginToServer;
 import ru.poly.bridgeandroid.model.Message;
+import ru.poly.bridgeandroid.model.Player;
 import ru.poly.bridgeandroid.model.PlayersCountLobbyToClient;
 import ru.poly.bridgeandroid.model.PlayersOnlineToClient;
-import ru.poly.bridgeandroid.model.RegistrationQuestionsToClient;
+import ru.poly.bridgeandroid.model.SelectTeamAdminToServer;
 import ru.poly.bridgeandroid.model.SelectTeamToClient;
 import ru.poly.bridgeandroid.model.SelectTeamToServer;
-import ru.poly.bridgeandroid.ui.login.LoginActivity;
-import ru.poly.bridgeandroid.ui.login.RegistrationActivity;
 
 public class ChoosePlaceActivity extends AppCompatActivity {
 
@@ -39,6 +37,9 @@ public class ChoosePlaceActivity extends AppCompatActivity {
     private boolean isAdmin;
     private Button firstTeamButton;
     private Button secondTeamButton;
+    private ArrayList<Player> players;
+    private ArrayList<Player> friends;
+    private Integer playersCount;
     private SharedPreferences sharedPreferences;
 
     @Override
@@ -70,19 +71,33 @@ public class ChoosePlaceActivity extends AppCompatActivity {
         firstTeamButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SelectTeamToServer selectTeam = new SelectTeamToServer(lobbyId, 1);
-                JsonObject jsonObject = (JsonObject) gson.toJsonTree(selectTeam);
-                Message message = new Message(token, "select_team", jsonObject);
-                EventBus.getDefault().post(gson.toJson(message));
+                if (isAdmin) {
+                    SelectTeamAdminToServer selectTeam = new SelectTeamAdminToServer(lobbyId, 0);
+                    JsonObject jsonObject = (JsonObject) gson.toJsonTree(selectTeam);
+                    Message message = new Message(token, "select_team_admin", jsonObject);
+                    EventBus.getDefault().post(gson.toJson(message));
+                } else {
+                    SelectTeamToServer selectTeam = new SelectTeamToServer(lobbyId, 0);
+                    JsonObject jsonObject = (JsonObject) gson.toJsonTree(selectTeam);
+                    Message message = new Message(token, "select_team", jsonObject);
+                    EventBus.getDefault().post(gson.toJson(message));
+                }
             }
         });
         secondTeamButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SelectTeamToServer selectTeam = new SelectTeamToServer(lobbyId, 2);
-                JsonObject jsonObject = (JsonObject) gson.toJsonTree(selectTeam);
-                Message message = new Message(token, "select_team", jsonObject);
-                EventBus.getDefault().post(gson.toJson(message));
+                if (isAdmin) {
+                    SelectTeamAdminToServer selectTeam = new SelectTeamAdminToServer(lobbyId, 1);
+                    JsonObject jsonObject = (JsonObject) gson.toJsonTree(selectTeam);
+                    Message message = new Message(token, "select_team_admin", jsonObject);
+                    EventBus.getDefault().post(gson.toJson(message));
+                } else {
+                    SelectTeamToServer selectTeam = new SelectTeamToServer(lobbyId, 1);
+                    JsonObject jsonObject = (JsonObject) gson.toJsonTree(selectTeam);
+                    Message message = new Message(token, "select_team", jsonObject);
+                    EventBus.getDefault().post(gson.toJson(message));
+                }
             }
         });
     }
@@ -117,11 +132,16 @@ public class ChoosePlaceActivity extends AppCompatActivity {
                 break;
             case "players_online":
                 PlayersOnlineToClient playersOnline = message.getData(PlayersOnlineToClient.class);
-                Intent intent = new Intent(ChoosePlaceActivity.this, CreateGameActivity.class);
-                intent.putParcelableArrayListExtra("friends", playersOnline.getFriends());
-                intent.putParcelableArrayListExtra("players", playersOnline.getPlayers());
-                startActivity(intent);
-                finish();
+                friends = playersOnline.getFriends();
+                players = playersOnline.getPlayers();
+                if (playersCount != null) {
+                    Intent intent = new Intent(ChoosePlaceActivity.this, CreateGameActivity.class);
+                    intent.putParcelableArrayListExtra("friends", friends);
+                    intent.putParcelableArrayListExtra("players", players);
+                    intent.putExtra("playersCount", playersCount);
+                    startActivity(intent);
+                    finish();
+                }
                 break;
             case "select_team":
                 SelectTeamToClient selectTeam = message.getData(SelectTeamToClient.class);
@@ -144,10 +164,21 @@ public class ChoosePlaceActivity extends AppCompatActivity {
             case "players_count_lobby":
                 PlayersCountLobbyToClient playersCountLobby = message.getData(PlayersCountLobbyToClient.class);
                 if (playersCountLobby.getError().equals("")) {
-                    Intent intentToWaiting = new Intent(ChoosePlaceActivity.this, CreateGameActivity.class);
-                    intentToWaiting.putExtra("playersCount", playersCountLobby.getPlayersInLobby());
-                    startActivity(intentToWaiting);
-                    finish();
+                    playersCount = playersCountLobby.getPlayersInLobby();
+                    if (!isAdmin) {
+                        Intent intent = new Intent(ChoosePlaceActivity.this, WaitGameActivity.class);
+                        intent.putExtra("playersCount", playersCount);
+                        startActivity(intent);
+                        finish();
+                    }
+                    if (friends != null && players != null) {
+                        Intent intent = new Intent(ChoosePlaceActivity.this, CreateGameActivity.class);
+                        intent.putParcelableArrayListExtra("friends", friends);
+                        intent.putParcelableArrayListExtra("players", players);
+                        intent.putExtra("playersCount", playersCount);
+                        startActivity(intent);
+                        finish();
+                    }
                     break;
                 } else {
                     runOnUiThread(() -> {
