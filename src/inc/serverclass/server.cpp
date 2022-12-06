@@ -10,6 +10,7 @@ Server::Server(QWidget *parent)
     ui->setupUi(this);
 
     serverNetwork = new ServerNetwork();
+    lobbyManager = new LobbyManager();
 
     connect(serverNetwork,&ServerNetwork::connectionResult,this,&Server::connectionResult);
     connect(serverNetwork,&ServerNetwork::generalError,this,&Server::generalError);
@@ -97,9 +98,6 @@ void Server::on_RestartBtn_clicked()
                     minLoginLength);
 }
 
-
-
-
 void Server::on_StopBtn_clicked()
 {
     delete serverNetwork;
@@ -109,7 +107,6 @@ void Server::on_StopBtn_clicked()
     ui->RestartBtn->setEnabled(false);
     ui->DeleteAllClientBtn->setEnabled(false);
 }
-
 
 void Server::on_DeleteAllClientBtn_clicked()
 {

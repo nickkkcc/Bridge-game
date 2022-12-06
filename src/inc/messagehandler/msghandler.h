@@ -6,6 +6,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include "inc/database/database.h"
+#include "inc/network/clientnetwork.h"
 
 class MsgHandler : public QObject
 {
@@ -21,8 +22,7 @@ private:
     int *maxPlayers;
     int *maxLoginLength;
     int *minLoginLength;
-    QVector<QString> *playerNames;
-    QVector<QUuid> *uidClients;
+    QVector<ClientNetwork*> *clients;
 
     public:
         bool checkTryReg(QJsonObject &obj);
@@ -32,8 +32,8 @@ private:
                    int *maxPlayers,
                    int *maxLoginLength,
                    int *minLoginLength,
-                   QVector<QString> *playerNames,
-                   QVector<QUuid> *uidClients);
+                   QVector<ClientNetwork*> *clients,
+                   QObject *parent);
     private:
        QJsonObject generateAnswer(const MsgType &type,
                             bool successful = true,

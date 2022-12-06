@@ -2,7 +2,6 @@
 #define SERVER_H
 
 #include <QMainWindow>
-#include "inc/network/servernetwork.h"
 #include <QHostAddress>
 #include <QObject>
 #include <QtWebSockets/QWebSocketServer>
@@ -11,6 +10,9 @@
 #include <QtCore/QFile>
 #include <QtNetwork/QSslCertificate>
 #include <QtNetwork/QSslKey>
+
+#include "inc/network/servernetwork.h"
+#include "inc/lobbymanager/lobbymanager.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class Server; }
@@ -43,6 +45,7 @@ private slots:
 
 private:
     ServerNetwork* serverNetwork = nullptr;
+    LobbyManager* lobbyManager = nullptr;
     Ui::Server *ui;
     QUrl ipAddress;
     ushort port;

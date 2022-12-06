@@ -34,7 +34,7 @@ bool MsgHandler::tryLogin(QJsonObject &obj){
                 return false;
             }
 
-            if(playerNames->count() >= *maxPlayers){
+            if(clients->count() >= *maxPlayers){
                 obj = generateAnswer(MsgType::LOGIN, false,
                                "Server is full.");
                 return false;
@@ -48,9 +48,10 @@ bool MsgHandler::tryLogin(QJsonObject &obj){
                 return false;
             }
 
+
             if(!base->readUserFromBase(obj["data"].toObject()["login"].toString())){
                obj = generateAnswer(MsgType::LOGIN, false,
-                         "There is no such login in the database. Choose another login");
+                         "Такого логина нет в базе данных. Choose another login");
                 return false;
             }else{
                 if(obj["data"].toObject()["password"] != base->getuserPassword()){
@@ -58,10 +59,21 @@ bool MsgHandler::tryLogin(QJsonObject &obj){
                          "Password is wrong");
                 return false;
                 }else{
+                    int num = 0;
+                    for(ClientNetwork *client : *clients){
+                        if(obj["data"].toObject()["login"].toString() == client->getName()){
+                            num++;
+                        }
+                    }
+                    if(num == 0){
                     QUuid uid = QUuid::createUuid();
-                    uidClients->append(uid);
                     obj = generateAnswer(MsgType::LOGIN, true, "", uid.toString(QUuid::StringFormat::WithoutBraces));
                     return true;
+                    }else{
+                        obj = generateAnswer(MsgType::LOGIN, false,
+                                             "Such a client is already online");
+                        return false;
+                    }
                 }
             }
 }
@@ -76,25 +88,28 @@ QJsonObject MsgHandler::generateAnswer(const MsgType &type, bool successful, con
         data["successful"] = successful;
         data["error"] = error;
 
-        answer["id"] = 0;
+        answer["id"] = "0";
         answer["type"] = "login";
         answer["data"] = data;
         break;
     }
     case MsgType::QUESTIONS:{
         QJsonArray arr;
-        for(QString str:questions){
-            arr.push_back(str);
+        QJsonObject question;
+        for(int i = 0; i < questions.count(); i++){
+            question["question_id"] = i;
+            question["question"] = questions.at(i);
+            arr.push_back(question);
         };
         data["questions"] = arr;
 
-        answer["id"] = 0;
+        answer["id"] = "0";
         answer["type"] = "registration_questions";
         answer["data"] = data;
         break;
     }
     case MsgType::REGISTRATION:{
-        answer["id"] = 0;
+        answer["id"] = "0";
         answer["type"] = "registration";
 
         data["successful"] = successful;
@@ -106,13 +121,13 @@ QJsonObject MsgHandler::generateAnswer(const MsgType &type, bool successful, con
     return answer;
 }
 
-MsgHandler::MsgHandler(DataBase *base, bool *bAllowNewClientConnection, int *maxPlayers, int *maxLoginLength, int *minLoginLength, QVector<QString> *playerNames, QVector<QUuid> *uidClients)
+MsgHandler::MsgHandler(DataBase *base, bool *bAllowNewClientConnection, int *maxPlayers, int *maxLoginLength, int *minLoginLength, QVector<ClientNetwork*> *clients, QObject *parent = nullptr):
+    QObject(parent)
 {
     this->base = base;
     this->bAllowNewClientConnection = bAllowNewClientConnection;
     this->maxPlayers = maxPlayers;
     this->maxLoginLength = maxLoginLength;
     this->minLoginLength = minLoginLength;
-    this->playerNames = playerNames;
-    this->uidClients = uidClients;
+    this->clients = clients;
 }
