@@ -2,20 +2,20 @@ package ru.poly.bridgeandroid.model;
 
 import com.google.gson.annotations.SerializedName;
 
-public class AcceptSelectTeamToClient {
+public class PlayersCountLobbyToClient {
 
     @SerializedName("lobby_id")
     private final String lobbyId;
 
-    @SerializedName("successful")
-    private final boolean isSuccessful;
+    @SerializedName("count")
+    private final int playersInLobby;
 
     @SerializedName("error")
     private final String error;
 
-    public AcceptSelectTeamToClient(String lobbyId, boolean isSuccessful, String error) {
+    public PlayersCountLobbyToClient(String lobbyId, int playersInLobby, String error) {
         this.lobbyId = lobbyId;
-        this.isSuccessful = isSuccessful;
+        this.playersInLobby = playersInLobby;
         this.error = error;
     }
 
@@ -23,8 +23,8 @@ public class AcceptSelectTeamToClient {
         return lobbyId;
     }
 
-    public boolean isSuccessful() {
-        return isSuccessful;
+    public int getPlayersInLobby() {
+        return playersInLobby;
     }
 
     public String getError() {

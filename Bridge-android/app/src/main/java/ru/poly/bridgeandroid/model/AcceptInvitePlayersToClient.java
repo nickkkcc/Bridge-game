@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 public class AcceptInvitePlayersToClient {
 
     @SerializedName("lobby_id")
-    private final int lobbyId;
+    private final String lobbyId;
 
     @SerializedName("successful")
     private final boolean isSuccessful;
@@ -13,13 +13,13 @@ public class AcceptInvitePlayersToClient {
     @SerializedName("error")
     private final String error;
 
-    public AcceptInvitePlayersToClient(int lobbyId, boolean isSuccessful, String error) {
+    public AcceptInvitePlayersToClient(String lobbyId, boolean isSuccessful, String error) {
         this.lobbyId = lobbyId;
         this.isSuccessful = isSuccessful;
         this.error = error;
     }
 
-    public int getLobbyId() {
+    public String getLobbyId() {
         return lobbyId;
     }
 

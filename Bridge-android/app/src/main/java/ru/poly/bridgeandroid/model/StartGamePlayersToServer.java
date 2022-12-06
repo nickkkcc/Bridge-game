@@ -2,7 +2,7 @@ package ru.poly.bridgeandroid.model;
 
 import com.google.gson.annotations.SerializedName;
 
-public class AcceptInvitePlayersToServer {
+public class StartGamePlayersToServer {
 
     @SerializedName("lobby_id")
     private final String lobbyId;
@@ -10,7 +10,7 @@ public class AcceptInvitePlayersToServer {
     @SerializedName("successful")
     private final boolean isSuccessful;
 
-    public AcceptInvitePlayersToServer(String lobbyId, boolean isSuccessful) {
+    public StartGamePlayersToServer(String lobbyId, boolean isSuccessful) {
         this.lobbyId = lobbyId;
         this.isSuccessful = isSuccessful;
     }

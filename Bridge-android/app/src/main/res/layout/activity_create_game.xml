@@ -1,10 +1,11 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:paddingLeft="0dp"
     android:paddingRight="0dp"
     android:background="@drawable/gradient_background"
-    android:orientation="vertical" >
+    android:orientation="vertical">
 
     <TextView
         android:layout_width="320dp"
@@ -22,7 +23,7 @@
         />
 
     <Button
-        android:id="@+id/startGame"
+        android:id="@+id/start_game"
         android:layout_gravity="right"
         android:text="НАЧАТЬ ИГРУ"
         android:textColor="#BDBDBD"
@@ -37,6 +38,7 @@
         android:layout_marginBottom="20dp"
         />
     <Button
+        android:id="@+id/exit_lobby"
         android:layout_gravity="right"
         android:text="ВЫЙТИ"
         android:textColor="#BDBDBD"
@@ -50,11 +52,26 @@
         android:shadowRadius="5"
         />
 
+    <com.github.angads25.toggle.widget.LabeledSwitch
+        android:id="@+id/switch_list"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:textOn="Друзья"
+        app:textOff="Игроки" />
+
     <ListView
         android:id="@+id/listView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
     </ListView>
+
+    <TextView
+        android:id="@+id/create_game_players_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Игроков в лобби: 2"
+        android:textSize="12sp"
+        android:textColor="@color/white"/>
 
 </LinearLayout>
 
