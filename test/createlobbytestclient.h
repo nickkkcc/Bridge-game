@@ -11,7 +11,7 @@
 {
     Q_OBJECT
 public:
-    explicit CreateLobbyTest(const QUrl &url, bool debug = false, QObject *parent = nullptr, QString name = "");
+    explicit CreateLobbyTest(const QUrl &url, bool debug = false, QObject *parent = nullptr, QString name = "", int number = 1);
     void sendLogin();
     void sendCreateLobbyTrue(bool trueFalse);
     void sendSelectTeam(bool trueFalse);
@@ -23,7 +23,7 @@ public:
             LOGIN_TRUE,
             CREATE_LOBBY_TRUE,
             CREATE_LOBBY_FALSE,
-            SELECT_TEAM_TRUE,
+            SELECT_TEAM_ADMIN,
             SELECT_TEAM_FALSE,
             INVITE_PLAYERS_TRUE,
             INVITE_PLAYERS_EMPTY,
@@ -51,6 +51,7 @@ private:
     QString name;
     QUuid uid;
     QUuid lobbyUid;
+    int number;
 
     QJsonObject createJsonD(const Type& name);
     void checkAnswerFromServer(const QJsonObject & rx);

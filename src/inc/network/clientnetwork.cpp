@@ -27,7 +27,8 @@ void ClientNetwork::rxAll(const QString& message)
             emit rxCreateLobby(this);
         }
         if(rx["type"] == "exit_lobby"){
-            emit rxCloseLobby(QUuid(rx["data"].toObject()["lobby_id"].toString()));
+            emit rxCloseLobby(rx["data"].toObject()["lobby_id"].toString(),
+                              this);
         }
         if(rx["type"] == "select_team_admin"){
                 emit rxSelectTeamAdmin((Team)rx["data"].toObject()["team"].toInt(),
@@ -49,14 +50,9 @@ void ClientNetwork::rxAll(const QString& message)
 
         if(rx["type"] == "start_game_players"){
             QJsonObject data = rx["data"].toObject();
-            emit rxStartGamePlayers(data["lobby_id"].toString());
+            emit rxStartGamePlayers(data["lobby_id"].toString(),
+                                    this);
         }
-
-        if(rx["type"] == "exit_lobby"){
-            QJsonObject data = rx["data"].toObject();
-            emit rxCloseLobby(data["lobby_id"].toString());
-        }
-
         if(rx["type"] == "join"){
             QJsonObject data = rx["data"].toObject();
             emit rxJoinLobby(data["join"].toBool(), this);
@@ -123,7 +119,8 @@ QWebSocket *ClientNetwork::getClientSoc() const
 
 ClientNetwork::~ClientNetwork()
 {
-    qInfo() <<  "Client: " << uuid->toString(QUuid::WithBraces) << ", " << name << "is disconnected.";
+    qInfo() << "Client:" << uuid->toString(QUuid::WithBraces) << "->" << name << "is disconnected.";
+
     delete uuid;
     delete clientSoc;
     uuid = nullptr;

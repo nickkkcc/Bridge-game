@@ -9,7 +9,7 @@ LobbyManager::LobbyManager(QObject *parent, int maxLobbyCount, QVector<ClientNet
     this->maxLobbyCount = maxLobbyCount;
     this->clients = clients;
     timer = new QTimer(this);
-    timer->setInterval(1000);
+    timer->setInterval(5000);
     connect(timer, &QTimer::timeout, this, &LobbyManager::onPlayerCount);
     connect(timer, &QTimer::timeout, this, &LobbyManager::onPlayersOnline);
 }
@@ -76,96 +76,85 @@ ClientNetwork *LobbyManager::findPlayer(QUuid playerUuid)
 // функция создания лобби.
 void LobbyManager::createLobby(ClientNetwork *client)
 {
-    ClientNetwork* senderClient = qobject_cast<ClientNetwork*>(sender());
+    if(client != nullptr){
+        QJsonObject tx;
+        QJsonObject data;
 
-    QJsonObject tx;
-    QJsonObject data;
-    if(getLobbyCount() <= maxLobbyCount){
-        lobbies.append(new Lobby(this,
-                                 client));
-        senderClient->setLobbyOwnerUuid(&lobbies.last()->getUuid());
-        lobbies.last()->setOwnerName(client->getName());
-            data["successful"] = true;
-            data["error"] = "";
-            data["lobby_id"] = lobbies.last()->getUuid().toString(QUuid::WithoutBraces);
+        tx["type"] = "create_lobby";
+        tx["id"] = client->getUuid()->toString(QUuid::WithoutBraces);
 
+        if(getLobbyCount() < maxLobbyCount && maxLobbyCount != 0){
+            lobbies.append(new Lobby(this,
+                                    client));
+
+            client->setLobbyOwnerUuid(&lobbies.last()->getUuid());
+            lobbies.last()->setOwnerName(client->getName());
+
+                data["successful"] = true;
+                data["error"] = "";
+                data["lobby_id"] = lobbies.last()->getUuid().toString(QUuid::WithoutBraces);
+            }else{
+                data["successful"] = false;
+                data["error"] = "The maximum number of lobbies that can be created has been exceeded";
+                data["lobby_id"] = "0";
+            }
             tx["data"] = data;
-            tx["type"] = "create_lobby";
-            tx["id"] = senderClient->getUuid()->toString(QUuid::WithoutBraces);
-        }else{
-            data["successful"] = false;
-            data["error"] = "The maximum number of lobbies that can be created has been exceeded";
-            data["lobby_id"] = "0";
-
-            tx["data"] = data;
-            tx["type"] = "create_lobby";
-            tx["id"] = senderClient->getUuid()->toString(QUuid::WithoutBraces);
-        }
-        txAll(tx, senderClient);
+            txAll(tx, client);
+    }
 }
 
 // Функция удаления лобби со сервера.
-void LobbyManager::closeLobby(QUuid uuidLobby)
+void LobbyManager::closeLobby(QUuid uuidLobby, ClientNetwork* sender)
 {
-    // Доделать, чтобы можно было оповестить всех игроков в лобби. Что лобби закрыто админом.
-    ClientNetwork* senderClient = qobject_cast<ClientNetwork*>(sender());
-
-    Lobby* lobby = findLobby(uuidLobby);
-    if(lobby != nullptr){
-        if(lobby->getOwner() == senderClient){
+    if(sender){
+        Lobby* lobby = findLobby(uuidLobby);
         QJsonObject tx;
         QJsonObject data;
-        if(uuidLobby != nullptr){
-            for (ClientNetwork* client : lobby->getPlayers()) {
-                if(client != nullptr){
-                    client->setLobbyOwnerUuid(nullptr);
-                    client->setFinder(false);
+        tx["type"] = "exit_lobby";
+
+        if(lobby){
+            if(lobby->getOwner() == sender){
+                for (ClientNetwork* client : qAsConst(lobby->getPlayers())) {
+                    if(client){
+                        if(client == lobby->getOwner()){
+                            client->setLobbyOwnerUuid(nullptr);
+                        }
+                        client->setFinder(false);
+                        data["successful"] = true;
+                        data["error"] = "";
+                        data["lobby_id"] = uuidLobby.toString(QUuid::WithoutBraces);
+                        tx["data"] = data;
+                        tx["id"] = client->getUuid()->toString(QUuid::WithoutBraces);
+                        txAll(tx, client);
+                    }
+                }
+                lobbyClose(lobby);
+            }else{
+                if(lobby->deletePlayer(sender->getTeam(), sender)){
+                    sender->setTeam(Team::NONE_TEAM);
                     data["successful"] = true;
                     data["error"] = "";
                     data["lobby_id"] = uuidLobby.toString(QUuid::WithoutBraces);
 
                     tx["data"] = data;
-                    tx["type"] = "exit_lobby";
-                    tx["id"] = client->getUuid()->toString(QUuid::WithoutBraces);
-                    txAll(tx, client);
+                    tx["id"] = sender->getUuid()->toString(QUuid::WithoutBraces);
+                }else{
+                    data["successful"] = false;
+                    data["error"] = "Failed to close the lobby (no such player in this team), please try again";
+                    data["lobby_id"] = uuidLobby.toString(QUuid::WithoutBraces);
 
+                    tx["data"] = data;
+                    tx["id"] = sender->getUuid()->toString(QUuid::WithoutBraces);
                 }
+                txAll(tx, sender);
             }
-            lobbyClose(lobby);
         }else{
             data["successful"] = false;
-            data["error"] = "Failed to close the lobby, please try again";
+            data["error"] = "Failed to close the lobby (lobby not found), please try again";
             data["lobby_id"] = uuidLobby.toString(QUuid::WithoutBraces);
-
             tx["data"] = data;
-            tx["type"] = "exit_lobby";
-            tx["id"] = senderClient->getUuid()->toString(QUuid::WithoutBraces);
-            txAll(tx, senderClient);
-        }
-
-        }else{
-            QJsonObject tx;
-            QJsonObject data;
-
-            if(uuidLobby != nullptr && lobby->deletePlayer(senderClient->getTeam(), senderClient)){
-                senderClient->setTeam(Team::NONE_TEAM);
-                data["successful"] = true;
-                data["error"] = "";
-                data["lobby_id"] = uuidLobby.toString(QUuid::WithoutBraces);
-
-                tx["data"] = data;
-                tx["type"] = "exit_lobby";
-                tx["id"] = senderClient->getUuid()->toString(QUuid::WithoutBraces);
-            }else{
-                data["successful"] = false;
-                data["error"] = "Failed to close the lobby, please try again";
-                data["lobby_id"] = uuidLobby.toString(QUuid::WithoutBraces);
-
-                tx["data"] = data;
-                tx["type"] = "exit_lobby";
-                tx["id"] = senderClient->getUuid()->toString(QUuid::WithoutBraces);
-            }
-            txAll(tx, senderClient);
+            tx["id"] = sender->getUuid()->toString(QUuid::WithoutBraces);
+            txAll(tx, sender);
         }
     }
 }
@@ -199,125 +188,129 @@ void LobbyManager::acceptSelectTeam(Team team, QUuid uuidLobby, ClientNetwork* c
 }
 
 // Функция добавления в определенную команду для админа лобби.
-void LobbyManager::selectTeamAdmin(Team team, QUuid uuidLobby, ClientNetwork *client)
+void LobbyManager::selectTeamAdmin(Team team, QUuid uuidLobby, ClientNetwork *sender)
 {
-    Lobby* tempLobby = findLobby(uuidLobby);
-    QJsonObject tx;
-    QJsonObject data;
-    tx["type"] = "accept_select_team";
-    tx["id"] = client->getUuid()->toString(QUuid::WithoutBraces);
+    if(sender){
+        Lobby* tempLobby = findLobby(uuidLobby);
+        QJsonObject tx;
+        QJsonObject data;
+        tx["type"] = "accept_select_team";
+        tx["id"] = sender->getUuid()->toString(QUuid::WithoutBraces);
+        data["lobby_id"] = uuidLobby.toString(QUuid::WithoutBraces);
 
-    if(tempLobby != 0 && tempLobby->addPlayer(team, client)){
-        client->setTeam(team);
-        client->setFinder(false);
-        data["error"] = "";
-        data["successful"] = true;
-        data["lobby_id"] = uuidLobby.toString(QUuid::WithoutBraces);
+        if(tempLobby && tempLobby->addPlayer(team, sender)){
+            sender->setTeam(team);
+            sender->setFinder(false);
+
+            data["error"] = "";
+            data["successful"] = true;
+        }else{
+            data["error"] = "Something went wrong when adding to the team.";
+            data["successful"] = false;
+        }
         tx["data"] = data;
-    }else{
-        data["error"] = "Something went wrong when adding to the team.";
-        data["successful"] = false;
-        data["lobby_id"] = uuidLobby.toString(QUuid::WithoutBraces);
-        tx["data"] = data;
+        txAll(tx, sender);
     }
-    txAll(tx, client);
 }
 
 // Функция оповещение клиентов, которых хотят пригласить в лобби.
 void LobbyManager::invitePlayers(QString login,  QUuid uuidLobby, ClientNetwork* sender)
 {
-    ClientNetwork* sendClient = findPlayer(login);
-    if(sender != nullptr && sendClient != nullptr){
-        QJsonObject tx;
-        QJsonObject data;
-        tx["type"] = "invite_players";
-        tx["id"] = sendClient->getUuid()->toString(QUuid::WithoutBraces);
-        data["lobby_id"] = uuidLobby.toString(QUuid::WithoutBraces);
-        data["alias"] = sender->getUuid()->toString(QUuid::WithoutBraces);
-        tx["data"] = data;
-        txAll(tx, sendClient);
+    if(sender != nullptr){
+        ClientNetwork* sendClient = findPlayer(login);
+        if(sendClient != nullptr){
+            QJsonObject tx;
+            QJsonObject data;
+            tx["type"] = "invite_players";
+            tx["id"] = sendClient->getUuid()->toString(QUuid::WithoutBraces);
+            data["lobby_id"] = uuidLobby.toString(QUuid::WithoutBraces);
+            data["alias"] = sender->getUuid()->toString(QUuid::WithoutBraces);
+            tx["data"] = data;
+            txAll(tx, sendClient);
+        }
     }
 }
 
 // Функция оповещения игроков лобби о начале игры.
-void LobbyManager::startGame(QUuid uuidLobby)
+void LobbyManager::startGame(QUuid uuidLobby, ClientNetwork* sender)
 {
-    ClientNetwork* senderClient = qobject_cast<ClientNetwork*>(sender());
-
-    Lobby *tempLobby = findLobby(uuidLobby);
-    QJsonObject tx;
-    QJsonObject data;
-    if(!tempLobby->getPlayers().contains(nullptr)){
-        tempLobby->setGameStarted(true);
-
-        for (ClientNetwork* client : tempLobby->getPlayers()) {
-            tx["id"] = client->getUuid()->toString(QUuid::WithoutBraces);
+    if(sender != nullptr){
+        Lobby *tempLobby = findLobby(uuidLobby);
+        if(tempLobby != nullptr){
+            QJsonObject tx;
+            QJsonObject data;
             tx["type"] = "start_game_players";
-
             data["lobby_id"] = uuidLobby.toString(QUuid::WithoutBraces);
-            data["successful"] = true;
-            data["error"] = "";
+
+            if(!tempLobby->getPlayers().contains(nullptr)){
+                tempLobby->setGameStarted(true);
+
+                for (ClientNetwork* client : qAsConst(tempLobby->getPlayers())) {
+                    tx["id"] = client->getUuid()->toString(QUuid::WithoutBraces);
+                    data["successful"] = true;
+                    data["error"] = "";
+                }
+            }else{
+                tx["id"] = sender->getUuid()->toString(QUuid::WithoutBraces);
+                data["successful"] = false;
+                data["error"] = "Not enough players or one of the participants disconnected unexpectedly.";
+            }
             tx["data"] = data;
-            txAll(tx,client);
-            return;
+            txAll(tx, sender);
         }
     }
-        tx["id"] = senderClient->getUuid()->toString(QUuid::WithoutBraces);
-        tx["type"] = "start_game_players";
-        data["lobby_id"] = uuidLobby.toString(QUuid::WithoutBraces);
-        data["successful"] = false;
-        data["error"] = "Not enough players or one of the participants disconnected unexpectedly.";
-        tx["data"] = data;
-        txAll(tx, senderClient);
 }
 
 // Функция отсылки игроков в онлайне.
 void LobbyManager::onPlayersOnline()
 {
     if(!lobbies.empty()){
-            for (Lobby *lobby : qAsConst(lobbies)) {
-            if(lobby->getOwner() != nullptr && lobby->getPlayerCount() >= 1){
-                        QStringList invitePlayersLogins;
-                        QStringList invitePlayersAliases;
+        // Инициилизируем и заполняем список игроков online.
+        QStringList invitePlayersLogins;
+        QStringList invitePlayersAliases;
 
-                        QStringList inviteFriendsLogins;
-                        QStringList inviteFriendsAliases;
-
-                        for (ClientNetwork *client : qAsConst(*clients)) {
-                            if(client->getFinder()){
-                                invitePlayersLogins.append(client->getName());
-                                invitePlayersAliases.append(client->getUuid()->toString(QUuid::WithoutBraces));
-                            }
-                        }
-                        QJsonObject tx;
-                        QJsonObject data;
-                        QJsonArray arrPlayers;
-                        QJsonArray arrFriends;
-                        QJsonObject temp;
-
-                        // Переделать, когда будут друзья.
-
-                        for(int i = 0; i < inviteFriendsLogins.count(); i++){
-                            temp["login"] = inviteFriendsLogins[i];
-                            temp["alias"] = inviteFriendsAliases[i];
-                            arrFriends.append(temp);
-                        }
-
-                        for(int i = 0; i < invitePlayersLogins.count(); i++){
-                            temp["login"] = invitePlayersLogins[i];
-                            temp["alias"] = invitePlayersAliases[i];
-                            arrPlayers.append(temp);
-                        }
-
-                        data["players"] = arrPlayers;
-                        data["friends"] = arrFriends;
-                        tx["data"] = data;
-                        tx["type"] = "players_online";
-                        tx["id"] = lobby->getOwner()->getUuid()->toString(QUuid::WithoutBraces);
-                        QJsonDocument txDoc(tx);
-                        lobby->getOwner()->getClientSoc()->sendTextMessage(txDoc.toJson(QJsonDocument::Compact));
-                    }
+        for (ClientNetwork *client : qAsConst(*clients)) {
+            if(client->getFinder()){
+                invitePlayersLogins.append(client->getName());
+                invitePlayersAliases.append(client->getUuid()->toString(QUuid::WithoutBraces));
             }
+        }
+
+        for (Lobby *lobby : qAsConst(lobbies)) {
+            if(lobby->getOwner() != nullptr && !lobby->getGameStarted() && lobby->getPlayerCount() >= 1){
+                // Доделать фичу с списком друзей.
+                QStringList inviteFriendsLogins;
+                QStringList inviteFriendsAliases;
+
+                QJsonObject tx;
+                QJsonObject data;
+                QJsonArray arrPlayers;
+                QJsonArray arrFriends;
+                QJsonObject temp;
+
+                // Заполняем json списком друзей (доделать фичу).
+                for(int i = 0; i < inviteFriendsLogins.count(); i++){
+                    temp["login"] = inviteFriendsLogins[i];
+                    temp["alias"] = inviteFriendsAliases[i];
+                    arrFriends.append(temp);
+                }
+
+                // Заполняем json списком игроков online.
+                for(int i = 0; i < invitePlayersLogins.count(); i++){
+                    temp["login"] = invitePlayersLogins[i];
+                    temp["alias"] = invitePlayersAliases[i];
+                    arrPlayers.append(temp);
+                }
+
+                data["players"] = arrPlayers;
+                data["friends"] = arrFriends;
+                tx["data"] = data;
+                tx["type"] = "players_online";
+                tx["id"] = lobby->getOwner()->getUuid()->toString(QUuid::WithoutBraces);
+
+                txAll(tx, lobby->getOwner());
+            }
+        }
     }
 }
 
@@ -325,23 +318,22 @@ void LobbyManager::onPlayersOnline()
 void LobbyManager::onPlayerCount()
 {
     if(!lobbies.empty()){
-    for (Lobby *lobby : qAsConst(lobbies)) {
-                if(!lobby->getGameStarted() && lobby->getPlayerCount() >= 1){
-                    QJsonObject tx;
-                    QJsonObject data;
-                    data["lobby_id"] = lobby->getUuid().toString(QUuid::WithoutBraces);
-                    data["count"] = lobby->getPlayerCount();
-                    data["error"] = "";
-                    tx["data"] = data;
-                    tx["type"] = "players_count_lobby";
-                    for (ClientNetwork *client : qAsConst(lobby->getPlayers())) {
-                        if(client != nullptr){
-                            tx["id"] = client->getUuid()->toString(QUuid::WithoutBraces);
-                            QJsonDocument txDoc(tx);
-                            client->getClientSoc()->sendTextMessage(txDoc.toJson(QJsonDocument::Compact));
-                        }
+        for (Lobby *lobby : qAsConst(lobbies)) {
+            if(!lobby->getGameStarted() && lobby->getPlayerCount() >= 1){
+                QJsonObject tx;
+                QJsonObject data;
+                data["lobby_id"] = lobby->getUuid().toString(QUuid::WithoutBraces);
+                data["count"] = lobby->getPlayerCount();
+                data["error"] = "";
+                tx["data"] = data;
+                tx["type"] = "players_count_lobby";
+                for (ClientNetwork *client : qAsConst(lobby->getPlayers())) {
+                    if(client != nullptr){
+                        tx["id"] = client->getUuid()->toString(QUuid::WithoutBraces);
+                        txAll(tx, client);
                     }
                 }
+            }
         }
     }
 }
@@ -353,66 +345,84 @@ void LobbyManager::startTimer()
 
 void LobbyManager::clientDisconnected(ClientNetwork* sender)
 {
-    Lobby *tempLobby = findLobby(sender);
-    if(tempLobby != nullptr){
-        tempLobby->setOwner(nullptr);
-        int index = tempLobby->getPlayers().indexOf(sender);
-        tempLobby->getPlayers().replace(index, nullptr);
+    if(sender){
+        Lobby *tempLobby = findLobby(sender);
+        if(tempLobby){
+            // Если во время самой игры админ отключается - лобби не закрывается.
+            // Предполагается, что клиенты могут присоединиться, если утратили соединение.
+            if(tempLobby->getOwner() == sender){
+                if(tempLobby->getGameStarted()){
+                    tempLobby->setOwner(nullptr);
+                }else{
+                    closeLobby(tempLobby->getUuid(), sender);
+                }
+            }else{
+                int index = tempLobby->getPlayers().indexOf(sender);
+
+                //Случай, когда отключается клиент не находящийся в какой-либо лобби.
+                if(index != -1){
+                    tempLobby->getPlayers().replace(index, nullptr);
+                }
+            }
+        }
+        emit disconnectClient(sender);
     }
-    emit disconnectClient(sender);
 }
 
 void LobbyManager::joinLobby(bool join, ClientNetwork *sender)
 {
-    // Обсудить нужен ли ответ на запрос к подключению.
     if(sender != nullptr){
         sender->setFinder(join);
+        QJsonObject tx;
+        QJsonObject data;
+
+        tx["id"] = sender->getUuid()->toString(QUuid::WithoutBraces);
+        tx["type"] = "join";
+        data["successful"] = true;
+        tx["data"] = data;
+
+        txAll(tx, sender);
     }
 }
 
 void LobbyManager::acceptInvitePlayers(QUuid uuidLobby, bool successful, ClientNetwork *sender)
 {
-    // Доделать функцию.
-    Lobby* lobby = findLobby(uuidLobby);
-    if(sender != nullptr && lobby != nullptr){
-        QJsonObject tx;
-        QJsonObject data;
-        if(lobby->getAcceptedPlayerCount() < lobby->getMaxPlayerSize()){
-            if(successful){
-                lobby->setAcceptedPlayerCount(lobby->getAcceptedPlayerCount() + 1);
-                tx["type"] = "accept_invite_players";
-                tx["id"] = sender->getUuid()->toString(QUuid::WithoutBraces);
-                data["lobby_id"] = uuidLobby.toString(QUuid::WithoutBraces);
-                data["successful"] = true;
-                data["error"] = "";
-                tx["data"] = data;
-                txAll(tx, sender);
-                sendSelectTeamClient(uuidLobby, sender);
-            }else{
-                tx["type"] = "accept_invite_players";
-                tx["id"] = sender->getUuid()->toString(QUuid::WithoutBraces);
-                data["lobby_id"] = uuidLobby.toString(QUuid::WithoutBraces);
-                data["successful"] = true;
-                data["error"] = "";
-                tx["data"] = data;
-                txAll(tx, sender);
-            }
-        }else{
+    if(sender){
+        Lobby* lobby = findLobby(uuidLobby);
+        if(lobby){
+            QJsonObject tx;
+            QJsonObject data;
             tx["type"] = "accept_invite_players";
             tx["id"] = sender->getUuid()->toString(QUuid::WithoutBraces);
             data["lobby_id"] = uuidLobby.toString(QUuid::WithoutBraces);
-            data["successful"] = false;
-            data["error"] = "This lobby is no longer available";
-            tx["data"] = data;
-            txAll(tx, sender);
-        }
 
+            if(lobby->getAcceptedPlayerCount() < lobby->getMaxPlayerSize()){
+                if(successful){
+                    lobby->setAcceptedPlayerCount(lobby->getAcceptedPlayerCount() + 1);
+                    data["successful"] = true;
+                    data["error"] = "";
+                    tx["data"] = data;
+                    txAll(tx, sender);
+                    sendSelectTeamClient(uuidLobby, sender);
+                }else{
+                    data["successful"] = true;
+                    data["error"] = "";
+                    tx["data"] = data;
+                    txAll(tx, sender);
+                }
+            }else{
+                data["successful"] = false;
+                data["error"] = "This lobby is no longer available";
+                tx["data"] = data;
+                txAll(tx, sender);
+            }
+        }
     }
 }
 
 void LobbyManager::lobbyClose(Lobby *lobby)
 {
-    qInfo() << "Lobby: " << lobby->getUuid().toString(QUuid::WithBraces) << " is closed.";
+    qInfo() << "Lobby:" << lobby->getUuid().toString() << "is closed.";
     lobbies.removeAll(lobby);
     delete lobby;
 }
@@ -425,9 +435,9 @@ void LobbyManager::txAll(QJsonObject tx, ClientNetwork *sender)
 
 void LobbyManager::sendSelectTeamClient(QUuid uuidLobby, ClientNetwork *client)
 {
-    if(client != nullptr){
+    if(client){
         Lobby* tempLobby = findLobby(uuidLobby);
-        if(tempLobby != nullptr){
+        if(tempLobby){
             QJsonObject tx;
             QJsonObject data;
             tx["id"] = client->getUuid()->toString(QUuid::WithoutBraces);

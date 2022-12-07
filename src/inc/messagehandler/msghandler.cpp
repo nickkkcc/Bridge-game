@@ -45,18 +45,18 @@ bool MsgHandler::tryLogin(QJsonObject &obj){
                                "Length of login must be greater than "
                                    + QString::number(*maxLoginLength)
                                    + " and less than " + QString::number(*minLoginLength));
-                return false;
+               return false;
             }
 
 
             if(!base->readUserFromBase(obj["data"].toObject()["login"].toString())){
                obj = generateAnswer(MsgType::LOGIN, false,
                          "Такого логина нет в базе данных. Choose another login");
-                return false;
+               return false;
             }else{
                 if(obj["data"].toObject()["password"] != base->getuserPassword()){
-                obj = generateAnswer(MsgType::LOGIN, false,
-                         "Password is wrong");
+                    obj = generateAnswer(MsgType::LOGIN, false,
+                            "Password is wrong");
                 return false;
                 }else{
                     int num = 0;
@@ -66,9 +66,9 @@ bool MsgHandler::tryLogin(QJsonObject &obj){
                         }
                     }
                     if(num == 0){
-                    QUuid uid = QUuid::createUuid();
-                    obj = generateAnswer(MsgType::LOGIN, true, "", uid.toString(QUuid::StringFormat::WithoutBraces));
-                    return true;
+                        QUuid uid = QUuid::createUuid();
+                        obj = generateAnswer(MsgType::LOGIN, true, "", uid.toString(QUuid::StringFormat::WithoutBraces));
+                        return true;
                     }else{
                         obj = generateAnswer(MsgType::LOGIN, false,
                                              "Such a client is already online");
@@ -83,40 +83,40 @@ QJsonObject MsgHandler::generateAnswer(const MsgType &type, bool successful, con
     QJsonObject data;
 
     switch (type) {
-    case MsgType::LOGIN:{
-        data["token"] = uid;
-        data["successful"] = successful;
-        data["error"] = error;
+        case MsgType::LOGIN:{
+            data["token"] = uid;
+            data["successful"] = successful;
+            data["error"] = error;
 
-        answer["id"] = "0";
-        answer["type"] = "login";
-        answer["data"] = data;
-        break;
-    }
-    case MsgType::QUESTIONS:{
-        QJsonArray arr;
-        QJsonObject question;
-        for(int i = 0; i < questions.count(); i++){
-            question["question_id"] = i;
-            question["question"] = questions.at(i);
-            arr.push_back(question);
-        };
-        data["questions"] = arr;
+            answer["id"] = "0";
+            answer["type"] = "login";
+            answer["data"] = data;
+            break;
+        }
+        case MsgType::QUESTIONS:{
+            QJsonArray arr;
+            QJsonObject question;
+            for(int i = 0; i < questions.count(); i++){
+                question["question_id"] = i;
+                question["question"] = questions.at(i);
+                arr.push_back(question);
+            };
+            data["questions"] = arr;
 
-        answer["id"] = "0";
-        answer["type"] = "registration_questions";
-        answer["data"] = data;
-        break;
-    }
-    case MsgType::REGISTRATION:{
-        answer["id"] = "0";
-        answer["type"] = "registration";
+            answer["id"] = "0";
+            answer["type"] = "registration_questions";
+            answer["data"] = data;
+            break;
+        }
+        case MsgType::REGISTRATION:{
+            answer["id"] = "0";
+            answer["type"] = "registration";
 
-        data["successful"] = successful;
-        data["error"] = error;
-        answer["data"] = data;
-        break;
-    }
+            data["successful"] = successful;
+            data["error"] = error;
+            answer["data"] = data;
+            break;
+        }
     }
     return answer;
 }

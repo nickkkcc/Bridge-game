@@ -23,11 +23,11 @@ public:
 
 public slots:
     void createLobby(ClientNetwork* client);
-    void closeLobby(QUuid uuidLobby);
+    void closeLobby(QUuid uuidLobby, ClientNetwork *sender);
     void acceptSelectTeam(Team team, QUuid uuidLobby, ClientNetwork* client);
     void selectTeamAdmin(Team team, QUuid uuidLobby, ClientNetwork* client);
     void invitePlayers(QString logins, QUuid uuidLobby, ClientNetwork *sender);
-    void startGame(QUuid uuidLobby);
+    void startGame(QUuid uuidLobby, ClientNetwork *sender);
     void startTimer();
     void clientDisconnected(ClientNetwork* sender);
     void joinLobby(bool join, ClientNetwork* sender);

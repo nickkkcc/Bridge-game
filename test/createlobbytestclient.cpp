@@ -8,15 +8,16 @@
 #include "createlobbytestclient.h"
 QT_USE_NAMESPACE
 
-CreateLobbyTest::CreateLobbyTest(const QUrl &url, bool debug , QObject *parent , QString name):
+CreateLobbyTest::CreateLobbyTest(const QUrl &url, bool debug , QObject *parent , QString name, int number):
     QObject(parent),
     m_url(url),
-    m_debug(debug),
-    name(name)
+    m_debug(debug)
 {
     if (m_debug)
         qDebug() << "WebSocket server:" << url;
     connect(&m_webSocket, &QWebSocket::connected, this, &CreateLobbyTest::onConnected);
+    this->number = number;
+    this->name = name;
     m_webSocket.open(QUrl(url));
     currentType = CreateLobbyTest::LOGIN_TRUE;
 }
@@ -40,7 +41,7 @@ void CreateLobbyTest::sendCreateLobbyTrue(bool trueFalse)
 void CreateLobbyTest::sendSelectTeam(bool trueFalse)
 {
     if(trueFalse){
-        send(CreateLobbyTest::SELECT_TEAM_TRUE);
+        send(CreateLobbyTest::SELECT_TEAM_ADMIN);
     }else{
          send(CreateLobbyTest::SELECT_TEAM_FALSE);
     }
@@ -104,7 +105,7 @@ void CreateLobbyTest::onDo(CreateLobbyTest::Type type)
             sendCreateLobbyTrue(true);
             break;
         }
-        case CreateLobbyTest::SELECT_TEAM_TRUE:{
+        case CreateLobbyTest::SELECT_TEAM_ADMIN:{
             sendSelectTeam(true);
             break;
         }
@@ -135,10 +136,10 @@ void CreateLobbyTest::checkAnswerFromServer(const QJsonObject &rx)
            data["error"] = "";
 
            answer["data"] = data;
-           answer["id"] = uid.toString();
+           answer["id"] = uid.toString(QUuid::WithoutBraces);
            answer["type"] = "create_lobby";
            oldType = currentType;
-           currentType = CreateLobbyTest::Type::SELECT_TEAM_TRUE;
+           currentType = CreateLobbyTest::Type::SELECT_TEAM_ADMIN;
            onDo(currentType);
            break;
        }
@@ -152,14 +153,14 @@ void CreateLobbyTest::checkAnswerFromServer(const QJsonObject &rx)
            answer["type"] = "create_lobby";
            break;
        }
-       case Type::SELECT_TEAM_TRUE:{
-           data["lobby_id"] = lobbyUid.toString();
-           data["team_1"] = 1;
-           data["team_2"] = 2;
+       case Type::SELECT_TEAM_ADMIN:{
+           data["lobby_id"] = lobbyUid.toString(QUuid::WithoutBraces);
+           data["error"] = "";
+           data["successful"] = true;
 
            answer["data"] = data;
-           answer["id"] = uid.toString();
-           answer["type"] = "select_team";
+           answer["id"] = uid.toString(QUuid::WithoutBraces);
+           answer["type"] = "accept_select_team";
            oldType = currentType;
            currentType = CreateLobbyTest::Type::EXIT_LOBBY;
            onDo(currentType);
@@ -176,18 +177,18 @@ void CreateLobbyTest::checkAnswerFromServer(const QJsonObject &rx)
            break;
        }
        case Type::EXIT_LOBBY:{
-           data["lobby_id"] = lobbyUid.toString();
+           data["lobby_id"] = lobbyUid.toString(QUuid::WithoutBraces);
            data["successful"] = true;
            data["error"] = "";
 
            answer["data"] = data;
-           answer["id"] = uid.toString();
+           answer["id"] = uid.toString(QUuid::WithoutBraces);
            answer["type"] = "exit_lobby";
            oldType = currentType;
            break;
        }
     }
-    qWarning() << "Test " << oldType << ": " << (rx == answer);
+       qWarning() << this->name << this->number << ": Test " << oldType << ": " << (rx == answer);
 }
 
 QJsonObject CreateLobbyTest::createJsonD(const CreateLobbyTest::Type& name){
@@ -198,19 +199,19 @@ QJsonObject CreateLobbyTest::createJsonD(const CreateLobbyTest::Type& name){
     switch (name) {
     case CreateLobbyTest::Type::CREATE_LOBBY_TRUE:{
         obj["data"] = data;
-        obj["id"] = uid.toString();
+        obj["id"] = uid.toString(QUuid::WithoutBraces);
         obj["type"] = "create_lobby";
         return obj;
     }
     case CreateLobbyTest::Type::CREATE_LOBBY_FALSE:{
         obj["data"] = data;
-        obj["id"] = uid.toString();
+        obj["id"] = uid.toString(QUuid::WithoutBraces);
         obj["type"] = "create_lobby";
         return obj;
     }
 
     case CreateLobbyTest::Type::LOGIN_TRUE:{
-        data["login"] = "Kolya";
+        data["login"] = this->name;
         data["password"] = "123456";
 
         obj["id"] = "0";
@@ -219,20 +220,20 @@ QJsonObject CreateLobbyTest::createJsonD(const CreateLobbyTest::Type& name){
         return obj;
     }
 
-    case CreateLobbyTest::Type::SELECT_TEAM_TRUE:{
-        data["lobby_id"] = lobbyUid.toString();
+    case CreateLobbyTest::Type::SELECT_TEAM_ADMIN:{
+        data["lobby_id"] = lobbyUid.toString(QUuid::WithoutBraces);
         data["team"] = 0;
 
-        obj["id"] = uid.toString();
-        obj["type"] = "select_team";
+        obj["id"] = uid.toString(QUuid::WithoutBraces);
+        obj["type"] = "select_team_admin";
         obj["data"] = data;
         return obj;
     }
     case CreateLobbyTest::Type::EXIT_LOBBY:{
-        data["lobby_id"] = lobbyUid.toString();
+        data["lobby_id"] = lobbyUid.toString(QUuid::WithoutBraces);
         data["successful"] = true;
 
-        obj["id"] = uid.toString();
+        obj["id"] = uid.toString(QUuid::WithoutBraces);
         obj["type"] = "exit_lobby";
         obj["data"] = data;
         return obj;

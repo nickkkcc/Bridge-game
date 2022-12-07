@@ -37,11 +37,11 @@ signals:
     void clientDisconnected(ClientNetwork* sender);
 
     void rxCreateLobby(ClientNetwork* client);
-    void rxCloseLobby(QUuid uuidLobby);
+    void rxCloseLobby(QUuid uuidLobby, ClientNetwork *sender);
     void rxAcceptSelectTeam(Team team, QUuid uuidLobby, ClientNetwork* client);
     void rxSelectTeamAdmin(Team team, QUuid uuidLobby, ClientNetwork* client);
     void rxInvitePlayers(QString logins, QUuid uuidLobby, ClientNetwork *sender);
-    void rxStartGamePlayers(QUuid uuidLobby);
+    void rxStartGamePlayers(QUuid uuidLobby,  ClientNetwork *sender);
     // New
     void rxJoinLobby(bool join, ClientNetwork* sender);
     void rxAcceptInvitePlayers(QUuid uuidLobby, bool successful, ClientNetwork* sender);

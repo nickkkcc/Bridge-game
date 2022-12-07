@@ -174,6 +174,7 @@ void Lobby::setGameStarted(bool newGameStarted)
     gameStarted = newGameStarted;
 }
 
+// Возвращает количество игроков, котрые уже приняли приглашение.
 int Lobby::getAcceptedPlayerCount() const
 {
     return acceptedPlayerCount;
