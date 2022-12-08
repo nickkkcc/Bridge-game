@@ -1,0 +1,10 @@
+{
+  "id": 0,
+  "type": "registration",
+  "data": {
+    "login": "\"...\"",
+    "password": "\"...\"",
+    "question": 0,
+    "answer": "\"...\""
+  }
+}

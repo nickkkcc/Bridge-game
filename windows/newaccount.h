@@ -15,23 +15,21 @@ public:
     explicit NewAccount(QWidget *parent = nullptr);
     ~NewAccount();
 public slots:
-    void loginStatus(bool loginSuccessful, QString reason);
-    void connectionResult(int status, QString errorMsg);
-    void serverDisconnected();
-    void generalError(QString errorMsg);
+
 private slots:
     void on_comboBox_activated(int index);
     void on_pushButton_clicked();
 signals:
-    void connectToServer(QHostAddress serverIP, quint16 port, QString playerName, QString password);
+
 
 private:
     Ui::NewAccount *ui;
     ClientNetwork *networkConnection = nullptr;
-    quint16 portID = 8888;
+    QString login;
     QString password;
-    QHostAddress *ipAddress = new QHostAddress ("31.134.130.194");
-    QString username;
+    QString answer;
+    qint64 question;
+
 };
 
 #endif // NEWACCOUNT_H

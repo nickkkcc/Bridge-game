@@ -1,0 +1,8 @@
+{
+  "id": 1234,
+  "type": "accept_invite_players",
+  "data": {
+    "lobby_id": 389458937,
+    "successful": true
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "id": 1234,
+  "type": "invite_players",
+  "data": {
+    "login": "\"...\""
+  }
+}

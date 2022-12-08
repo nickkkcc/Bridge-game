@@ -1,0 +1,9 @@
+{
+  "id": 1234,
+  "type": "select_team",
+  "data": {
+    "lobby_id": 12313768917,
+    "team_1": 1,
+    "team_2": 2
+  }
+}

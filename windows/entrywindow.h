@@ -22,18 +22,12 @@ public:
     void setupWindow();
     quint16 portID = 8888;
     QString password;
-    QHostAddress *ipAddress = new QHostAddress ("127.0.0.1"); //"31.134.130.194"
-    QString username;
-    int pageID = 3;
-    bool loginSuccessful = false;
+    QString login;
     ClientNetwork *networkConnection = nullptr;
     NewAccount *newaccount = nullptr;
 
 public slots:
-    void loginStatus(bool loginSuccessful, QString reason);
-    void connectionResult(int status, QString errorMsg);
-    void serverDisconnected();
-    void generalError(QString errorMsg);
+
 
 private slots:
     void on_enter_button_clicked();
@@ -44,7 +38,6 @@ private:
 
 
 signals:
-    void connectToServer(QHostAddress serverIP, quint16 port, QString playerName, QString password);
 
 
 

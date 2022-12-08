@@ -1,0 +1,9 @@
+{
+  "id": 1234,
+  "type": "create_lobby",
+  "data": {
+    "lobby_id" : 123456,
+    "successful": "\"...\"",
+    "error": "\"...\""
+  }
+}

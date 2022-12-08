@@ -1,0 +1,8 @@
+{
+  "id": 1234,
+  "type": "invite_players",
+  "data": {
+    "lobby_id": 12313768917,
+    "alias": "\"...\""
+  }
+}

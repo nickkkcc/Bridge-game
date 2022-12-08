@@ -1,0 +1,9 @@
+{
+  "id": 1234,
+  "type": "players_count_lobby",
+  "data": {
+    "lobby_id": 12313768917,
+    "count": 1,
+    "error": "\"...\""
+  }
+}

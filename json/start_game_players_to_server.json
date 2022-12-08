@@ -1,0 +1,8 @@
+{
+  "id": 1234,
+  "type": "start_game_players",
+  "data": {
+    "lobby_id": 12313768917,
+    "successful": true
+  }
+}

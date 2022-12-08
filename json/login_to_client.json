@@ -1,0 +1,9 @@
+{
+  "id": 0,
+  "type": "login",
+  "data": {
+    "token": 0,
+    "successful": "\"\"",
+    "error": "\"\""
+  }
+}

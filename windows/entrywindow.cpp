@@ -6,12 +6,8 @@ EntryWindow::EntryWindow(QWidget *parent)
 {
     ui->setupUi(this);
     setupWindow();
-    networkConnection = new ClientNetwork();
-    connect(networkConnection,&ClientNetwork::connectionResult, this,&EntryWindow::connectionResult);
-    connect(networkConnection,&ClientNetwork::loginResult, this,&EntryWindow::loginStatus);
-    connect(networkConnection,&ClientNetwork::serverDisconnected, this,&EntryWindow::serverDisconnected);
-    connect(networkConnection,&ClientNetwork::generalError, this,&EntryWindow::generalError);
-    connect(this,&EntryWindow::connectToServer, networkConnection,&ClientNetwork::txRequestLogin);
+
+
 
 }
 
@@ -34,10 +30,9 @@ void EntryWindow::setupWindow()
 
 }
 
-void EntryWindow::on_enter_button_clicked()
+void EntryWindow::on_enter_button_clicked() //кнопка входа
 {
-    //тут такая конструкция для проверки на пустой логин
-    //из-за того, что length работает с char и не дает прямо проверить qstring,приходиться делать костыль, может позже изменю
+
     int countL = ui->edit_LOGIN->text().length();
     int countS = 0;
     for(int i = 0; i < ui->edit_LOGIN->text().length();i++)
@@ -47,88 +42,22 @@ void EntryWindow::on_enter_button_clicked()
             countS++;
         }
     }
-    username = ui->edit_LOGIN->text();
-    if (username == "" || countS == countL)
-    {
-        QMessageBox::warning(this,"Проблема","Ваше имя пользователя не может быть пустым!");
-    }
+    login = ui->edit_LOGIN->text();
     password = ui->passworld_edit->text();
-    emit connectToServer(*ipAddress,portID,username,password);
-    lobby *l = new lobby();
-    l->show();
+    if (login == "" || countS == countL || password == "")
+    {
+        QMessageBox::warning(this,"Проблема","Поля пустые!");
+    }
+    networkConnection = new ClientNetwork();
+
 
 }
 
 
-void EntryWindow::loginStatus(bool loginSuccessful, QString reason)
-{
-    if(loginSuccessful == false)
-    {
-        QMessageBox::warning(this,"Login status",reason);
-    }
-}
 
-void EntryWindow::connectionResult(int status, QString errorMsg)
-{
-    QString msg;
-    switch(status)
-    {
-    case 0:
-    {
-        break;
-    }
-    case 1:
-    {
-        QMessageBox::warning(this,"Login failure",errorMsg);
-        break;
-    }
-    case 3:
-    {
-//        msg = "Already logged in. Nothing was changed.";
-//        QMessageBox::warning(this,"Login failure",msg);
-//        break;
-    }
-    default:
-    {
-        break;
-    }
-    }
-}
-
-void EntryWindow::serverDisconnected()
-{
-//    QMessageBox::warning(this,"Game started","You have not been picked and the game has started without you.");
-//    this->close();
-}
-
-void EntryWindow::generalError(QString errorMsg)
-{
-    QMessageBox::warning(this,"Error message",errorMsg);
-}
 void EntryWindow::on_newAccount_clicked()
 {
     NewAccount *newaccount = new NewAccount();
     newaccount->show();
 }
-
-//void EntryWindow::updateGameState(PlayerGameState player)
-//{
-//    if(player.getEvent() == INITIALIZE)
-//    {
-//        playerWindow = new GameWindow(networkConnection);
-//        playerWindow->setName(username);
-//        playerWindow->setGameState(player);
-//        connect(networkConnection,&ClientNetwork::notifyBidTurn, playerWindow,&GameWindow::playerTurnBid);
-//        disconnect(networkConnection,&ClientNetwork::connectionResult, this,&entrywindow::connectionResult);
-//        disconnect(networkConnection,&ClientNetwork::loginResult, this,&entrywindow::loginStatus);
-//        disconnect(networkConnection,&ClientNetwork::serverDisconnected, this,&entrywindow::serverDisconnected);
-//        disconnect(networkConnection,&ClientNetwork::generalError, this,&entrywindow::generalError);
-//        disconnect(networkConnection,&ClientNetwork::updateGameState, this,&entrywindow::updateGameState);
-//        disconnect(this,&entrywindow::connectToServer, networkConnection,&ClientNetwork::txRequestLogin);
-//        this->close();
-
-//    }
-//}
-
-
 

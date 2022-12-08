@@ -7,11 +7,7 @@ NewAccount::NewAccount(QWidget *parent) :
 {
     ui->setupUi(this);
     networkConnection = new ClientNetwork();
-    connect(networkConnection,&ClientNetwork::connectionResult, this,&NewAccount::connectionResult);
-    connect(networkConnection,&ClientNetwork::loginResult, this,&NewAccount::loginStatus);
-    connect(networkConnection,&ClientNetwork::serverDisconnected, this,&NewAccount::serverDisconnected);
-    connect(networkConnection,&ClientNetwork::generalError, this,&NewAccount::generalError);
-    connect(this,&NewAccount::connectToServer, networkConnection,&ClientNetwork::txRequestLogin);
+    ui->comboBox->addItems(networkConnection->listq);
 }
 
 NewAccount::~NewAccount()
@@ -24,6 +20,7 @@ void NewAccount::on_comboBox_activated(int index)
     if(index > 0){
         ui->secretQues_line->setEnabled(true);
     }
+
 }
 
 
@@ -38,60 +35,20 @@ void NewAccount::on_pushButton_clicked()
             countS++;
         }
     }
-    username = ui->new_login->text();
-    if (username == "" || countS == countL)
-    {
-        QMessageBox::warning(this,"Проблема","Ваше имя пользователя не может быть пустым!");
-    }
+    question = ui->comboBox->currentIndex();
+    login = ui->new_login->text();
     password = ui->new_password->text();
-    emit connectToServer(*ipAddress,portID,username,password);
-}
+    answer = ui->comboBox->itemText(question);
+    if (login == "" || countS == countL || password == "" || answer== "")
+    {
+        QMessageBox::warning(this,"Проблема","Поля пустые!");
+    }
+    else{
+        networkConnection->sendRegistr(login,password,question,answer);
+        NewAccount::close();
+        qInfo("Данные переданы сети");
+    }
 
-
-void NewAccount::loginStatus(bool loginSuccessful, QString reason)
-{
-    if(loginSuccessful == false)
-    {
-        QMessageBox::warning(this,"Login status",reason);
-    }
-}
-
-void NewAccount::connectionResult(int status, QString errorMsg)
-{
-    QString msg;
-    switch(status)
-    {
-    case 0:
-    {
-        break;
-    }
-    case 1:
-    {
-        QMessageBox::warning(this,"Login failure",errorMsg);
-        break;
-    }
-    case 3:
-    {
-        msg = "Already logged in. Nothing was changed.";
-        QMessageBox::warning(this,"Login failure",msg);
-        break;
-    }
-    default:
-    {
-        break;
-    }
-    }
-}
-
-void NewAccount::serverDisconnected()
-{
-    QMessageBox::warning(this,"Game started","You have not been picked and the game has started without you.");
-    this->close();
-}
-
-void NewAccount::generalError(QString errorMsg)
-{
-    QMessageBox::warning(this,"Error message",errorMsg);
 }
 
 
