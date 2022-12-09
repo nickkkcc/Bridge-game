@@ -5,29 +5,67 @@
     <string name="nav_open">Open</string>
     <string name="nav_close">Close</string>
 
-    <string name="title_activity_login">LoginActivity</string>
-    <string name="title_activity_menu">MenuActivity</string>
-    <string name="title_activity_create_game">CreateGameActivity</string>
-    <string name="title_activity_join_game">JoinGameActivity</string>
-    <string name="title_activity_choose_place">ChoosePlaceActivity</string>
 
-    <string name="prompt_email">Email</string>
-    <string name="prompt_password">Password</string>
-    <string name="action_sign_in">Sign in or register</string>
-    <string name="action_sign_in_short">Sign in</string>
     <string name="welcome">"Welcome !"</string>
-    <string name="invalid_username">Not a valid username</string>
-    <string name="invalid_password">Password must be >5 characters</string>
-    <string name="login_failed">"Login failed"</string>
     <string name="contra">Contra</string>
     <string name="recontra">Recontra</string>
     <string name="pass">Pass</string>
     <string name="chat">Чат</string>
+
+    <!--Login Activity-->
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="login_title">Вход в аккаунт</string>
     <string name="login_login">Логин</string>
     <string name="login_password">Пароль</string>
-    <string name="registration_answer">Ответ на вопрос</string>
-    <string name="login_sign_in">Войти</string>
     <string name="registration">Регистрация</string>
+    <string name="login_sign_in">Войти</string>
+    <string name="registration_answer">Ответ на вопрос</string>
+    <string name="invalid_password">Password must be >5 characters</string>
+    <string name="invalid_username">Not a valid username</string>
+    <string name="login_failed">"Login failed"</string>
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+
+    <!--Main Menu Activity-->
+    <string name="title_activity_menu">MenuActivity</string>
+
+    <string name="game_title">Робберный бридж</string>
+    <string name="create_team">Создать команду</string>
+    <string name="join_team">Присоединиться</string>
+    <string name="log_out">Выйти из аккаунта</string>
+
+    <string name="game_title_en">Rubber Bridge</string>
+    <string name="create_team_en">Create new team</string>
+    <string name="join_team_en">Join existing team</string>
+    <string name="log_out_en">Log out</string>
+
+    <!--Choose Place Activity -->
+    <string name="title_activity_choose_place">ChoosePlaceActivity</string>
+
+    <string name="choose_place_title">Выберите команду</string>
+    <string name="NS_team">Север-Юг</string>
+    <string name="EW_team">Запад-Восток</string>
+
+    <string name="choose_place_title_en">Choose your team</string>
+    <string name="NS_team_en">North-South</string>
+    <string name="EW_team_en">East-West</string>
+
+    <!--Create Game Activity -->
+    <string name="title_activity_create_game">CreateGameActivity</string>
+
+    <string name="create_game_title">Выбор игроков</string>
+    <string name="start_game">Начать игру</string>
+
+    <string name="create_game_title_en">Pick players to invite</string>
+    <string name="start_game_en">Start Game</string>
+
+
+    <!--Wait Game Activity -->
+    <string name="title_wait_game">WaitGameActivity</string>
+
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

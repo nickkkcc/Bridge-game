@@ -1,28 +1,34 @@
 <resources xmlns:tools="http://schemas.android.com/tools" xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- Base application theme. -->
+
+    <style name="Theme.BridgeAndroid.FullscreenGameNoActionBar"
+        parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="android:navigationBarColor">@color/black_navigation_bar</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">false</item>
+    </style>
+
     <style name="Theme.BridgeAndroid" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/bridge_grey</item>
-        <item name="colorPrimaryVariant">@color/bridge_red</item>
+        <item name="colorPrimary">@color/white</item>
+        <item name="colorPrimaryVariant">@color/white</item>
         <item name="colorOnPrimary">@color/black</item>
         <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/teal_200</item>
-        <item name="colorSecondaryVariant">@color/bridge_red</item>
+        <item name="colorSecondary">@color/yellow</item>
+        <item name="colorSecondaryVariant">@color/black</item>
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">@color/black</item>
         <!-- Customize your theme here. -->
         <item name="android:actionBarItemBackground">@color/black</item>
-        <item name="android:windowActionBarOverlay">false</item>
-        <item name="android:windowBackground">@color/black</item>
-        <item name="fullscreenBackgroundColor">@color/black</item>
+        <item name="android:windowActionBarOverlay">true</item>
     </style>
 
     <style name="Theme.BridgeAndroid.Fullscreen" parent="Theme.BridgeAndroid">
         <item name="android:actionBarStyle">@style/Widget.Theme.BridgeAndroid.ActionBar.Fullscreen
         </item>
-        <item name="android:windowActionBarOverlay">false</item>
-        <item name="android:windowBackground">@color/white</item>
+        <item name="android:windowActionBarOverlay">true</item>
+        <item name="android:windowBackground">@color/black</item>
     </style>
 
     <style name="Theme.BridgeAndroid.FullscreenGame" parent="Theme.BridgeAndroid">
@@ -32,16 +38,8 @@
         <item name="android:windowContentOverlay">@null</item>
     </style>
 
-    <style name="Theme.BridgeAndroid.FullscreenGameNoActionBar"
-        parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:windowActionBar">false</item>
-        <item name="android:windowFullscreen">false</item>
-        <item name="android:windowContentOverlay">@null</item>
-    </style>
-
     <style name="ThemeOverlay.BridgeAndroid.FullscreenContainer" parent="">
-        <item name="fullscreenBackgroundColor">@color/light_blue_600</item>
-        <item name="fullscreenTextColor">@color/light_blue_A200</item>
+        <item name="fullscreenBackgroundColor">@color/black</item>
+        <item name="fullscreenTextColor">@color/black</item>
     </style>
 </resources>

@@ -33,15 +33,6 @@
         </activity>
 
         <activity
-            android:name=".JoinGameActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"
-            android:exported="true"
-            android:screenOrientation="portrait"
-            android:label="@string/title_activity_join_game"
-            android:theme="@style/Theme.BridgeAndroid.FullscreenGameNoActionBar">
-        </activity>
-
-        <activity
             android:name=".ui.login.LoginActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:exported="true"

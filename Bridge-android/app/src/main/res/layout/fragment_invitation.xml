@@ -7,7 +7,7 @@
         android:layout_width="match_parent"
         android:layout_height="64dp"
         android:scaleType="center"
-        android:background="@color/bridge_red"
+        android:background="@color/dark_red"
         android:contentDescription="@string/app_name" />
 
 </LinearLayout>

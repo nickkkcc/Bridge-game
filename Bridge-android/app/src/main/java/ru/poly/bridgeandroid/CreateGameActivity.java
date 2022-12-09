@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import ru.poly.bridgeandroid.model.ExitLobbyToClient;
 import ru.poly.bridgeandroid.model.ExitLobbyToServer;
 import ru.poly.bridgeandroid.model.InvitePlayersToServer;
 import ru.poly.bridgeandroid.model.Message;
@@ -42,7 +41,7 @@ public class CreateGameActivity extends AppCompatActivity {
     private static final String LOBBY = "lobby";
     private static final String PREFERENCE = "preference";
     private Gson gson;
-    private ArrayList<Player> friends;
+    private List<Player> friends;
     private List<Player> players;
     private ListView listView;
     private TextView playersCountTextView;
@@ -62,7 +61,6 @@ public class CreateGameActivity extends AppCompatActivity {
         Intent myIntent = getIntent();
         friends = myIntent.getParcelableArrayListExtra("friends");
         players = myIntent.getParcelableArrayListExtra("players");
-        playersCount = myIntent.getIntExtra("playersCount", 0);
 //        players = Arrays.asList(new Player("login1","player1"), new Player("login1","player2"),
 //                new Player("login3","player3"), new Player("login4","player4"),
 //                new Player("login5","player5"), new Player("login6","player6"),
@@ -80,9 +78,7 @@ public class CreateGameActivity extends AppCompatActivity {
         final Button startGameButton = findViewById(R.id.start_game);
         final Button exitGameButton = findViewById(R.id.exit_lobby);
         final LabeledSwitch labeledSwitch = findViewById(R.id.switch_list);
-        playersCountTextView = findViewById(R.id.create_game_players_count);
-
-        updatePlayersCountTextView();
+        playersCountTextView = findViewById(R.id.textView_players_count);
 
         isFriends = false;
         updateListViewAdapter(false);
@@ -104,6 +100,14 @@ public class CreateGameActivity extends AppCompatActivity {
                 JsonObject jsonObject = (JsonObject) gson.toJsonTree(exitGame);
                 Message message = new Message(token, "exit_lobby", jsonObject);
                 EventBus.getDefault().post(gson.toJson(message));
+
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.remove(LOBBY);
+                editor.apply();
+
+                Intent intent = new Intent(CreateGameActivity.this, MenuActivity.class);
+                startActivity(intent);
+                finish();
             }
         });
 
@@ -111,7 +115,7 @@ public class CreateGameActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String login = isFriends ? friends.get(position).getLogin() :
                         players.get(position).getLogin();
-                InvitePlayersToServer invitePlayers = new InvitePlayersToServer(lobbyId, login);
+                InvitePlayersToServer invitePlayers = new InvitePlayersToServer(lobbyId,login);
                 JsonObject jsonObject = (JsonObject) gson.toJsonTree(invitePlayers);
                 Message message = new Message(token, "invite_players", jsonObject);
                 EventBus.getDefault().post(gson.toJson(message));
@@ -178,24 +182,6 @@ public class CreateGameActivity extends AppCompatActivity {
                 friends = playersOnline.getFriends();
                 players = playersOnline.getPlayers();
                 updateListViewAdapter(isFriends);
-                break;
-            case "exit_lobby":
-                ExitLobbyToClient exitLobby = message.getData(ExitLobbyToClient.class);
-                if (exitLobby.isSuccessful()) {
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.remove(LOBBY);
-                    editor.apply();
-
-                    Intent intent = new Intent(CreateGameActivity.this, MenuActivity.class);
-                    startActivity(intent);
-                    finish();
-                } else {
-                    runOnUiThread(() -> {
-                        Toast toast = Toast.makeText(getBaseContext(), exitLobby.getError(), Toast.LENGTH_SHORT);
-                        toast.show();
-                    });
-                }
-                break;
             default:
                 throw new RuntimeException();
         }

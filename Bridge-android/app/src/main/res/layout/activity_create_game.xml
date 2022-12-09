@@ -1,77 +1,85 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/registration_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:paddingLeft="0dp"
-    android:paddingRight="0dp"
     android:background="@drawable/gradient_background"
-    android:orientation="vertical">
+    tools:context=".ui.login.LoginActivity">
 
     <TextView
-        android:layout_width="320dp"
+        android:id="@+id/textView3"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="50dp"
-        android:layout_marginTop="40dp"
-        android:text="Выбор игроков"
-        android:textSize="30dp"
-        android:gravity="left"
-        android:textColor="#aaaaaa"
-        android:paddingLeft="16dp"
-        android:paddingBottom="20dp"
-        android:paddingTop="16dp"
         android:background="@drawable/text_background"
-        />
-
-    <Button
-        android:id="@+id/start_game"
-        android:layout_gravity="right"
-        android:text="НАЧАТЬ ИГРУ"
-        android:textColor="#BDBDBD"
-        android:textSize="12sp"
-        android:layout_width="200dp"
-        android:layout_height="55dp"
-        android:background="@drawable/button_style"
-        android:shadowColor="#A8A8A8"
-        android:shadowDx="0"
-        android:shadowDy="0"
-        android:shadowRadius="5"
-        android:layout_marginBottom="20dp"
-        />
-    <Button
-        android:id="@+id/exit_lobby"
-        android:layout_gravity="right"
-        android:text="ВЫЙТИ"
-        android:textColor="#BDBDBD"
-        android:textSize="12sp"
-        android:layout_width="200dp"
-        android:layout_height="55dp"
-        android:background="@drawable/button_style"
-        android:shadowColor="#A8A8A8"
-        android:shadowDx="0"
-        android:shadowDy="0"
-        android:shadowRadius="5"
-        />
+        android:gravity="center"
+        android:paddingTop="16dp"
+        android:paddingBottom="20dp"
+        android:text="Выбор игроков"
+        android:textColor="#aaaaaa"
+        android:textSize="30dp"
+        app:layout_constraintBottom_toTopOf="@+id/listView" />
 
     <com.github.angads25.toggle.widget.LabeledSwitch
         android:id="@+id/switch_list"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:textOn="Друзья"
-        app:textOff="Игроки" />
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/listView"
+        app:textOff="Игроки"
+        app:textOn="Друзья" />
 
     <ListView
         android:id="@+id/listView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
-    </ListView>
+        android:layout_height="340dp"
+        android:background="@color/black_transparent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.36" />
+
+    <Button
+        android:id="@+id/start_game"
+        android:layout_width="@dimen/button_width"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right"
+        android:background="@drawable/button_enabled"
+        android:text="НАЧАТЬ ИГРУ"
+        android:textColor="@color/white"
+        android:textSize="@dimen/text_size"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/switch_list"
+        app:layout_constraintVertical_bias="0.3" />
+
+    <Button
+        android:id="@+id/exit_lobby"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/button_enabled"
+        android:text="ВЫЙТИ"
+        android:textColor="@color/white"
+        android:textSize="@dimen/text_size"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/start_game" />
 
     <TextView
-        android:id="@+id/create_game_players_count"
+        android:id="@+id/textView_players_count"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
         android:text="Игроков в лобби: 2"
+        android:textColor="@color/white"
         android:textSize="12sp"
-        android:textColor="@color/white"/>
+        app:layout_constraintBottom_toTopOf="@+id/start_game"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/switch_list" />
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
 

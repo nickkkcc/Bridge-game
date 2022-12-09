@@ -24,7 +24,6 @@ import ru.poly.bridgeandroid.model.AcceptInvitePlayersToServer;
 import ru.poly.bridgeandroid.model.CreateLobbyToClient;
 import ru.poly.bridgeandroid.model.ExitLobbyToServer;
 import ru.poly.bridgeandroid.model.InvitePlayersToClient;
-import ru.poly.bridgeandroid.model.JoinToClient;
 import ru.poly.bridgeandroid.model.JoinToServer;
 import ru.poly.bridgeandroid.model.LoginToClient;
 import ru.poly.bridgeandroid.model.Message;
@@ -40,8 +39,6 @@ public class MenuActivity extends AppCompatActivity {
     private static final String LOBBY = "lobby";
     private static final String PREFERENCE = "preference";
     private String token;
-    private boolean isAccepted;
-    private boolean readyToJoin;
     private Gson gson;
     private TextView loadingTextView;
     private ProgressBar loadingProgressBar;
@@ -74,12 +71,19 @@ public class MenuActivity extends AppCompatActivity {
         joinButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (readyToJoin) {
+                boolean readyToJoin;
+                if (loadingTextView.getVisibility() == View.VISIBLE) {
+                    //loadingTextView.setVisibility(View.INVISIBLE);
+                    loadingProgressBar.setVisibility(View.INVISIBLE);
                     joinButton.setText("Присоединиться");
                     readyToJoin = false;
                 } else {
+                    //loadingTextView.setVisibility(View.VISIBLE);
+                    loadingProgressBar.setVisibility(View.VISIBLE);
                     joinButton.setText("Отменить поиск");
                     readyToJoin = true;
+                    Toast.makeText(getBaseContext(), "Ожидание приглашения", Toast.LENGTH_LONG)
+                            .show();
                 }
 
                 JoinToServer join = new JoinToServer(readyToJoin);
@@ -145,9 +149,8 @@ public class MenuActivity extends AppCompatActivity {
                     builder.setMessage("Присоединиться в лобби?");
                     builder.setNegativeButton("Нет", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
-                            isAccepted = false;
                             AcceptInvitePlayersToServer acceptInvite =
-                                    new AcceptInvitePlayersToServer(invitePlayers.getLobbyId(), isAccepted);
+                                    new AcceptInvitePlayersToServer(invitePlayers.getLobbyId(), false);
                             JsonObject jsonObject = (JsonObject) gson.toJsonTree(acceptInvite);
                             Message message = new Message(token, "accept_invite_players", jsonObject);
                             EventBus.getDefault().post(gson.toJson(message));
@@ -155,9 +158,8 @@ public class MenuActivity extends AppCompatActivity {
                     });
                     builder.setPositiveButton("Да", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
-                            isAccepted = true;
                             AcceptInvitePlayersToServer acceptInvite =
-                                    new AcceptInvitePlayersToServer(invitePlayers.getLobbyId(), isAccepted);
+                                    new AcceptInvitePlayersToServer(invitePlayers.getLobbyId(), true);
                             JsonObject jsonObject = (JsonObject) gson.toJsonTree(acceptInvite);
                             Message message = new Message(token, "accept_invite_players", jsonObject);
                             EventBus.getDefault().post(gson.toJson(message));
@@ -169,7 +171,7 @@ public class MenuActivity extends AppCompatActivity {
                 break;
             case "accept_invite_players":
                 AcceptInvitePlayersToClient acceptInvite = message.getData(AcceptInvitePlayersToClient.class);
-                if (acceptInvite.isSuccessful() && isAccepted) {
+                if (acceptInvite.isSuccessful()) {
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putString(LOBBY, acceptInvite.getLobbyId());
                     editor.apply();
@@ -198,39 +200,8 @@ public class MenuActivity extends AppCompatActivity {
                 startActivity(intent);
                 finish();
                 break;
-            case "join":
-                JoinToClient join = message.getData(JoinToClient.class);
-                if (!join.isSuccessful()) {
-                    readyToJoin = !readyToJoin;
-                    runOnUiThread(() -> {
-                        String error;
-                        if (readyToJoin) {
-                            error = "Не удалось отменить поиск, попробуйте ещё раз.";
-                        } else {
-                            error = "Не удалось начать поиск, попробуйте ещё раз.";
-                        }
-                        Toast toast = Toast.makeText(getBaseContext(), error, Toast.LENGTH_SHORT);
-                        toast.show();
-                    });
-                }
-                switchLoadingVisibility();
-                break;
             default:
                 throw new RuntimeException();
-        }
-    }
-
-    private void switchLoadingVisibility() {
-        if (readyToJoin) {
-            runOnUiThread(() -> {
-                loadingTextView.setVisibility(View.VISIBLE);
-                loadingProgressBar.setVisibility(View.VISIBLE);
-            });
-        } else {
-            runOnUiThread(() -> {
-                loadingTextView.setVisibility(View.INVISIBLE);
-                loadingProgressBar.setVisibility(View.INVISIBLE);
-            });
         }
     }
 }
