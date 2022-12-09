@@ -16,167 +16,310 @@
         <TableLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:padding="2.5dp"
             android:background="@drawable/table_background"
             android:stretchColumns="*">
-            <TableRow>
-                <TextView
-                    android:padding="20dp"
-                    android:layout_margin="5dp"
-                    android:background="@drawable/table_background"/>
-                <TextView
-                    android:padding="20dp"
-                    android:layout_margin="5dp"
-                    android:background="@drawable/table_background" />
-                <TextView
-                    android:padding="20dp"
-                    android:layout_margin="5dp"
-                    android:background="@drawable/table_background" />
-                <TextView
-                    android:layout_margin="5dp"
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <ImageView
+                    android:id="@+id/bargaining_c_1"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_margin="2.5dp"
                     android:background="@drawable/table_background"
-                    android:padding="20dp"/>
-                <TextView
-                    android:padding="20dp"
-                    android:layout_margin="5dp"
-                    android:background="@drawable/table_background" />
+                    app:srcCompat="@drawable/bargaining_c_1"/>
+                <ImageView
+                    android:id="@+id/bargaining_d_1"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_margin="2.5dp"
+                    android:background="@drawable/table_background"
+                    app:srcCompat="@drawable/bargaining_d_1"/>
+                <ImageView
+                    android:id="@+id/bargaining_h_1"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_margin="2.5dp"
+                    android:background="@drawable/table_background"
+                    app:srcCompat="@drawable/bargaining_h_1"/>
+                <ImageView
+                    android:id="@+id/bargaining_s_1"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_margin="2.5dp"
+                    android:background="@drawable/table_background"
+                    app:srcCompat="@drawable/bargaining_s_1"/>
+                <ImageView
+                    android:id="@+id/bargaining_nt_1"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_margin="2.5dp"
+                    android:background="@drawable/table_background"
+                    app:srcCompat="@drawable/bargaining_nt_1"/>
             </TableRow>
 
             <TableRow>
-                <TextView
-                    android:padding="20dp"
-                    android:layout_margin="5dp"
-                    android:background="@drawable/table_background"/>
-                <TextView
-                    android:padding="20dp"
-                    android:layout_margin="5dp"
-                    android:background="@drawable/table_background" />
-                <TextView
-                    android:padding="20dp"
-                    android:layout_margin="5dp"
-                    android:background="@drawable/table_background" />
-                <TextView
-                    android:padding="20dp"
-                    android:layout_margin="5dp"
-                    android:background="@drawable/table_background" />
-                <TextView
-                    android:padding="20dp"
-                    android:layout_margin="5dp"
-                    android:background="@drawable/table_background" />
+                <ImageView
+                    android:id="@+id/bargaining_c_2"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_margin="2.5dp"
+                    android:background="@drawable/table_background"
+                    app:srcCompat="@drawable/bargaining_c_2"/>
+                <ImageView
+                    android:id="@+id/bargaining_d_2"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_margin="2.5dp"
+                    android:background="@drawable/table_background"
+                    app:srcCompat="@drawable/bargaining_d_2"/>
+                <ImageView
+                    android:id="@+id/bargaining_h_2"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_margin="2.5dp"
+                    android:background="@drawable/table_background"
+                    app:srcCompat="@drawable/bargaining_h_2"/>
+                <ImageView
+                    android:id="@+id/bargaining_s_2"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_margin="2.5dp"
+                    android:background="@drawable/table_background"
+                    app:srcCompat="@drawable/bargaining_s_2"/>
+                <ImageView
+                    android:id="@+id/bargaining_nt_2"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_margin="2.5dp"
+                    android:background="@drawable/table_background"
+                    app:srcCompat="@drawable/bargaining_nt_2"/>
             </TableRow>
 
             <TableRow>
-                <TextView
-                    android:padding="20dp"
-                    android:layout_margin="5dp"
-                    android:background="@drawable/table_background"/>
-                <TextView
-                    android:padding="20dp"
-                    android:layout_margin="5dp"
-                    android:background="@drawable/table_background" />
-                <TextView
-                    android:padding="20dp"
-                    android:layout_margin="5dp"
-                    android:background="@drawable/table_background" />
-                <TextView
-                    android:padding="20dp"
-                    android:layout_margin="5dp"
-                    android:background="@drawable/table_background" />
-                <TextView
-                    android:padding="20dp"
-                    android:layout_margin="5dp"
-                    android:background="@drawable/table_background" />
+                <ImageView
+                    android:id="@+id/bargaining_c_3"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_margin="2.5dp"
+                    android:background="@drawable/table_background"
+                    app:srcCompat="@drawable/bargaining_c_3"/>
+                <ImageView
+                    android:id="@+id/bargaining_d_3"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_margin="2.5dp"
+                    android:background="@drawable/table_background"
+                    app:srcCompat="@drawable/bargaining_d_3"/>
+                <ImageView
+                    android:id="@+id/bargaining_h_3"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_margin="2.5dp"
+                    android:background="@drawable/table_background"
+                    app:srcCompat="@drawable/bargaining_h_3"/>
+                <ImageView
+                    android:id="@+id/bargaining_s_3"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_margin="2.5dp"
+                    android:background="@drawable/table_background"
+                    app:srcCompat="@drawable/bargaining_s_3"/>
+                <ImageView
+                    android:id="@+id/bargaining_nt_3"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_margin="2.5dp"
+                    android:background="@drawable/table_background"
+                    app:srcCompat="@drawable/bargaining_nt_3"/>
             </TableRow>
 
             <TableRow>
-                <TextView
-                    android:padding="20dp"
-                    android:layout_margin="5dp"
-                    android:background="@drawable/table_background"/>
-                <TextView
-                    android:padding="20dp"
-                    android:layout_margin="5dp"
-                    android:background="@drawable/table_background" />
-                <TextView
-                    android:padding="20dp"
-                    android:layout_margin="5dp"
-                    android:background="@drawable/table_background" />
-                <TextView
-                    android:padding="20dp"
-                    android:layout_margin="5dp"
-                    android:background="@drawable/table_background" />
-                <TextView
-                    android:padding="20dp"
-                    android:layout_margin="5dp"
-                    android:background="@drawable/table_background" />
+                <ImageView
+                    android:id="@+id/bargaining_c_4"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_margin="2.5dp"
+                    android:background="@drawable/table_background"
+                    app:srcCompat="@drawable/bargaining_c_4"/>
+                <ImageView
+                    android:id="@+id/bargaining_d_4"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_margin="2.5dp"
+                    android:background="@drawable/table_background"
+                    app:srcCompat="@drawable/bargaining_d_4"/>
+                <ImageView
+                    android:id="@+id/bargaining_h_4"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_margin="2.5dp"
+                    android:background="@drawable/table_background"
+                    app:srcCompat="@drawable/bargaining_h_4"/>
+                <ImageView
+                    android:id="@+id/bargaining_s_4"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_margin="2.5dp"
+                    android:background="@drawable/table_background"
+                    app:srcCompat="@drawable/bargaining_s_4"/>
+                <ImageView
+                    android:id="@+id/bargaining_nt_4"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_margin="2.5dp"
+                    android:background="@drawable/table_background"
+                    app:srcCompat="@drawable/bargaining_nt_4"/>
             </TableRow>
 
             <TableRow>
-                <TextView
-                    android:padding="20dp"
-                    android:layout_margin="5dp"
-                    android:background="@drawable/table_background"/>
-                <TextView
-                    android:padding="20dp"
-                    android:layout_margin="5dp"
-                    android:background="@drawable/table_background" />
-                <TextView
-                    android:padding="20dp"
-                    android:layout_margin="5dp"
-                    android:background="@drawable/table_background" />
-                <TextView
-                    android:padding="20dp"
-                    android:layout_margin="5dp"
-                    android:background="@drawable/table_background" />
-                <TextView
-                    android:padding="20dp"
-                    android:layout_margin="5dp"
-                    android:background="@drawable/table_background" />
+                <ImageView
+                    android:id="@+id/bargaining_c_5"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_margin="2.5dp"
+                    android:background="@drawable/table_background"
+                    app:srcCompat="@drawable/bargaining_c_5"/>
+                <ImageView
+                    android:id="@+id/bargaining_d_5"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_margin="2.5dp"
+                    android:background="@drawable/table_background"
+                    app:srcCompat="@drawable/bargaining_d_5"/>
+                <ImageView
+                    android:id="@+id/bargaining_h_5"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_margin="2.5dp"
+                    android:background="@drawable/table_background"
+                    app:srcCompat="@drawable/bargaining_h_5"/>
+                <ImageView
+                    android:id="@+id/bargaining_s_5"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_margin="2.5dp"
+                    android:background="@drawable/table_background"
+                    app:srcCompat="@drawable/bargaining_s_5"/>
+                <ImageView
+                    android:id="@+id/bargaining_nt_5"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_margin="2.5dp"
+                    android:background="@drawable/table_background"
+                    app:srcCompat="@drawable/bargaining_nt_5"/>
             </TableRow>
 
             <TableRow>
-                <TextView
-                    android:padding="20dp"
-                    android:layout_margin="5dp"
-                    android:background="@drawable/table_background"/>
-                <TextView
-                    android:padding="20dp"
-                    android:layout_margin="5dp"
-                    android:background="@drawable/table_background" />
-                <TextView
-                    android:padding="20dp"
-                    android:layout_margin="5dp"
-                    android:background="@drawable/table_background" />
-                <TextView
-                    android:padding="20dp"
-                    android:layout_margin="5dp"
-                    android:background="@drawable/table_background" />
-                <TextView
-                    android:padding="20dp"
-                    android:layout_margin="5dp"
-                    android:background="@drawable/table_background" />
+                <ImageView
+                    android:id="@+id/bargaining_c_6"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_margin="2.5dp"
+                    android:background="@drawable/table_background"
+                    app:srcCompat="@drawable/bargaining_c_6"/>
+                <ImageView
+                    android:id="@+id/bargaining_d_6"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_margin="2.5dp"
+                    android:background="@drawable/table_background"
+                    app:srcCompat="@drawable/bargaining_d_6"/>
+                <ImageView
+                    android:id="@+id/bargaining_h_6"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_margin="2.5dp"
+                    android:background="@drawable/table_background"
+                    app:srcCompat="@drawable/bargaining_h_6"/>
+                <ImageView
+                    android:id="@+id/bargaining_s_6"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_margin="2.5dp"
+                    android:background="@drawable/table_background"
+                    app:srcCompat="@drawable/bargaining_s_6"/>
+                <ImageView
+                    android:id="@+id/bargaining_nt_6"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_margin="2.5dp"
+                    android:background="@drawable/table_background"
+                    app:srcCompat="@drawable/bargaining_nt_6"/>
             </TableRow>
 
             <TableRow>
-                <TextView
-                    android:padding="20dp"
-                    android:layout_margin="5dp"
-                    android:background="@drawable/table_background"/>
-                <TextView
-                    android:padding="20dp"
-                    android:layout_margin="5dp"
-                    android:background="@drawable/table_background" />
-                <TextView
-                    android:padding="20dp"
-                    android:layout_margin="5dp"
-                    android:background="@drawable/table_background" />
-                <TextView
-                    android:padding="20dp"
-                    android:layout_margin="5dp"
-                    android:background="@drawable/table_background" />
-                <TextView
-                    android:padding="20dp"
-                    android:layout_margin="5dp"
-                    android:background="@drawable/table_background" />
+                <ImageView
+                    android:id="@+id/bargaining_c_7"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_margin="2.5dp"
+                    android:background="@drawable/table_background"
+                    app:srcCompat="@drawable/bargaining_c_7"/>
+                <ImageView
+                    android:id="@+id/bargaining_d_7"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_margin="2.5dp"
+                    android:background="@drawable/table_background"
+                    app:srcCompat="@drawable/bargaining_d_7"/>
+                <ImageView
+                    android:id="@+id/bargaining_h_7"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_margin="2.5dp"
+                    android:background="@drawable/table_background"
+                    app:srcCompat="@drawable/bargaining_h_7"/>
+                <ImageView
+                    android:id="@+id/bargaining_s_7"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_margin="2.5dp"
+                    android:background="@drawable/table_background"
+                    app:srcCompat="@drawable/bargaining_s_7"/>
+                <ImageView
+                    android:id="@+id/bargaining_nt_7"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_margin="2.5dp"
+                    android:background="@drawable/table_background"
+                    app:srcCompat="@drawable/bargaining_nt_7"/>
             </TableRow>
         </TableLayout>
 
