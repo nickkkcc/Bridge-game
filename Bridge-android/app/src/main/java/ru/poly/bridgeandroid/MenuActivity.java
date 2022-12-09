@@ -24,6 +24,7 @@ import ru.poly.bridgeandroid.model.AcceptInvitePlayersToServer;
 import ru.poly.bridgeandroid.model.CreateLobbyToClient;
 import ru.poly.bridgeandroid.model.ExitLobbyToServer;
 import ru.poly.bridgeandroid.model.InvitePlayersToClient;
+import ru.poly.bridgeandroid.model.JoinToClient;
 import ru.poly.bridgeandroid.model.JoinToServer;
 import ru.poly.bridgeandroid.model.LoginToClient;
 import ru.poly.bridgeandroid.model.Message;
@@ -40,6 +41,7 @@ public class MenuActivity extends AppCompatActivity {
     private static final String PREFERENCE = "preference";
     private String token;
     private boolean isAccepted;
+    private boolean readyToJoin;
     private Gson gson;
     private TextView loadingTextView;
     private ProgressBar loadingProgressBar;
@@ -72,15 +74,10 @@ public class MenuActivity extends AppCompatActivity {
         joinButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                boolean readyToJoin;
-                if (loadingTextView.getVisibility() == View.VISIBLE) {
-                    loadingTextView.setVisibility(View.INVISIBLE);
-                    loadingProgressBar.setVisibility(View.INVISIBLE);
+                if (readyToJoin) {
                     joinButton.setText("Присоединиться");
                     readyToJoin = false;
                 } else {
-                    loadingTextView.setVisibility(View.VISIBLE);
-                    loadingProgressBar.setVisibility(View.VISIBLE);
                     joinButton.setText("Отменить поиск");
                     readyToJoin = true;
                 }
@@ -201,8 +198,39 @@ public class MenuActivity extends AppCompatActivity {
                 startActivity(intent);
                 finish();
                 break;
+            case "join":
+                JoinToClient join = message.getData(JoinToClient.class);
+                if (!join.isSuccessful()) {
+                    readyToJoin = !readyToJoin;
+                    runOnUiThread(() -> {
+                        String error;
+                        if (readyToJoin) {
+                            error = "Не удалось отменить поиск, попробуйте ещё раз.";
+                        } else {
+                            error = "Не удалось начать поиск, попробуйте ещё раз.";
+                        }
+                        Toast toast = Toast.makeText(getBaseContext(), error, Toast.LENGTH_SHORT);
+                        toast.show();
+                    });
+                }
+                switchLoadingVisibility();
+                break;
             default:
                 throw new RuntimeException();
+        }
+    }
+
+    private void switchLoadingVisibility() {
+        if (readyToJoin) {
+            runOnUiThread(() -> {
+                loadingTextView.setVisibility(View.VISIBLE);
+                loadingProgressBar.setVisibility(View.VISIBLE);
+            });
+        } else {
+            runOnUiThread(() -> {
+                loadingTextView.setVisibility(View.INVISIBLE);
+                loadingProgressBar.setVisibility(View.INVISIBLE);
+            });
         }
     }
 }

@@ -48,7 +48,134 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="5"
-                    android:background="@drawable/table_background"/>
+                    android:background="@drawable/table_background">
+
+                    <TableRow
+                        android:id="@+id/game_table_row1_teammate"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1">
+
+                        <ImageView
+                            android:id="@+id/game_table_row1_teammate_card1"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            app:srcCompat="@drawable/back"
+                            android:layout_weight="1"
+                            android:layout_margin="2dp"/>
+
+                        <ImageView
+                            android:id="@+id/game_table_row1_teammate_card2"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            app:srcCompat="@drawable/back"
+                            android:layout_weight="1"
+                            android:layout_margin="2dp"/>
+
+                        <ImageView
+                            android:id="@+id/game_table_row1_teammate_card3"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            app:srcCompat="@drawable/back"
+                            android:layout_weight="1"
+                            android:layout_margin="2dp"/>
+
+                        <ImageView
+                            android:id="@+id/game_table_row1_teammate_card4"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            app:srcCompat="@drawable/back"
+                            android:layout_weight="1"
+                            android:layout_margin="2dp"/>
+
+                        <ImageView
+                            android:id="@+id/game_table_row1_teammate_card5"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            app:srcCompat="@drawable/back"
+                            android:layout_weight="1"
+                            android:layout_margin="2dp"/>
+
+                        <ImageView
+                            android:id="@+id/game_table_row1_teammate_card6"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            app:srcCompat="@drawable/back"
+                            android:layout_weight="1"
+                            android:layout_margin="2dp"/>
+
+                        <ImageView
+                            android:id="@+id/game_table_teammate_bargaining"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:layout_margin="2dp"/>
+                    </TableRow>
+
+                    <TableRow
+                        android:id="@+id/game_table_row2_teammate"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1">
+
+                        <ImageView
+                            android:id="@+id/game_table_row2_teammate_card1"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            app:srcCompat="@drawable/back"
+                            android:layout_weight="1"
+                            android:layout_margin="2dp"/>
+
+                        <ImageView
+                            android:id="@+id/game_table_row2_teammate_card2"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            app:srcCompat="@drawable/back"
+                            android:layout_weight="1"
+                            android:layout_margin="2dp"/>
+
+                        <ImageView
+                            android:id="@+id/game_table_row2_teammate_card3"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            app:srcCompat="@drawable/back"
+                            android:layout_weight="1"
+                            android:layout_margin="2dp"/>
+
+                        <ImageView
+                            android:id="@+id/game_table_row2_teammate_card4"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            app:srcCompat="@drawable/back"
+                            android:layout_weight="1"
+                            android:layout_margin="2dp"/>
+
+                        <ImageView
+                            android:id="@+id/game_table_row2_teammate_card5"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            app:srcCompat="@drawable/back"
+                            android:layout_weight="1"
+                            android:layout_margin="2dp"/>
+
+                        <ImageView
+                            android:id="@+id/game_table_row2_teammate_card6"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            app:srcCompat="@drawable/back"
+                            android:layout_weight="1"
+                            android:layout_margin="2dp"/>
+
+                        <ImageView
+                            android:id="@+id/game_table_row2_teammate_card7"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            app:srcCompat="@drawable/back"
+                            android:layout_weight="1"
+                            android:layout_margin="2dp"/>
+                    </TableRow>
+
+                </TableLayout>
 
                 <Space
                     android:layout_width="0dp"
@@ -68,7 +195,260 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="2"
-                    android:background="@drawable/table_background"/>
+                    android:background="@drawable/table_background">
+
+                    <TableRow
+                        android:id="@+id/game_table_row1_enemy_left"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1">
+
+                        <com.github.rongi.rotate_layout.layout.RotateLayout
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            app:angle="90"
+                            android:layout_margin="2dp">
+
+                        <ImageView
+                            android:id="@+id/game_table_row1_enemy_left_card1"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            app:srcCompat="@drawable/back"/>
+
+                        </com.github.rongi.rotate_layout.layout.RotateLayout>
+
+                        <com.github.rongi.rotate_layout.layout.RotateLayout
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            app:angle="90"
+                            android:layout_margin="2dp">
+
+                            <ImageView
+                                android:id="@+id/game_table_row1_enemy_left_card2"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                app:srcCompat="@drawable/back" />
+
+                        </com.github.rongi.rotate_layout.layout.RotateLayout>
+                    </TableRow>
+
+                    <TableRow
+                        android:id="@+id/game_table_row2_enemy_left"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1">
+
+                        <com.github.rongi.rotate_layout.layout.RotateLayout
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            app:angle="90"
+                            android:layout_margin="2dp">
+
+                            <ImageView
+                                android:id="@+id/game_table_row2_enemy_left_card1"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                app:srcCompat="@drawable/back" />
+
+                        </com.github.rongi.rotate_layout.layout.RotateLayout>
+
+                        <com.github.rongi.rotate_layout.layout.RotateLayout
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            app:angle="90"
+                            android:layout_margin="2dp">
+
+                            <ImageView
+                                android:id="@+id/game_table_row2_enemy_left_card2"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                app:srcCompat="@drawable/back" />
+
+                        </com.github.rongi.rotate_layout.layout.RotateLayout>
+                    </TableRow>
+
+                    <TableRow
+                        android:id="@+id/game_table_row3_enemy_left"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1">
+
+                        <com.github.rongi.rotate_layout.layout.RotateLayout
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            app:angle="90"
+                            android:layout_margin="2dp">
+
+                            <ImageView
+                                android:id="@+id/game_table_row3_enemy_left_card1"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                app:srcCompat="@drawable/back" />
+
+                        </com.github.rongi.rotate_layout.layout.RotateLayout>
+
+                        <com.github.rongi.rotate_layout.layout.RotateLayout
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            app:angle="90"
+                            android:layout_margin="2dp">
+
+                            <ImageView
+                                android:id="@+id/game_table_row3_enemy_left_card2"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                app:srcCompat="@drawable/back" />
+
+                        </com.github.rongi.rotate_layout.layout.RotateLayout>
+                    </TableRow>
+
+                    <TableRow
+                        android:id="@+id/game_table_row4_enemy_left"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1">
+
+                        <com.github.rongi.rotate_layout.layout.RotateLayout
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            app:angle="90"
+                            android:layout_margin="2dp">
+
+                            <ImageView
+                                android:id="@+id/game_table_row4_enemy_left_card1"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                app:srcCompat="@drawable/back" />
+
+                        </com.github.rongi.rotate_layout.layout.RotateLayout>
+
+                        <com.github.rongi.rotate_layout.layout.RotateLayout
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            app:angle="90"
+                            android:layout_margin="2dp">
+
+                            <ImageView
+                                android:id="@+id/game_table_row4_enemy_left_card2"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                app:srcCompat="@drawable/back" />
+
+                        </com.github.rongi.rotate_layout.layout.RotateLayout>
+                    </TableRow>
+
+                    <TableRow
+                        android:id="@+id/game_table_row5_enemy_left"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1">
+
+                        <com.github.rongi.rotate_layout.layout.RotateLayout
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            app:angle="90"
+                            android:layout_margin="2dp">
+
+                            <ImageView
+                                android:id="@+id/game_table_row5_enemy_left_card1"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                app:srcCompat="@drawable/back" />
+
+                        </com.github.rongi.rotate_layout.layout.RotateLayout>
+
+                        <com.github.rongi.rotate_layout.layout.RotateLayout
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            app:angle="90"
+                            android:layout_margin="2dp">
+
+                            <ImageView
+                                android:id="@+id/game_table_row5_enemy_left_card2"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                app:srcCompat="@drawable/back" />
+
+                        </com.github.rongi.rotate_layout.layout.RotateLayout>
+                    </TableRow>
+
+                    <TableRow
+                        android:id="@+id/game_table_row6_enemy_left"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1">
+
+                        <com.github.rongi.rotate_layout.layout.RotateLayout
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            app:angle="90"
+                            android:layout_margin="2dp">
+
+                            <ImageView
+                                android:id="@+id/game_table_row6_enemy_left_card1"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                app:srcCompat="@drawable/back" />
+
+                        </com.github.rongi.rotate_layout.layout.RotateLayout>
+
+                        <com.github.rongi.rotate_layout.layout.RotateLayout
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            app:angle="90"
+                            android:layout_margin="2dp">
+
+                            <ImageView
+                                android:id="@+id/game_table_row6_enemy_left_card2"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                app:srcCompat="@drawable/back" />
+
+                        </com.github.rongi.rotate_layout.layout.RotateLayout>
+                    </TableRow>
+
+                    <TableRow
+                        android:id="@+id/game_table_row7_enemy_left"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1">
+
+                        <com.github.rongi.rotate_layout.layout.RotateLayout
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            app:angle="90"
+                            android:layout_margin="2dp">
+
+                            <ImageView
+                                android:id="@+id/game_table_row7_enemy_left_card1"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                app:srcCompat="@drawable/back" />
+
+                        </com.github.rongi.rotate_layout.layout.RotateLayout>
+
+                        <ImageView
+                            android:id="@+id/game_table_enemy_left_bargaining"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:layout_margin="2dp"/>
+                    </TableRow>
+
+                </TableLayout>
 
                 <Space
                     android:layout_width="0dp"
@@ -81,7 +461,7 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="5"
-                    android:name="ru.poly.bridgeandroid.BargainingFragment">
+                    android:name="ru.poly.bridgeandroid.ScoresFragment">
                 </androidx.fragment.app.FragmentContainerView>
 
                 <Space
@@ -95,7 +475,260 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="2"
-                    android:background="@drawable/table_background"/>
+                    android:background="@drawable/table_background">
+
+                    <TableRow
+                        android:id="@+id/game_table_row1_enemy_right"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1">
+
+                        <com.github.rongi.rotate_layout.layout.RotateLayout
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            app:angle="270"
+                            android:layout_margin="2dp">
+
+                            <ImageView
+                                android:id="@+id/game_table_row1_enemy_right_card1"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                app:srcCompat="@drawable/back"/>
+
+                        </com.github.rongi.rotate_layout.layout.RotateLayout>
+
+                        <com.github.rongi.rotate_layout.layout.RotateLayout
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            app:angle="270"
+                            android:layout_margin="2dp">
+
+                            <ImageView
+                                android:id="@+id/game_table_row1_enemy_right_card2"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                app:srcCompat="@drawable/back"/>
+
+                        </com.github.rongi.rotate_layout.layout.RotateLayout>
+                    </TableRow>
+
+                    <TableRow
+                        android:id="@+id/game_table_row2_enemy_right"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1">
+
+                        <com.github.rongi.rotate_layout.layout.RotateLayout
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            app:angle="270"
+                            android:layout_margin="2dp">
+
+                            <ImageView
+                                android:id="@+id/game_table_row2_enemy_right_card1"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                app:srcCompat="@drawable/back"/>
+
+                        </com.github.rongi.rotate_layout.layout.RotateLayout>
+
+                        <com.github.rongi.rotate_layout.layout.RotateLayout
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            app:angle="270"
+                            android:layout_margin="2dp">
+
+                            <ImageView
+                                android:id="@+id/game_table_row2_enemy_right_card2"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                app:srcCompat="@drawable/back"/>
+
+                        </com.github.rongi.rotate_layout.layout.RotateLayout>
+                    </TableRow>
+
+                    <TableRow
+                        android:id="@+id/game_table_row3_enemy_right"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1">
+
+                        <com.github.rongi.rotate_layout.layout.RotateLayout
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            app:angle="270"
+                            android:layout_margin="2dp">
+
+                            <ImageView
+                                android:id="@+id/game_table_row3_enemy_right_card1"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                app:srcCompat="@drawable/back"/>
+
+                        </com.github.rongi.rotate_layout.layout.RotateLayout>
+
+                        <com.github.rongi.rotate_layout.layout.RotateLayout
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            app:angle="270"
+                            android:layout_margin="2dp">
+
+                            <ImageView
+                                android:id="@+id/game_table_row3_enemy_right_card2"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                app:srcCompat="@drawable/back"/>
+
+                        </com.github.rongi.rotate_layout.layout.RotateLayout>
+                    </TableRow>
+
+                    <TableRow
+                        android:id="@+id/game_table_row4_enemy_right"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1">
+
+                        <com.github.rongi.rotate_layout.layout.RotateLayout
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            app:angle="270"
+                            android:layout_margin="2dp">
+
+                            <ImageView
+                                android:id="@+id/game_table_row4_enemy_right_card1"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                app:srcCompat="@drawable/back"/>
+
+                        </com.github.rongi.rotate_layout.layout.RotateLayout>
+
+                        <com.github.rongi.rotate_layout.layout.RotateLayout
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            app:angle="270"
+                            android:layout_margin="2dp">
+
+                            <ImageView
+                                android:id="@+id/game_table_row4_enemy_right_card2"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                app:srcCompat="@drawable/back"/>
+
+                        </com.github.rongi.rotate_layout.layout.RotateLayout>
+                    </TableRow>
+
+                    <TableRow
+                        android:id="@+id/game_table_row5_enemy_right"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1">
+
+                        <com.github.rongi.rotate_layout.layout.RotateLayout
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            app:angle="270"
+                            android:layout_margin="2dp">
+
+                            <ImageView
+                                android:id="@+id/game_table_row5_enemy_right_card1"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                app:srcCompat="@drawable/back"/>
+
+                        </com.github.rongi.rotate_layout.layout.RotateLayout>
+
+                        <com.github.rongi.rotate_layout.layout.RotateLayout
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            app:angle="270"
+                            android:layout_margin="2dp">
+
+                            <ImageView
+                                android:id="@+id/game_table_row5_enemy_right_card2"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                app:srcCompat="@drawable/back"/>
+
+                        </com.github.rongi.rotate_layout.layout.RotateLayout>
+                    </TableRow>
+
+                    <TableRow
+                        android:id="@+id/game_table_row6_enemy_right"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1">
+
+                        <com.github.rongi.rotate_layout.layout.RotateLayout
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            app:angle="270"
+                            android:layout_margin="2dp">
+
+                            <ImageView
+                                android:id="@+id/game_table_row6_enemy_right_card1"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                app:srcCompat="@drawable/back"/>
+
+                        </com.github.rongi.rotate_layout.layout.RotateLayout>
+
+                        <com.github.rongi.rotate_layout.layout.RotateLayout
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            app:angle="270"
+                            android:layout_margin="2dp">
+
+                            <ImageView
+                                android:id="@+id/game_table_row6_enemy_right_card2"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                app:srcCompat="@drawable/back"/>
+
+                        </com.github.rongi.rotate_layout.layout.RotateLayout>
+                    </TableRow>
+
+                    <TableRow
+                        android:id="@+id/game_table_row7_enemy_right"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1">
+
+                        <ImageView
+                            android:id="@+id/game_table_enemy_right_bargaining"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:layout_margin="2dp"/>
+
+                        <com.github.rongi.rotate_layout.layout.RotateLayout
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            app:angle="270"
+                            android:layout_margin="2dp">
+
+                            <ImageView
+                                android:id="@+id/game_table_row7_enemy_right_card2"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                app:srcCompat="@drawable/back"/>
+
+                        </com.github.rongi.rotate_layout.layout.RotateLayout>
+                    </TableRow>
+
+                    </TableLayout>
             </LinearLayout>
 
             <LinearLayout
@@ -104,29 +737,164 @@
                 android:orientation="horizontal"
                 android:layout_weight="1">
 
-                <Space
+                <TextView
+                    android:id="@+id/local_score"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:layout_weight="3">
-                </Space>
+                    android:layout_weight="3"
+                    android:text="Мы: 0/10\nОни: 0/4"
+                    android:textColor="@color/white"
+                    android:gravity="bottom|end"
+                    android:textSize="28sp">
+                </TextView>
 
                 <TableLayout
                     android:id="@+id/game_table_player"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="5"
-                    android:background="@drawable/table_background"/>
+                    android:background="@drawable/table_background">
 
-                <Space
+                    <TableRow
+                        android:id="@+id/game_table_row1_player"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1">
+
+                        <ImageView
+                            android:id="@+id/game_table_row1_player_card1"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            app:srcCompat="@drawable/back"
+                            android:layout_weight="1"
+                            android:layout_margin="2dp"/>
+
+                        <ImageView
+                            android:id="@+id/game_table_row1_player_card2"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            app:srcCompat="@drawable/back"
+                            android:layout_weight="1"
+                            android:layout_margin="2dp"/>
+
+                        <ImageView
+                            android:id="@+id/game_table_row1_player_card3"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            app:srcCompat="@drawable/back"
+                            android:layout_weight="1"
+                            android:layout_margin="2dp"/>
+
+                        <ImageView
+                            android:id="@+id/game_table_row1_player_card4"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            app:srcCompat="@drawable/back"
+                            android:layout_weight="1"
+                            android:layout_margin="2dp"/>
+
+                        <ImageView
+                            android:id="@+id/game_table_row1_player_card5"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            app:srcCompat="@drawable/back"
+                            android:layout_weight="1"
+                            android:layout_margin="2dp"/>
+
+                        <ImageView
+                            android:id="@+id/game_table_row1_player_card6"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            app:srcCompat="@drawable/back"
+                            android:layout_weight="1"
+                            android:layout_margin="2dp"/>
+
+                        <ImageView
+                            android:id="@+id/game_table_row1_player_card7"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            app:srcCompat="@drawable/back"
+                            android:layout_weight="1"
+                            android:layout_margin="2dp"/>
+                    </TableRow>
+
+                    <TableRow
+                        android:id="@+id/game_table_row2_player"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1">
+
+                        <ImageView
+                            android:id="@+id/game_table_row2_player_card1"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            app:srcCompat="@drawable/back"
+                            android:layout_weight="1"
+                            android:layout_margin="2dp"/>
+
+                        <ImageView
+                            android:id="@+id/game_table_row2_player_card2"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            app:srcCompat="@drawable/back"
+                            android:layout_weight="1"
+                            android:layout_margin="2dp"/>
+
+                        <ImageView
+                            android:id="@+id/game_table_row2_player_card3"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            app:srcCompat="@drawable/back"
+                            android:layout_weight="1"
+                            android:layout_margin="2dp"/>
+
+                        <ImageView
+                            android:id="@+id/game_table_row2_player_card4"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            app:srcCompat="@drawable/back"
+                            android:layout_weight="1"
+                            android:layout_margin="2dp"/>
+
+                        <ImageView
+                            android:id="@+id/game_table_row2_player_card5"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            app:srcCompat="@drawable/back"
+                            android:layout_weight="1"
+                            android:layout_margin="2dp"/>
+
+                        <ImageView
+                            android:id="@+id/game_table_row2_player_card6"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            app:srcCompat="@drawable/back"
+                            android:layout_weight="1"
+                            android:layout_margin="2dp"/>
+
+                        <Space
+                            android:id="@+id/game_table_player_bargaining"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            app:srcCompat="@drawable/back"
+                            android:layout_weight="1"
+                            android:layout_margin="2dp"/>
+                    </TableRow>
+
+                </TableLayout>
+
+                <TextView
+                    android:id="@+id/global_score"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:layout_weight="3">
-                </Space>
+                    android:layout_weight="3"
+                    android:text="Мы: 0\nОни: 0\nПартия: 2 из 6"
+                    android:textColor="@color/white"
+                    android:gravity="bottom|end"
+                    android:textSize="28sp">
+                </TextView>
             </LinearLayout>
         </LinearLayout>
-
-
-
     </FrameLayout>
 
     <!-- 2 | NavigationView -->

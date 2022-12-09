@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:layout_marginTop="5dp"
+    android:layout_marginBottom="5dp"
+    android:background="@drawable/table_background">
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Подсчёт очков"
+        android:textSize="20sp"
+        android:textColor="@color/white"
+        android:gravity="center"
+        android:padding="5dp"/>
+
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:stretchColumns="*">
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/score_team1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:layout_weight="1"
+                android:text="Мы"
+                android:textColor="@color/white"
+                android:textSize="20sp"
+                android:padding="10dp"/>
+
+            <TextView
+                android:id="@+id/score_team2"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="Они"
+                android:textColor="@color/white"
+                android:textSize="20sp"
+                android:padding="10dp"/>
+        </TableRow>
+    </TableLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="3"
+        android:layout_marginBottom="5dp">
+
+        <TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/table_background"
+            android:stretchColumns="*"
+            android:divider="@drawable/table_divider"
+            android:showDividers="middle">
+            <TableRow
+                android:divider="@drawable/table_divider"
+                android:showDividers="middle">
+
+                <TextView
+                    android:id="@+id/score_row1_team1"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="100"
+                    android:textColor="@color/white"
+                    android:textSize="20sp"
+                    android:padding="10dp"/>
+
+                <TextView
+                    android:id="@+id/score_row1_team2"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="150"
+                    android:textColor="@color/white"
+                    android:textSize="20sp"
+                    android:padding="10dp"/>
+            </TableRow>
+
+            <TableRow
+                android:divider="@drawable/table_divider"
+                android:showDividers="middle">
+
+                <TextView
+                    android:id="@+id/score_row2_team1"
+                    android:gravity="center"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="200"
+                    android:textColor="@color/white"
+                    android:textSize="20sp"
+                    android:padding="10dp"/>
+
+                <TextView
+                    android:id="@+id/score_row2_team2"
+                    android:gravity="center"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="300"
+                    android:textColor="@color/white"
+                    android:textSize="20sp"
+                    android:padding="10dp"/>
+            </TableRow>
+
+            <TableRow
+                android:divider="@drawable/table_divider"
+                android:showDividers="middle">
+
+                <TextView
+                    android:id="@+id/score_row3_team1"
+                    android:gravity="center"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="450"
+                    android:textColor="@color/white"
+                    android:textSize="20sp"
+                    android:padding="10dp"/>
+
+                <TextView
+                    android:id="@+id/score_row3_team2"
+                    android:gravity="center"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="300"
+                    android:textColor="@color/white"
+                    android:textSize="20sp"
+                    android:padding="10dp"/>
+            </TableRow>
+
+            <TableRow
+                android:divider="@drawable/table_divider"
+                android:showDividers="middle">
+
+                <TextView
+                    android:id="@+id/score_row4_team1"
+                    android:gravity="center"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="560"
+                    android:textColor="@color/white"
+                    android:textSize="20sp"
+                    android:padding="10dp"/>
+
+                <TextView
+                    android:id="@+id/score_row4_team2"
+                    android:gravity="center"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="440"
+                    android:textColor="@color/white"
+                    android:textSize="20sp"
+                    android:padding="10dp"/>
+            </TableRow>
+
+            <TableRow
+                android:divider="@drawable/table_divider"
+                android:showDividers="middle">
+
+                <TextView
+                    android:id="@+id/score_row5_team1"
+                    android:gravity="center"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="600"
+                    android:textColor="@color/white"
+                    android:textSize="20sp"
+                    android:padding="10dp"/>
+
+                <TextView
+                    android:id="@+id/score_row5_team2"
+                    android:gravity="center"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="650"
+                    android:textColor="@color/white"
+                    android:textSize="20sp"
+                    android:padding="10dp"/>
+            </TableRow>
+
+            <TableRow
+                android:divider="@drawable/table_divider"
+                android:showDividers="middle">
+
+                <TextView
+                    android:id="@+id/score_row6_team1"
+                    android:gravity="center"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="800"
+                    android:textColor="@color/white"
+                    android:textSize="20sp"
+                    android:padding="10dp"/>
+
+                <TextView
+                    android:id="@+id/score_row6_team2"
+                    android:gravity="center"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="750"
+                    android:textColor="@color/white"
+                    android:textSize="20sp"
+                    android:padding="10dp"/>
+            </TableRow>
+        </TableLayout>
+
+    </ScrollView>
+
+</LinearLayout>
