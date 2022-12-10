@@ -45,7 +45,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            app:srcCompat="@drawable/d_5" />
+            app:srcCompat="@drawable/s_5" />
 
         <ImageView
             android:layout_width="0dp"
@@ -59,7 +59,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            app:srcCompat="@drawable/c_6" />
+            app:srcCompat="@drawable/d_6" />
     </TableRow>
 
     <TableRow
@@ -78,7 +78,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            app:srcCompat="@drawable/c_a" />
+            app:srcCompat="@drawable/h_a" />
 
         <Space
             android:layout_width="0dp"

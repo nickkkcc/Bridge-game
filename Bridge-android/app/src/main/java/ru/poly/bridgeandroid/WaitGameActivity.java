@@ -9,7 +9,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentManager;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -40,7 +39,7 @@ public class WaitGameActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_wait_game);
 
-        playersCountTextView = findViewById(R.id.textView_players_count);
+        playersCountTextView = findViewById(R.id.create_game_players_count);
         final Button exitButton = findViewById(R.id.exit_to_menu_button);
 
         Intent myIntent = getIntent();
