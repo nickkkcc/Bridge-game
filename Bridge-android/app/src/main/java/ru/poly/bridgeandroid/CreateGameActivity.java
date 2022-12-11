@@ -23,6 +23,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import ru.poly.bridgeandroid.model.ExitLobbyToClient;
@@ -58,20 +59,20 @@ public class CreateGameActivity extends AppCompatActivity {
         String token = sharedPreferences.getString(KEY, "");
         String lobbyId = sharedPreferences.getString(LOBBY, "");
 
-        Intent myIntent = getIntent();
-        friends = myIntent.getParcelableArrayListExtra("friends");
-        players = myIntent.getParcelableArrayListExtra("players");
-        playersCount = myIntent.getIntExtra("playersCount", 0);
-//        players = Arrays.asList(new Player("login1","player1"), new Player("login1","player2"),
-//                new Player("login3","player3"), new Player("login4","player4"),
-//                new Player("login5","player5"), new Player("login6","player6"),
-//                new Player("login7","player7"), new Player("login8","player8"),
-//                new Player("login9","player9"), new Player("login10","player10"));
-//        friends = Arrays.asList(new Player("login1","friend1"), new Player("login1","friend2"),
-//                new Player("login3","friend3"), new Player("login4","friend4"),
-//                new Player("login5","friend5"), new Player("login6","friend6"),
-//                new Player("login7","friend7"), new Player("login8","friend8"),
-//                new Player("login9","friend9"), new Player("login10","friend10"));
+//        Intent myIntent = getIntent();
+//        friends = myIntent.getParcelableArrayListExtra("friends");
+//        players = myIntent.getParcelableArrayListExtra("players");
+//        playersCount = myIntent.getIntExtra("playersCount", 0);
+        players = Arrays.asList(new Player("login1","player1"), new Player("login1","player2"),
+                new Player("login3","player3"), new Player("login4","player4"),
+                new Player("login5","player5"), new Player("login6","player6"),
+                new Player("login7","player7"), new Player("login8","player8"),
+                new Player("login9","player9"), new Player("login10","player10"));
+        friends = Arrays.asList(new Player("login1","friend1"), new Player("login1","friend2"),
+                new Player("login3","friend3"), new Player("login4","friend4"),
+                new Player("login5","friend5"), new Player("login6","friend6"),
+                new Player("login7","friend7"), new Player("login8","friend8"),
+                new Player("login9","friend9"), new Player("login10","friend10"));
 
         gson = new Gson();
 

@@ -22,7 +22,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.110000014" />
+        app:layout_constraintVertical_bias="0.12"/>
 
     <EditText
         android:id="@+id/registration_username"
@@ -107,8 +107,10 @@
         android:id="@+id/registration_registration"
         android:text="@string/registration"
         android:enabled="false"
-        android:background="@drawable/button_enabled"
+        android:background="@drawable/button"
         android:textColor="@color/white"
+        android:textAllCaps="false"
+        android:textSize="@dimen/text_size"
         android:layout_width="@dimen/button_width"
         android:layout_height="wrap_content"
         android:layout_gravity="start"

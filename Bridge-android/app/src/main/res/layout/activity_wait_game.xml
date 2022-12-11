@@ -12,17 +12,17 @@
         android:id="@+id/create_game_players_count"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="64dp"
         android:background="@drawable/text_background"
         android:gravity="center"
-        android:paddingLeft="16dp"
         android:paddingTop="16dp"
         android:paddingBottom="20dp"
         android:text="Ожидание игроков\n (игроков в лобби: 2)"
-        android:textColor="#aaaaaa"
+        android:textColor="@color/white"
         android:textSize="@dimen/title_text_size"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.12"/>
 
     <Button
         android:id="@+id/fetchTeam"
@@ -35,16 +35,19 @@
         android:shadowRadius="5"
         android:text="Искать команду"
         android:textColor="#BDBDBD"
+        android:textAllCaps="false"
         android:textSize="@dimen/text_size"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.47" />
 
     <Button
         android:id="@+id/exit_to_menu_button"
         android:layout_width="200dp"
         android:layout_height="55dp"
+        android:layout_marginTop="32dp"
         android:background="@drawable/button_enabled"
         android:shadowColor="#A8A8A8"
         android:shadowDx="0"
@@ -52,11 +55,10 @@
         android:shadowRadius="5"
         android:text="Выйти из лобби"
         android:textColor="#BDBDBD"
+        android:textAllCaps="false"
         android:textSize="@dimen/text_size"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.64" />
+        app:layout_constraintTop_toBottomOf="@+id/fetchTeam" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

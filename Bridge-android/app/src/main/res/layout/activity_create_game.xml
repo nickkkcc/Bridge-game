@@ -19,7 +19,10 @@
         android:text="Выбор игроков"
         android:textColor="#aaaaaa"
         android:textSize="30dp"
-        app:layout_constraintBottom_toTopOf="@+id/listView" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.06999999"
+        tools:layout_editor_absoluteX="0dp" />
 
     <com.github.angads25.toggle.widget.LabeledSwitch
         android:id="@+id/switch_list"
@@ -36,33 +39,33 @@
         android:layout_width="match_parent"
         android:layout_height="340dp"
         android:background="@color/black_transparent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.36" />
+        app:layout_constraintTop_toBottomOf="@id/textView3" />
 
     <Button
         android:id="@+id/start_game"
         android:layout_width="@dimen/button_width"
         android:layout_height="wrap_content"
         android:layout_gravity="right"
-        android:background="@drawable/button_enabled"
-        android:text="НАЧАТЬ ИГРУ"
+        android:background="@drawable/button"
+        android:text="Начать игру"
         android:textColor="@color/white"
+        android:textAllCaps="false"
         android:textSize="@dimen/text_size"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/switch_list"
-        app:layout_constraintVertical_bias="0.3" />
+        app:layout_constraintVertical_bias="0.19999999" />
 
     <Button
         android:id="@+id/exit_lobby"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:background="@drawable/button_enabled"
-        android:text="ВЫЙТИ"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/button"
+        android:text="Выйти"
         android:textColor="@color/white"
+        android:textAllCaps="false"
         android:textSize="@dimen/text_size"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -72,14 +75,14 @@
         android:id="@+id/create_game_players_count"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
         android:layout_marginEnd="16dp"
         android:layout_marginRight="16dp"
         android:text="Игроков в лобби: 2"
         android:textColor="@color/white"
         android:textSize="12sp"
-        app:layout_constraintBottom_toTopOf="@+id/start_game"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/switch_list" />
+        app:layout_constraintTop_toBottomOf="@+id/exit_lobby" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -12,29 +12,27 @@
         android:id="@+id/textView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="92dp"
         android:background="@drawable/text_background"
         android:gravity="center"
         android:text="@string/game_title"
         android:textColor="#aaaaaa"
         android:textSize="@dimen/title_text_size"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.12"/>
 
     <Button
         android:id="@+id/create_button"
         android:text="@string/create_team"
-        android:textSize="@dimen/bottom_text_size"
         android:layout_width="@dimen/button_width"
         android:layout_height="wrap_content"
-        android:background="@drawable/button_enabled"
+        android:background="@drawable/button"
+        android:textAllCaps="false"
+        android:textSize="@dimen/text_size"
 
         android:layout_marginBottom="32dp"
-        android:shadowColor="#A8A8A8"
-        android:shadowDx="0"
-        android:shadowDy="0"
-        android:shadowRadius="5"
-        android:textColor="#BDBDBD"
+        android:textColor="@color/white"
         app:layout_constraintBottom_toTopOf="@+id/join_button"
         app:layout_constraintEnd_toEndOf="@+id/join_button"
         app:layout_constraintStart_toStartOf="@+id/join_button" />
@@ -43,15 +41,12 @@
         android:id="@+id/join_button"
         android:text="@string/join_team"
         android:textColor="@color/white"
-        android:textSize="@dimen/bottom_text_size"
         android:layout_width="@dimen/button_width"
         android:layout_height="wrap_content"
-        android:background="@drawable/button_enabled"
-        android:shadowColor="#A8A8A8"
-        android:shadowDx="0"
+        android:background="@drawable/button"
+        android:textAllCaps="false"
+        android:textSize="@dimen/text_size"
 
-        android:shadowDy="0"
-        android:shadowRadius="5"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintHorizontal_bias="0.507"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -63,14 +58,17 @@
         android:id="@+id/exit_account_button"
         android:text="@string/log_out"
         android:textColor="@color/white"
-        android:textSize="@dimen/bottom_text_size"
+        android:textAllCaps="false"
+        android:textSize="@dimen/text_size"
+
         android:layout_width="@dimen/button_width"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
-        android:background="@drawable/button_enabled"
+        android:background="@drawable/button"
         app:layout_constraintEnd_toEndOf="@+id/join_button"
         app:layout_constraintStart_toStartOf="@+id/join_button"
         app:layout_constraintTop_toBottomOf="@+id/join_button" />
+
 
     <TextView
         android:id="@+id/joining_text"

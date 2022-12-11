@@ -11,18 +11,18 @@
 
     <TextView
         android:id="@+id/textView2"
-        android:textSize="30dp"
-        android:text="@string/login_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
         android:background="@drawable/text_background"
+        android:gravity="center"
+        android:text="@string/login_title"
         android:textColor="#aaaaaa"
+        android:textSize="30dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.110000014" />
+        app:layout_constraintVertical_bias="0.12"/>
 
     <EditText
         android:id="@+id/username"
@@ -66,9 +66,11 @@
         android:layout_width="@dimen/button_width"
         android:layout_height="wrap_content"
         android:layout_gravity="start"
-        android:background="@drawable/button_enabled"
+        android:background="@drawable/button"
         android:enabled="false"
         android:textColor="@color/white"
+        android:textAllCaps="false"
+        android:textSize="@dimen/text_size"
         android:text="@string/login_sign_in"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -79,8 +81,10 @@
     <Button
         android:id="@+id/registration"
         android:text="@string/registration"
+        android:textAllCaps="false"
+        android:textSize="@dimen/text_size"
         android:textColor="@color/white"
-        android:background="@drawable/button_enabled"
+        android:background="@drawable/button"
         android:layout_width="@dimen/button_width"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
