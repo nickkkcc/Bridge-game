@@ -25,40 +25,23 @@
         app:layout_constraintVertical_bias="0.12"/>
 
     <Button
-        android:id="@+id/fetchTeam"
-        android:layout_width="200dp"
-        android:layout_height="55dp"
-        android:background="@drawable/button_enabled"
-        android:shadowColor="#A8A8A8"
-        android:shadowDx="0"
-        android:shadowDy="0"
-        android:shadowRadius="5"
-        android:text="Искать команду"
-        android:textColor="#BDBDBD"
-        android:textAllCaps="false"
-        android:textSize="@dimen/text_size"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.47" />
-
-    <Button
         android:id="@+id/exit_to_menu_button"
         android:layout_width="200dp"
         android:layout_height="55dp"
-        android:layout_marginTop="32dp"
-        android:background="@drawable/button_enabled"
+        android:layout_gravity="center"
+        android:background="@drawable/button"
         android:shadowColor="#A8A8A8"
         android:shadowDx="0"
         android:shadowDy="0"
         android:shadowRadius="5"
         android:text="Выйти из лобби"
-        android:textColor="#BDBDBD"
         android:textAllCaps="false"
+        android:textColor="#BDBDBD"
         android:textSize="@dimen/text_size"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/fetchTeam" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.59000003" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

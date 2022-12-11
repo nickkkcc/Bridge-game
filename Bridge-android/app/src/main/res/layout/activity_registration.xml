@@ -26,7 +26,7 @@
 
     <EditText
         android:id="@+id/registration_username"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="40dp"
         android:layout_marginEnd="40dp"
@@ -44,7 +44,7 @@
 
     <EditText
         android:id="@+id/registration_password"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="40dp"
         android:layout_marginTop="8dp"
@@ -86,7 +86,7 @@
 
     <EditText
         android:id="@+id/registration_answer"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="40dp"
         android:layout_marginTop="8dp"
@@ -108,12 +108,12 @@
         android:text="@string/registration"
         android:enabled="false"
         android:background="@drawable/button"
+        android:layout_gravity="center"
         android:textColor="@color/white"
         android:textAllCaps="false"
         android:textSize="@dimen/text_size"
         android:layout_width="@dimen/button_width"
         android:layout_height="wrap_content"
-        android:layout_gravity="start"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -125,15 +125,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="64dp"
-        android:layout_marginEnd="32dp"
-        android:layout_marginBottom="64dp"
         android:visibility="gone"
+        android:indeterminateTint="@color/yellow"
+        android:layout_marginBottom="64dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/registration_password"
-        app:layout_constraintStart_toStartOf="@+id/registration_password"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.3" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/registration_registration"
+        app:layout_constraintVertical_bias="0.35000002" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

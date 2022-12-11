@@ -55,7 +55,7 @@ public class MenuActivity extends AppCompatActivity {
         final Button createButton = findViewById(R.id.create_button);
         final Button joinButton = findViewById(R.id.join_button);
         final Button exitButton = findViewById(R.id.exit_account_button);
-        loadingTextView = findViewById(R.id.joining_text);
+        //loadingTextView = findViewById(R.id.joining_text);
         loadingProgressBar = findViewById(R.id.loading_menu);
 
         gson = new Gson();

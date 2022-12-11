@@ -1,6 +1,7 @@
 package ru.poly.bridgeandroid;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SwitchCompat;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -79,8 +80,26 @@ public class CreateGameActivity extends AppCompatActivity {
         listView = findViewById(R.id.listView);
         final Button startGameButton = findViewById(R.id.start_game);
         final Button exitGameButton = findViewById(R.id.exit_lobby);
-        final LabeledSwitch labeledSwitch = findViewById(R.id.switch_list);
+        //final LabeledSwitch labeledSwitch = findViewById(R.id.switch_list);
         playersCountTextView = findViewById(R.id.create_game_players_count);
+
+        final SwitchCompat switchOnOff = findViewById(R.id.switch_list);
+        final TextView tvSwitchFriends = findViewById(R.id.tvSwitchFriends);
+        final TextView tvSwitchPlayers = findViewById(R.id.tvSwitchPlayers);
+
+        switchOnOff.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(switchOnOff.isChecked()) {
+                    tvSwitchFriends.setTextColor(getResources().getColor(R.color.white));
+                    tvSwitchPlayers.setTextColor(getResources().getColor(R.color.yellow));
+                }else {
+                    tvSwitchFriends.setTextColor(getResources().getColor(R.color.yellow));
+                    tvSwitchPlayers.setTextColor(getResources().getColor(R.color.white));
+                }
+            }
+        });
+
 
         updatePlayersCountTextView();
 
@@ -123,13 +142,13 @@ public class CreateGameActivity extends AppCompatActivity {
             }
         });
 
-        labeledSwitch.setOnToggledListener(new OnToggledListener() {
-            @Override
-            public void onSwitched(ToggleableView toggleableView, boolean isOn) {
-                isFriends = isOn;
-                updateListViewAdapter(isFriends);
-            }
-        });
+//        labeledSwitch.setOnToggledListener(new OnToggledListener() {
+//            @Override
+//            public void onSwitched(ToggleableView toggleableView, boolean isOn) {
+//                isFriends = isOn;
+//                updateListViewAdapter(isFriends);
+//            }
+//        });
     }
 
     @Override
