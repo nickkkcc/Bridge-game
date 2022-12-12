@@ -26,11 +26,17 @@
 
     <RelativeLayout
         android:id="@+id/relativeLayout"
-        android:layout_width="match_parent"
+        android:layout_width="220dp"
         android:layout_height="50dp"
         android:layout_centerHorizontal="true"
         android:background="@drawable/bg_switch"
+        android:paddingHorizontal="6dp"
+        android:paddingVertical="6dp"
+        app:layout_constraintBottom_toTopOf="@+id/listView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView3">
+
 
         <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/switch_list"
@@ -38,6 +44,7 @@
             android:layout_height="50dp"
             android:layout_centerVertical="true"
             android:checked="true"
+            android:paddingHorizontal="4dp"
             android:textColor="@color/white"
             android:thumb="@drawable/thumb_selector"
             app:track="@drawable/track_selector" />
@@ -56,7 +63,7 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="Друзья"
-                android:textColor="@color/yellow"
+                android:textColor="@color/white"
                 android:textSize="12sp" />
 
             <TextView
@@ -67,7 +74,7 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="Игроки"
-                android:textColor="@color/white"
+                android:textColor="@color/yellow"
                 android:textSize="12sp" />
         </LinearLayout>
     </RelativeLayout>

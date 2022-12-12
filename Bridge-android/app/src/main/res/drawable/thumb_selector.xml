@@ -6,9 +6,9 @@
             android:dither="true" android:shape="rectangle"
             android:useLevel="false" android:visible="true">
             <solid android:color="@color/dark_grey" />
-            <corners android:radius="6dp" />
+            <corners android:radius="14dp" />
             <size
-                android:width="180dp"
+                android:width="100dp"
                 android:height="40dp" />
         </shape>
 

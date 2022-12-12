@@ -87,19 +87,6 @@ public class CreateGameActivity extends AppCompatActivity {
         final TextView tvSwitchFriends = findViewById(R.id.tvSwitchFriends);
         final TextView tvSwitchPlayers = findViewById(R.id.tvSwitchPlayers);
 
-        switchOnOff.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(switchOnOff.isChecked()) {
-                    tvSwitchFriends.setTextColor(getResources().getColor(R.color.white));
-                    tvSwitchPlayers.setTextColor(getResources().getColor(R.color.yellow));
-                }else {
-                    tvSwitchFriends.setTextColor(getResources().getColor(R.color.yellow));
-                    tvSwitchPlayers.setTextColor(getResources().getColor(R.color.white));
-                }
-            }
-        });
-
 
         updatePlayersCountTextView();
 
@@ -139,6 +126,23 @@ public class CreateGameActivity extends AppCompatActivity {
                         players.get(position).getAlias();
                 Toast toast = Toast.makeText(getBaseContext(), alias + " пришлашён в лобби", Toast.LENGTH_SHORT);
                 toast.show();
+            }
+        });
+
+        switchOnOff.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(switchOnOff.isChecked()) {
+                    tvSwitchFriends.setTextColor(getResources().getColor(R.color.white));
+                    tvSwitchPlayers.setTextColor(getResources().getColor(R.color.yellow));
+                    isFriends = false;
+                    updateListViewAdapter(isFriends);
+                }else {
+                    tvSwitchFriends.setTextColor(getResources().getColor(R.color.yellow));
+                    tvSwitchPlayers.setTextColor(getResources().getColor(R.color.white));
+                    isFriends = true;
+                    updateListViewAdapter(isFriends);
+                }
             }
         });
 
