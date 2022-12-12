@@ -121,7 +121,8 @@ public class CreateGameActivity extends AppCompatActivity {
                 JsonObject jsonObject = (JsonObject) gson.toJsonTree(invitePlayers);
                 Message message = new Message(token, "invite_players", jsonObject);
                 EventBus.getDefault().post(gson.toJson(message));
-
+                playersCount+=1;
+                updatePlayersCountTextView();
                 String alias = isFriends ? friends.get(position).getAlias() :
                         players.get(position).getAlias();
                 Toast toast = Toast.makeText(getBaseContext(), alias + " пришлашён в лобби", Toast.LENGTH_SHORT);
