@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -115,6 +116,7 @@ public class CreateGameActivity extends AppCompatActivity {
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                //view.setBackgroundColor(getResources().getColor(R.color.yellow));
                 String login = isFriends ? friends.get(position).getLogin() :
                         players.get(position).getLogin();
                 InvitePlayersToServer invitePlayers = new InvitePlayersToServer(lobbyId, login);
@@ -230,8 +232,20 @@ public class CreateGameActivity extends AppCompatActivity {
         for (Player player : isFriends ? friends : players) {
             playersList.add(player.getAlias());
         }
-        ArrayAdapter<String> playersAdapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_list_item_1, playersList);
+        ArrayAdapter<String> playersAdapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_list_item_1, playersList){
+
+            public View getView(int position, View convertView, ViewGroup parent) {
+                View view =super.getView(position, convertView, parent);
+
+                TextView textView=(TextView) view.findViewById(android.R.id.text1);
+
+                /*YOUR CHOICE OF COLOR*/
+                textView.setTextColor(getResources().getColor(R.color.tab_indicator_text));
+
+                return view;
+            }
+        };
         runOnUiThread(() -> {
             listView.setAdapter(playersAdapter);
         });
