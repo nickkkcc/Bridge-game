@@ -64,12 +64,4 @@ enum Team{
     E_W = 1,
     NONE_TEAM = 2
 };
-
-enum LobbyManAns{
-    LOBBY_CREATED_TRUE,
-    LOBBY_CREATED_FALSE,
-    CLOSE_LOBBY_TRUE,
-    CLOSE_LOBBY_FALSE
-};
-
 #endif // ENUMIRATION_H

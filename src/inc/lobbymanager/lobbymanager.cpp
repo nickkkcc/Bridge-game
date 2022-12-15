@@ -9,9 +9,10 @@ LobbyManager::LobbyManager(QObject *parent, int maxLobbyCount, QVector<ClientNet
     this->maxLobbyCount = maxLobbyCount;
     this->clients = clients;
     timer = new QTimer(this);
-    timer->setInterval(5000);
+    timer->setInterval(500);
     connect(timer, &QTimer::timeout, this, &LobbyManager::onPlayerCount);
     connect(timer, &QTimer::timeout, this, &LobbyManager::onPlayersOnline);
+
 }
 
 // Функция возвращает кол-во лобби на сервере.
@@ -93,10 +94,16 @@ void LobbyManager::createLobby(ClientNetwork *client)
                 data["successful"] = true;
                 data["error"] = "";
                 data["lobby_id"] = lobbies.last()->getUuid().toString(QUuid::WithoutBraces);
+                qInfo() << "Client:" << client->getUuid()->toString() << "--->"
+                        << client->getName() << "created lobby --->"
+                        << client->getLobbyOwnerUuid()->toString();
             }else{
                 data["successful"] = false;
                 data["error"] = "The maximum number of lobbies that can be created has been exceeded";
                 data["lobby_id"] = "0";
+                qInfo() << "Client:" << client->getUuid()->toString() << "--->"
+                        << client->getName() << "tried created lobby --->"
+                        << "fail";
             }
             tx["data"] = data;
             txAll(tx, client);
@@ -125,6 +132,9 @@ void LobbyManager::closeLobby(QUuid uuidLobby, ClientNetwork* sender)
                         data["lobby_id"] = uuidLobby.toString(QUuid::WithoutBraces);
                         tx["data"] = data;
                         tx["id"] = client->getUuid()->toString(QUuid::WithoutBraces);
+                        qInfo() << "Admin:" << client->getUuid()->toString() << "--->"
+                                << client->getName() << "close lobby --->"
+                                << uuidLobby.toString();
                         txAll(tx, client);
                     }
                 }
@@ -138,6 +148,9 @@ void LobbyManager::closeLobby(QUuid uuidLobby, ClientNetwork* sender)
 
                     tx["data"] = data;
                     tx["id"] = sender->getUuid()->toString(QUuid::WithoutBraces);
+                    qInfo() << "Client:" << sender->getUuid()->toString() << "--->"
+                            << sender->getName() << "exit from lobby --->"
+                            << uuidLobby.toString();
                 }else{
                     data["successful"] = false;
                     data["error"] = "Failed to close the lobby (no such player in this team), please try again";
@@ -175,6 +188,9 @@ void LobbyManager::acceptSelectTeam(Team team, QUuid uuidLobby, ClientNetwork* c
             data["successful"] = true;
             data["error"] = "";
             tx["data"] = data;
+            qInfo() << "Client:" << client->getUuid()->toString()
+                    << "--->" << client->getName() << "joined to lobby --->"
+                    << tempLobby->getUuid().toString();
             txAll(tx, client);
         }else{
             tx["type"] = "accept_select_team";
@@ -204,6 +220,9 @@ void LobbyManager::selectTeamAdmin(Team team, QUuid uuidLobby, ClientNetwork *se
 
             data["error"] = "";
             data["successful"] = true;
+            qInfo() << "Admin:" << sender->getUuid()->toString()
+                    << "--->" << sender->getName() << "is joined to lobby --->"
+                    << tempLobby->getUuid().toString();
         }else{
             data["error"] = "Something went wrong when adding to the team.";
             data["successful"] = false;
@@ -226,6 +245,8 @@ void LobbyManager::invitePlayers(QString login,  QUuid uuidLobby, ClientNetwork*
             data["lobby_id"] = uuidLobby.toString(QUuid::WithoutBraces);
             data["alias"] = sender->getUuid()->toString(QUuid::WithoutBraces);
             tx["data"] = data;
+            qInfo() << "Admin:" << sender->getUuid()->toString() << "--->"
+                    << sender->getName() << "invited player --->" << sendClient->getName();
             txAll(tx, sendClient);
         }
     }
@@ -245,18 +266,26 @@ void LobbyManager::startGame(QUuid uuidLobby, ClientNetwork* sender)
             if(!tempLobby->getPlayers().contains(nullptr)){
                 tempLobby->setGameStarted(true);
 
+                 // Отправка оповещений игрокам о том, что игра началась.
                 for (ClientNetwork* client : qAsConst(tempLobby->getPlayers())) {
                     tx["id"] = client->getUuid()->toString(QUuid::WithoutBraces);
                     data["successful"] = true;
                     data["error"] = "";
+                    tx["data"] = data;
+                    txAll(tx, client);
                 }
+                qInfo() << "Lobby:" << uuidLobby.toString() << "---> is started";
+                tempLobby->startMatch();
             }else{
+
+                // Отправка сообщения админу комнаты, о том, что начать игру не удалось.
                 tx["id"] = sender->getUuid()->toString(QUuid::WithoutBraces);
                 data["successful"] = false;
                 data["error"] = "Not enough players or one of the participants disconnected unexpectedly.";
+                tx["data"] = data;
+                txAll(tx, sender);
             }
-            tx["data"] = data;
-            txAll(tx, sender);
+
         }
     }
 }
@@ -337,6 +366,7 @@ void LobbyManager::onPlayerCount()
         }
     }
 }
+
 
 void LobbyManager::startTimer()
 {

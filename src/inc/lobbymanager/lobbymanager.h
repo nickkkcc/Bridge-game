@@ -33,6 +33,7 @@ public slots:
     void joinLobby(bool join, ClientNetwork* sender);
     void acceptInvitePlayers(QUuid uuidLobby, bool successful, ClientNetwork* sender);
 
+
 signals:
     void disconnectClient(ClientNetwork* sender);
 

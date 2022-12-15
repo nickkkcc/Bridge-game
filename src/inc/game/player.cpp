@@ -36,8 +36,6 @@ Team Player::getTeam() const
     return team;
 }
 
-
-
 void Player::setPosition(PlayerPosition position)
 {
     this->position = position;

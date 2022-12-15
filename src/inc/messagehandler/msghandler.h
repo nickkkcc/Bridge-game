@@ -14,9 +14,9 @@ class MsgHandler : public QObject
 private:
     DataBase *base;
     QStringList questions{
-                          "How Are You",
-                          "GOR",
-                          "DA"
+                          "How Are You?",
+                          "City where you were born?",
+                          "What is your mother's name?"
                           };
     bool *bAllowNewClientConnection;
     int *maxPlayers;

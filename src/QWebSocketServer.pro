@@ -6,11 +6,18 @@ QT += websockets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-CONFIG += c++17
+CONFIG += c++11
 
 SOURCES += \
     inc/database/database.cpp \
     inc/game/player.cpp \
+    inc/game/aboutCard/bid.cpp \
+    inc/game/aboutCard/card.cpp \
+    inc/game/aboutCard/cardkit.cpp \
+    inc/game/aboutGameState/gamestate.cpp \
+    inc/game/aboutGameState/playergamestate.cpp \
+    inc/game/aboutGameState/score.cpp \
+    inc/game/aboutGameState/servergamestate.cpp \
     inc/lobbymanager/lobby.cpp \
     inc/lobbymanager/lobbymanager.cpp \
     inc/main.cpp \
@@ -22,6 +29,13 @@ SOURCES += \
 HEADERS += \
     inc/enumeration/Enumiration.h \
     inc/game/player.h \
+    inc/game/aboutCard/bid.h \
+    inc/game/aboutCard/card.h \
+    inc/game/aboutCard/cardkit.h \
+    inc/game/aboutGameState/gamestate.h \
+    inc/game/aboutGameState/playergamestate.h \
+    inc/game/aboutGameState/score.h \
+    inc/game/aboutGameState/servergamestate.h \
     inc/lobbymanager/lobby.h \
     inc/lobbymanager/lobbymanager.h \
     inc/messagehandler/MsgType.h \
