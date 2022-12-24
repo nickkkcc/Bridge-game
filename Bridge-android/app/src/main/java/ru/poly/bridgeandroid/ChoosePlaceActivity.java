@@ -17,24 +17,25 @@ import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
 
-import ru.poly.bridgeandroid.model.AcceptSelectTeamToClient;
+import ru.poly.bridgeandroid.model.menu.AcceptSelectTeamToClient;
 import ru.poly.bridgeandroid.model.Message;
-import ru.poly.bridgeandroid.model.Player;
-import ru.poly.bridgeandroid.model.PlayersCountLobbyToClient;
-import ru.poly.bridgeandroid.model.PlayersOnlineToClient;
-import ru.poly.bridgeandroid.model.SelectTeamAdminToServer;
-import ru.poly.bridgeandroid.model.SelectTeamToClient;
-import ru.poly.bridgeandroid.model.SelectTeamToServer;
+import ru.poly.bridgeandroid.model.menu.Player;
+import ru.poly.bridgeandroid.model.menu.PlayersCountLobbyToClient;
+import ru.poly.bridgeandroid.model.menu.PlayersOnlineToClient;
+import ru.poly.bridgeandroid.model.menu.SelectTeamAdminToServer;
+import ru.poly.bridgeandroid.model.menu.SelectTeamToClient;
+import ru.poly.bridgeandroid.model.menu.SelectTeamToServer;
 
 public class ChoosePlaceActivity extends AppCompatActivity {
 
-    private static final String KEY = "token";
+    private static final String TOKEN = "token";
     private static final String LOBBY = "lobby";
     private static final String PREFERENCE = "preference";
     private Gson gson;
     private boolean firstTeam;
     private boolean secondTeam;
     private boolean isAdmin;
+    private boolean isStartedNewActivity;
     private Button firstTeamButton;
     private Button secondTeamButton;
     private ArrayList<Player> players;
@@ -51,7 +52,7 @@ public class ChoosePlaceActivity extends AppCompatActivity {
         secondTeamButton = findViewById(R.id.EW);
 
         sharedPreferences = getSharedPreferences(PREFERENCE, MODE_PRIVATE);
-        String token = sharedPreferences.getString(KEY, "");
+        String token = sharedPreferences.getString(TOKEN, "");
         String lobbyId = sharedPreferences.getString(LOBBY, "");
 
         Intent myIntent = getIntent();
@@ -134,7 +135,8 @@ public class ChoosePlaceActivity extends AppCompatActivity {
                 PlayersOnlineToClient playersOnline = message.getData(PlayersOnlineToClient.class);
                 friends = playersOnline.getFriends();
                 players = playersOnline.getPlayers();
-                if (playersCount != null) {
+                if (playersCount != null && !isStartedNewActivity) {
+                    isStartedNewActivity = true;
                     Intent intent = new Intent(ChoosePlaceActivity.this, CreateGameActivity.class);
                     intent.putParcelableArrayListExtra("friends", friends);
                     intent.putParcelableArrayListExtra("players", players);
@@ -165,13 +167,15 @@ public class ChoosePlaceActivity extends AppCompatActivity {
                 PlayersCountLobbyToClient playersCountLobby = message.getData(PlayersCountLobbyToClient.class);
                 if (playersCountLobby.getError().equals("")) {
                     playersCount = playersCountLobby.getPlayersInLobby();
-                    if (!isAdmin) {
+                    if (!isAdmin && !isStartedNewActivity) {
+                        isStartedNewActivity = true;
                         Intent intent = new Intent(ChoosePlaceActivity.this, WaitGameActivity.class);
                         intent.putExtra("playersCount", playersCount);
                         startActivity(intent);
                         finish();
                     }
-                    if (friends != null && players != null) {
+                    if (friends != null && players != null && !isStartedNewActivity) {
+                        isStartedNewActivity = true;
                         Intent intent = new Intent(ChoosePlaceActivity.this, CreateGameActivity.class);
                         intent.putParcelableArrayListExtra("friends", friends);
                         intent.putParcelableArrayListExtra("players", players);

@@ -12,7 +12,7 @@
     <style name="LoginEditText">
         <item name="colorControlNormal">@color/white</item>
         <item name="statusBarBackground">@color/white</item>
-        <item name="colorControlActivated">@color/yellow</item>
+        <item name="colorControlActivated">@color/menu_yellow</item>
         <item name="colorControlHighlight">@color/white</item>
         <item name="android:textColorHint">@color/white</item>
     </style>

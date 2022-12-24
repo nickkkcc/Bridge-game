@@ -105,10 +105,11 @@
                             android:layout_margin="2dp"/>
 
                         <ImageView
-                            android:id="@+id/game_table_teammate_bargaining"
+                            android:id="@+id/game_table_row1_teammate_card7"
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
                             android:layout_weight="1"
+                            app:srcCompat="@drawable/back"
                             android:layout_margin="2dp"/>
                     </TableRow>
 
@@ -170,18 +171,18 @@
                             android:id="@+id/game_table_row2_teammate_card7"
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
-                            app:srcCompat="@drawable/back"
                             android:layout_weight="1"
                             android:layout_margin="2dp"/>
                     </TableRow>
 
                 </TableLayout>
 
-                <Space
+                <ImageView
+                    android:id="@+id/game_table_contract_bid"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="3">
-                </Space>
+                </ImageView>
             </LinearLayout>
 
             <LinearLayout
@@ -441,7 +442,7 @@
                         </com.github.rongi.rotate_layout.layout.RotateLayout>
 
                         <ImageView
-                            android:id="@+id/game_table_enemy_left_bargaining"
+                            android:id="@+id/game_table_row7_enemy_left_card2"
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
                             android:layout_weight="1"
@@ -460,8 +461,7 @@
                     android:id="@+id/game_fragment"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:layout_weight="5"
-                    android:name="ru.poly.bridgeandroid.BargainingFragment">
+                    android:layout_weight="5">
                 </androidx.fragment.app.FragmentContainerView>
 
                 <Space
@@ -705,13 +705,6 @@
                         android:layout_height="0dp"
                         android:layout_weight="1">
 
-                        <ImageView
-                            android:id="@+id/game_table_enemy_right_bargaining"
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1"
-                            android:layout_margin="2dp"/>
-
                         <com.github.rongi.rotate_layout.layout.RotateLayout
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
@@ -720,12 +713,19 @@
                             android:layout_margin="2dp">
 
                             <ImageView
-                                android:id="@+id/game_table_row7_enemy_right_card2"
+                                android:id="@+id/game_table_row7_enemy_right_card1"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 app:srcCompat="@drawable/back"/>
 
                         </com.github.rongi.rotate_layout.layout.RotateLayout>
+
+                        <ImageView
+                            android:id="@+id/game_table_row7_enemy_right_card2"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:layout_margin="2dp"/>
                     </TableRow>
 
                     </TableLayout>
@@ -873,11 +873,10 @@
                             android:layout_weight="1"
                             android:layout_margin="2dp"/>
 
-                        <Space
-                            android:id="@+id/game_table_player_bargaining"
+                        <ImageView
+                            android:id="@+id/game_table_row2_player_card7"
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
-                            app:srcCompat="@drawable/back"
                             android:layout_weight="1"
                             android:layout_margin="2dp"/>
                     </TableRow>
@@ -889,10 +888,10 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="3"
-                    android:text="Мы: 0\nОни: 0\nСделка: 2 из 6"
+                    android:text="Мы: 0\nОни: 0\nСделка: 1 из 6"
                     android:textColor="@color/white"
                     android:gravity="bottom|end"
-                    android:textSize="28sp">
+                    android:textSize="24sp">
                 </TextView>
             </LinearLayout>
         </LinearLayout>

@@ -29,17 +29,19 @@ import org.greenrobot.eventbus.Subscribe;
 
 import ru.poly.bridgeandroid.MenuActivity;
 import ru.poly.bridgeandroid.R;
-import ru.poly.bridgeandroid.model.LoginToClient;
-import ru.poly.bridgeandroid.model.LoginToServer;
+import ru.poly.bridgeandroid.model.menu.LoginToClient;
+import ru.poly.bridgeandroid.model.menu.LoginToServer;
 import ru.poly.bridgeandroid.model.Message;
-import ru.poly.bridgeandroid.model.RegistrationQuestionsToClient;
+import ru.poly.bridgeandroid.model.menu.RegistrationQuestionsToClient;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private static final String KEY = "token";
+    private static final String TOKEN = "token";
+    private static final String LOGIN = "login";
     private static final String PREFERENCE = "preference";
     private Gson gson;
     private LoginViewModel loginViewModel;
+    private EditText usernameEditText;
     private ProgressBar loadingProgressBar;
 
     @Override
@@ -50,7 +52,7 @@ public class LoginActivity extends AppCompatActivity {
                 .get(LoginViewModel.class);
         gson = new Gson();
 
-        final EditText usernameEditText = findViewById(R.id.username);
+        usernameEditText = findViewById(R.id.username);
         final EditText passwordEditText = findViewById(R.id.password);
         final Button loginButton = findViewById(R.id.login);
         final Button registrationButton = findViewById(R.id.registration);
@@ -189,7 +191,8 @@ public class LoginActivity extends AppCompatActivity {
         if (loginToClient.isSuccessful()) {
             SharedPreferences sharedPreferences = getSharedPreferences(PREFERENCE, MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putString(KEY, loginToClient.getToken());
+            editor.putString(TOKEN, loginToClient.getToken());
+            editor.putString(LOGIN, usernameEditText.getText().toString());
             editor.apply();
 
             Intent intent = new Intent(LoginActivity.this, MenuActivity.class);

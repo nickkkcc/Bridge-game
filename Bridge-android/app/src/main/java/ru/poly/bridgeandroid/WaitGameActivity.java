@@ -16,23 +16,29 @@ import com.google.gson.JsonObject;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
-import ru.poly.bridgeandroid.model.ExitLobbyToClient;
-import ru.poly.bridgeandroid.model.ExitLobbyToServer;
+import ru.poly.bridgeandroid.model.game.PlayerGameState;
+import ru.poly.bridgeandroid.model.game.UpdateGameState;
+import ru.poly.bridgeandroid.model.menu.ExitLobbyToClient;
+import ru.poly.bridgeandroid.model.menu.ExitLobbyToServer;
 import ru.poly.bridgeandroid.model.Message;
-import ru.poly.bridgeandroid.model.PlayersCountLobbyToClient;
-import ru.poly.bridgeandroid.model.StartGamePlayersToClient;
+import ru.poly.bridgeandroid.model.menu.PlayersCountLobbyToClient;
+import ru.poly.bridgeandroid.model.menu.StartGamePlayersToClient;
 
 public class WaitGameActivity extends AppCompatActivity {
 
-    private static final String KEY = "token";
+    private static final String TOKEN = "token";
     private static final String LOBBY = "lobby";
+    private static final String LOGIN = "login";
     private static final String PREFERENCE = "preference";
     private String token;
     private String lobbyId;
+    private String login;
     private int playersCount;
+    private boolean isStartGame;
     private Gson gson;
     private TextView playersCountTextView;
     private SharedPreferences sharedPreferences;
+    private Intent gameIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,8 +56,9 @@ public class WaitGameActivity extends AppCompatActivity {
         gson = new Gson();
 
         sharedPreferences = getSharedPreferences(PREFERENCE, MODE_PRIVATE);
-        token = sharedPreferences.getString(KEY, "");
+        token = sharedPreferences.getString(TOKEN, "");
         lobbyId = sharedPreferences.getString(LOBBY, "");
+        login = sharedPreferences.getString(LOGIN, "");
 
         exitButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -82,6 +89,7 @@ public class WaitGameActivity extends AppCompatActivity {
             case "players_count_lobby":
                 PlayersCountLobbyToClient playersCountLobby = message.getData(PlayersCountLobbyToClient.class);
                 if (playersCountLobby.getError().equals("")) {
+                    playersCount = playersCountLobby.getPlayersInLobby();
                     updatePlayersCountTextView();
                 } else {
                     runOnUiThread(() -> {
@@ -93,9 +101,7 @@ public class WaitGameActivity extends AppCompatActivity {
             case "start_game_players":
                 StartGamePlayersToClient startGame = message.getData(StartGamePlayersToClient.class);
                 if (startGame.isSuccessful()) {
-                    Intent intent = new Intent(WaitGameActivity.this, GameActivity.class);
-                    startActivity(intent);
-                    finish();
+                    isStartGame = true;
                 } else {
                     runOnUiThread(() -> {
                         Toast toast = Toast.makeText(getBaseContext(), startGame.getError(), Toast.LENGTH_SHORT);
@@ -119,6 +125,33 @@ public class WaitGameActivity extends AppCompatActivity {
                         toast.show();
                     });
                 }
+                break;
+            case "update_game_state":
+                if (!isStartGame) {
+                    runOnUiThread(() -> {
+                        Toast toast = Toast.makeText(getBaseContext(), "update_game_state error", Toast.LENGTH_SHORT);
+                        toast.show();
+                    });
+                }
+                UpdateGameState updateGameState = message.getData(UpdateGameState.class);
+                PlayerGameState gameState = updateGameState.getGameState();
+                gameIntent = new Intent(WaitGameActivity.this, GameActivity.class);
+                gameIntent.putExtra("gameState", gameState);
+                if (!gameState.getPlayerTurn().equals(gameState.getPlayerPositionForLogin(login))) {
+                    startActivity(gameIntent);
+                    finish();
+                }
+                break;
+            case "notify_bid_turn":
+                if (!isStartGame) {
+                    runOnUiThread(() -> {
+                        Toast toast = Toast.makeText(getBaseContext(), "notify_bid_turn error", Toast.LENGTH_SHORT);
+                        toast.show();
+                    });
+                }
+                gameIntent.putExtra("notifyBidTurn", true);
+                startActivity(gameIntent);
+                finish();
                 break;
             default:
                 throw new RuntimeException();

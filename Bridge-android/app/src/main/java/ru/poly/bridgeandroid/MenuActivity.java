@@ -19,24 +19,19 @@ import com.google.gson.JsonObject;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
-import ru.poly.bridgeandroid.model.AcceptInvitePlayersToClient;
-import ru.poly.bridgeandroid.model.AcceptInvitePlayersToServer;
-import ru.poly.bridgeandroid.model.CreateLobbyToClient;
-import ru.poly.bridgeandroid.model.ExitLobbyToServer;
-import ru.poly.bridgeandroid.model.InvitePlayersToClient;
-import ru.poly.bridgeandroid.model.JoinToClient;
-import ru.poly.bridgeandroid.model.JoinToServer;
-import ru.poly.bridgeandroid.model.LoginToClient;
+import ru.poly.bridgeandroid.model.menu.AcceptInvitePlayersToClient;
+import ru.poly.bridgeandroid.model.menu.AcceptInvitePlayersToServer;
+import ru.poly.bridgeandroid.model.menu.CreateLobbyToClient;
+import ru.poly.bridgeandroid.model.menu.InvitePlayersToClient;
+import ru.poly.bridgeandroid.model.menu.JoinToClient;
+import ru.poly.bridgeandroid.model.menu.JoinToServer;
 import ru.poly.bridgeandroid.model.Message;
-import ru.poly.bridgeandroid.model.RegistrationQuestionsToClient;
-import ru.poly.bridgeandroid.model.SelectTeamToClient;
-import ru.poly.bridgeandroid.model.SelectTeamToServer;
+import ru.poly.bridgeandroid.model.menu.SelectTeamToClient;
 import ru.poly.bridgeandroid.ui.login.LoginActivity;
-import ru.poly.bridgeandroid.ui.login.RegistrationActivity;
 
 public class MenuActivity extends AppCompatActivity {
 
-    private static final String KEY = "token";
+    private static final String TOKEN = "token";
     private static final String LOBBY = "lobby";
     private static final String PREFERENCE = "preference";
     private String token;
@@ -61,7 +56,7 @@ public class MenuActivity extends AppCompatActivity {
         gson = new Gson();
 
         sharedPreferences = getSharedPreferences(PREFERENCE, MODE_PRIVATE);
-        token = sharedPreferences.getString(KEY, "");
+        token = sharedPreferences.getString(TOKEN, "");
 
         createButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -226,12 +221,12 @@ public class MenuActivity extends AppCompatActivity {
     private void switchLoadingVisibility() {
         if (readyToJoin) {
             runOnUiThread(() -> {
-                loadingTextView.setVisibility(View.VISIBLE);
+//                loadingTextView.setVisibility(View.VISIBLE);
                 loadingProgressBar.setVisibility(View.VISIBLE);
             });
         } else {
             runOnUiThread(() -> {
-                loadingTextView.setVisibility(View.INVISIBLE);
+//                loadingTextView.setVisibility(View.INVISIBLE);
                 loadingProgressBar.setVisibility(View.INVISIBLE);
             });
         }

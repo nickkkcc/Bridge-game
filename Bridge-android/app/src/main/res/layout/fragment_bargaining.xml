@@ -29,7 +29,7 @@
                     android:layout_weight="1"
                     android:layout_margin="2.5dp"
                     android:background="@drawable/table_background"
-                    app:srcCompat="@drawable/bargaining_c_1"/>
+                    app:srcCompat="@drawable/bargaining_c_1" />
                 <ImageView
                     android:id="@+id/bargaining_d_1"
                     android:layout_width="0dp"
@@ -37,7 +37,7 @@
                     android:layout_weight="1"
                     android:layout_margin="2.5dp"
                     android:background="@drawable/table_background"
-                    app:srcCompat="@drawable/bargaining_d_1"/>
+                    app:srcCompat="@drawable/bargaining_d_1" />
                 <ImageView
                     android:id="@+id/bargaining_h_1"
                     android:layout_width="0dp"
@@ -340,8 +340,9 @@
             android:layout_marginEnd="10dp"
             android:layout_marginRight="10dp"
             android:layout_weight="1"
+            android:textSize="10sp"
             android:text="@string/contra"
-            app:backgroundTint="#FF0000" />
+            app:backgroundTint="@color/yellow"/>
 
         <Button
             android:id="@+id/button_recontra"
@@ -352,8 +353,9 @@
             android:layout_marginEnd="10dp"
             android:layout_marginRight="10dp"
             android:layout_weight="1"
+            android:textSize="10sp"
             android:text="@string/recontra"
-            app:backgroundTint="#FFA500" />
+            app:backgroundTint="@color/orange" />
 
         <Button
             android:id="@+id/button_pass"
@@ -364,8 +366,9 @@
             android:layout_marginEnd="10dp"
             android:layout_marginRight="10dp"
             android:layout_weight="1"
+            android:textSize="10sp"
             android:text="@string/pass"
-            app:backgroundTint="#FFFF00" />
+            app:backgroundTint="@color/red" />
     </LinearLayout>
 
 </LinearLayout>

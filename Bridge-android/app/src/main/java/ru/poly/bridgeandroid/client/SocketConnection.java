@@ -15,7 +15,7 @@ import ru.poly.bridgeandroid.model.Message;
 
 public class SocketConnection implements ClientWebSocket.MessageListener {
 
-    private static String SERVER_URL = "ws://31.134.130.194:8888";
+    private static String SERVER_URL = "ws://31.134.129.26:8888";
 
     private ClientWebSocket clientWebSocket;
     private Context context;

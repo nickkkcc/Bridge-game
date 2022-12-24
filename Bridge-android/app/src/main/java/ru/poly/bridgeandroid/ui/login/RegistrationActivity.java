@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
@@ -14,9 +13,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,22 +31,21 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import ru.poly.bridgeandroid.MenuActivity;
 import ru.poly.bridgeandroid.R;
-import ru.poly.bridgeandroid.model.LoginToClient;
-import ru.poly.bridgeandroid.model.LoginToServer;
+import ru.poly.bridgeandroid.model.menu.LoginToClient;
+import ru.poly.bridgeandroid.model.menu.LoginToServer;
 import ru.poly.bridgeandroid.model.Message;
-import ru.poly.bridgeandroid.model.Question;
-import ru.poly.bridgeandroid.model.RegistrationQuestionsToClient;
-import ru.poly.bridgeandroid.model.RegistrationToClient;
-import ru.poly.bridgeandroid.model.RegistrationToServer;
+import ru.poly.bridgeandroid.model.menu.Question;
+import ru.poly.bridgeandroid.model.menu.RegistrationToClient;
+import ru.poly.bridgeandroid.model.menu.RegistrationToServer;
 
 public class RegistrationActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
-    private static final String KEY = "token";
+    private static final String TOKEN = "token";
+    private static final String LOGIN = "login";
     private static final String PREFERENCE = "preference";
     private LoginViewModel loginViewModel;
     private Gson gson;
@@ -235,7 +231,8 @@ public class RegistrationActivity extends AppCompatActivity implements AdapterVi
                 if (loginToClient.isSuccessful()) {
                     SharedPreferences sharedPreferences = getSharedPreferences(PREFERENCE, MODE_PRIVATE);
                     SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putString(KEY, loginToClient.getToken());
+                    editor.putString(TOKEN, loginToClient.getToken());
+                    editor.putString(LOGIN, usernameEditText.getText().toString());
                     editor.apply();
 
                     Intent intent = new Intent(RegistrationActivity.this, MenuActivity.class);

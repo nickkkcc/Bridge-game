@@ -15,9 +15,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.github.angads25.toggle.interfaces.OnToggledListener;
-import com.github.angads25.toggle.model.ToggleableView;
-import com.github.angads25.toggle.widget.LabeledSwitch;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
@@ -28,20 +25,23 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import ru.poly.bridgeandroid.model.ExitLobbyToClient;
-import ru.poly.bridgeandroid.model.ExitLobbyToServer;
-import ru.poly.bridgeandroid.model.InvitePlayersToServer;
+import ru.poly.bridgeandroid.model.game.PlayerGameState;
+import ru.poly.bridgeandroid.model.game.UpdateGameState;
+import ru.poly.bridgeandroid.model.menu.ExitLobbyToClient;
+import ru.poly.bridgeandroid.model.menu.ExitLobbyToServer;
+import ru.poly.bridgeandroid.model.menu.InvitePlayersToServer;
 import ru.poly.bridgeandroid.model.Message;
-import ru.poly.bridgeandroid.model.Player;
-import ru.poly.bridgeandroid.model.PlayersCountLobbyToClient;
-import ru.poly.bridgeandroid.model.PlayersOnlineToClient;
-import ru.poly.bridgeandroid.model.StartGamePlayersToClient;
-import ru.poly.bridgeandroid.model.StartGamePlayersToServer;
+import ru.poly.bridgeandroid.model.menu.Player;
+import ru.poly.bridgeandroid.model.menu.PlayersCountLobbyToClient;
+import ru.poly.bridgeandroid.model.menu.PlayersOnlineToClient;
+import ru.poly.bridgeandroid.model.menu.StartGamePlayersToClient;
+import ru.poly.bridgeandroid.model.menu.StartGamePlayersToServer;
 
 public class CreateGameActivity extends AppCompatActivity {
 
-    private static final String KEY = "token";
+    private static final String TOKEN = "token";
     private static final String LOBBY = "lobby";
+    private static final String LOGIN = "login";
     private static final String PREFERENCE = "preference";
     private Gson gson;
     private List<Player> friends;
@@ -50,7 +50,10 @@ public class CreateGameActivity extends AppCompatActivity {
     private TextView playersCountTextView;
     private int playersCount;
     private boolean isFriends;
+    private boolean isStartGame;
+    private String login;
     private SharedPreferences sharedPreferences;
+    private Intent gameIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,36 +61,35 @@ public class CreateGameActivity extends AppCompatActivity {
         setContentView(R.layout.activity_create_game);
 
         sharedPreferences = getSharedPreferences(PREFERENCE, MODE_PRIVATE);
-        String token = sharedPreferences.getString(KEY, "");
+        String token = sharedPreferences.getString(TOKEN, "");
         String lobbyId = sharedPreferences.getString(LOBBY, "");
+        login = sharedPreferences.getString(LOGIN, "");
 
-//        Intent myIntent = getIntent();
-//        friends = myIntent.getParcelableArrayListExtra("friends");
-//        players = myIntent.getParcelableArrayListExtra("players");
-//        playersCount = myIntent.getIntExtra("playersCount", 0);
-        players = Arrays.asList(new Player("login1","player1"), new Player("login1","player2"),
-                new Player("login3","player3"), new Player("login4","player4"),
-                new Player("login5","player5"), new Player("login6","player6"),
-                new Player("login7","player7"), new Player("login8","player8"),
-                new Player("login9","player9"), new Player("login10","player10"));
-        friends = Arrays.asList(new Player("login1","friend1"), new Player("login1","friend2"),
-                new Player("login3","friend3"), new Player("login4","friend4"),
-                new Player("login5","friend5"), new Player("login6","friend6"),
-                new Player("login7","friend7"), new Player("login8","friend8"),
-                new Player("login9","friend9"), new Player("login10","friend10"));
+        Intent myIntent = getIntent();
+        friends = myIntent.getParcelableArrayListExtra("friends");
+        players = myIntent.getParcelableArrayListExtra("players");
+        playersCount = myIntent.getIntExtra("playersCount", 0);
+//        players = Arrays.asList(new Player("login1","player1"), new Player("login1","player2"),
+//                new Player("login3","player3"), new Player("login4","player4"),
+//                new Player("login5","player5"), new Player("login6","player6"),
+//                new Player("login7","player7"), new Player("login8","player8"),
+//                new Player("login9","player9"), new Player("login10","player10"));
+//        friends = Arrays.asList(new Player("login1","friend1"), new Player("login1","friend2"),
+//                new Player("login3","friend3"), new Player("login4","friend4"),
+//                new Player("login5","friend5"), new Player("login6","friend6"),
+//                new Player("login7","friend7"), new Player("login8","friend8"),
+//                new Player("login9","friend9"), new Player("login10","friend10"));
 
         gson = new Gson();
 
         listView = findViewById(R.id.listView);
         final Button startGameButton = findViewById(R.id.start_game);
         final Button exitGameButton = findViewById(R.id.exit_lobby);
-        //final LabeledSwitch labeledSwitch = findViewById(R.id.switch_list);
         playersCountTextView = findViewById(R.id.create_game_players_count);
 
         final SwitchCompat switchOnOff = findViewById(R.id.switch_list);
         final TextView tvSwitchFriends = findViewById(R.id.tvSwitchFriends);
         final TextView tvSwitchPlayers = findViewById(R.id.tvSwitchPlayers);
-
 
         updatePlayersCountTextView();
 
@@ -123,11 +125,10 @@ public class CreateGameActivity extends AppCompatActivity {
                 JsonObject jsonObject = (JsonObject) gson.toJsonTree(invitePlayers);
                 Message message = new Message(token, "invite_players", jsonObject);
                 EventBus.getDefault().post(gson.toJson(message));
-                playersCount+=1;
-                updatePlayersCountTextView();
+
                 String alias = isFriends ? friends.get(position).getAlias() :
                         players.get(position).getAlias();
-                Toast toast = Toast.makeText(getBaseContext(), alias + " пришлашён в лобби", Toast.LENGTH_SHORT);
+                Toast toast = Toast.makeText(getBaseContext(), alias + " приглашён в лобби", Toast.LENGTH_SHORT);
                 toast.show();
             }
         });
@@ -135,27 +136,18 @@ public class CreateGameActivity extends AppCompatActivity {
         switchOnOff.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(switchOnOff.isChecked()) {
+                isFriends = !switchOnOff.isChecked();
+                updateListViewAdapter(isFriends);
+                if (isFriends) {
                     tvSwitchFriends.setTextColor(getResources().getColor(R.color.white));
-                    tvSwitchPlayers.setTextColor(getResources().getColor(R.color.yellow));
-                    isFriends = false;
-                    updateListViewAdapter(isFriends);
-                }else {
-                    tvSwitchFriends.setTextColor(getResources().getColor(R.color.yellow));
+                    tvSwitchPlayers.setTextColor(getResources().getColor(R.color.menu_yellow));
+                } else {
+                    tvSwitchFriends.setTextColor(getResources().getColor(R.color.menu_yellow));
                     tvSwitchPlayers.setTextColor(getResources().getColor(R.color.white));
-                    isFriends = true;
-                    updateListViewAdapter(isFriends);
                 }
+                updateListViewAdapter(isFriends);
             }
         });
-
-//        labeledSwitch.setOnToggledListener(new OnToggledListener() {
-//            @Override
-//            public void onSwitched(ToggleableView toggleableView, boolean isOn) {
-//                isFriends = isOn;
-//                updateListViewAdapter(isFriends);
-//            }
-//        });
     }
 
     @Override
@@ -189,9 +181,7 @@ public class CreateGameActivity extends AppCompatActivity {
             case "start_game_players":
                 StartGamePlayersToClient startGame = message.getData(StartGamePlayersToClient.class);
                 if (startGame.isSuccessful()) {
-                    Intent intent = new Intent(CreateGameActivity.this, GameActivity.class);
-                    startActivity(intent);
-                    finish();
+                    isStartGame = true;
                 } else {
                     runOnUiThread(() -> {
                         Toast toast = Toast.makeText(getBaseContext(), startGame.getError(), Toast.LENGTH_SHORT);
@@ -222,6 +212,33 @@ public class CreateGameActivity extends AppCompatActivity {
                     });
                 }
                 break;
+            case "update_game_state":
+                if (!isStartGame) {
+                    runOnUiThread(() -> {
+                        Toast toast = Toast.makeText(getBaseContext(), "update_game_state error", Toast.LENGTH_SHORT);
+                        toast.show();
+                    });
+                }
+                UpdateGameState updateGameState = message.getData(UpdateGameState.class);
+                PlayerGameState gameState = updateGameState.getGameState();
+                gameIntent = new Intent(CreateGameActivity.this, GameActivity.class);
+                gameIntent.putExtra("gameState", gameState);
+                if (!gameState.getPlayerTurn().equals(gameState.getPlayerPositionForLogin(login))) {
+                    startActivity(gameIntent);
+                    finish();
+                }
+                break;
+            case "notify_bid_turn":
+                if (!isStartGame) {
+                    runOnUiThread(() -> {
+                        Toast toast = Toast.makeText(getBaseContext(), "notify_bid_turn error", Toast.LENGTH_SHORT);
+                        toast.show();
+                    });
+                }
+                gameIntent.putExtra("notifyBidTurn", true);
+                startActivity(gameIntent);
+                finish();
+                break;
             default:
                 throw new RuntimeException();
         }
@@ -233,12 +250,12 @@ public class CreateGameActivity extends AppCompatActivity {
             playersList.add(player.getAlias());
         }
         ArrayAdapter<String> playersAdapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_1, playersList){
+                android.R.layout.simple_list_item_1, playersList) {
 
             public View getView(int position, View convertView, ViewGroup parent) {
-                View view =super.getView(position, convertView, parent);
+                View view = super.getView(position, convertView, parent);
 
-                TextView textView=(TextView) view.findViewById(android.R.id.text1);
+                TextView textView = (TextView) view.findViewById(android.R.id.text1);
 
                 /*YOUR CHOICE OF COLOR*/
                 textView.setTextColor(getResources().getColor(R.color.tab_indicator_text));
