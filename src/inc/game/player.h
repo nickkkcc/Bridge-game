@@ -9,7 +9,7 @@
 class Player : public QObject
 {
     Q_OBJECT
-public:
+  public:
     explicit Player(QObject *parent = nullptr);
 
     // Функция, вызываемая, когда сервер отправляет запрос клиенту для того, чтобы тот сделал заявку.
@@ -25,10 +25,10 @@ public:
     virtual void moveRejected(QString reason) = 0;
 
     // Функция, вызываемая, когда сервер завершил игру по каким-либо причинам.
-    //virtual void gameTerminated(QString reason) = 0;
+    // virtual void gameTerminated(QString reason) = 0;
 
     // Функция, вызываемая, когда сервер приостановил игру по каким-либо причинам.
-    //virtual void gameStopped(QString reason) = 0;
+    // virtual void gameStopped(QString reason) = 0;
 
     // Функция, вызываемая, когда сервер отправляет клиенту обновленные игровые данные.
     virtual void updateGameState(PlayerGameState gameState) = 0;
@@ -46,7 +46,7 @@ public:
     void setPosition(PlayerPosition position);
 
     // Получить команду игрока.
-    Team getTeam() const;
+    const Team getTeam() const;
 
     // Установить команду для игрока.
     void setTeam(Team newTeam);
@@ -55,14 +55,14 @@ public:
     void setUuid(const QUuid &newUuid);
 
     // Получить идентификатор для игрока.
-    QUuid *getUuid();
+    const QUuid &getUuid() const;
 
-protected:
+  protected:
     // Имя (логин) игрока.
     QString name;
 
     // Временный идентификатор игрока на время прибывания на сервере.
-    QUuid *uuid;
+    QUuid uuid;
 
     // Позиция игрока (север, восток, юг, запад)
     PlayerPosition position;

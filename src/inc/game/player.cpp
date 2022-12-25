@@ -1,9 +1,8 @@
 #include "player.h"
 
 Player::Player(QObject *parent)
-    : QObject{parent}
 {
-
+    this->setParent(parent);
 }
 
 QString Player::getName() const
@@ -21,7 +20,7 @@ void Player::setName(QString name)
     this->name = name;
 }
 
-QUuid *Player::getUuid()
+const QUuid &Player::getUuid() const
 {
     return uuid;
 }
@@ -31,7 +30,7 @@ void Player::setTeam(Team newTeam)
     team = newTeam;
 }
 
-Team Player::getTeam() const
+const Team Player::getTeam() const
 {
     return team;
 }

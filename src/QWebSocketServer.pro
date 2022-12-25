@@ -54,16 +54,16 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../../../../../QxEntityEditor/cpp/bin/ -lbridgeServer
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../../../../../QxEntityEditor/cpp/bin/ -lbridgeServerd
-else:unix: LIBS += -L$$PWD/../../../../../../../QxEntityEditor/cpp/bin/ -lbridgeServer
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/libs/DataBaseLib/bin/ -lbridgeServer
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/libs/DataBaseLib/bin/ -lbridgeServerd
+else:unix: LIBS += -L$$PWD/libs/DataBaseLib/bin/ -lbridgeServer
 
-INCLUDEPATH += $$PWD/../../../../../../../QxEntityEditor/cpp/include
-DEPENDPATH += $$PWD/../../../../../../../QxEntityEditor/cpp/include
+INCLUDEPATH += $$PWD/libs/DataBaseLib/include
+DEPENDPATH += $$PWD/libs/DataBaseLib/include
 
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../../../../../QT/libraries/QxOrm/lib/ -lQxOrm
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../../../../../QT/libraries/QxOrm/lib/ -lQxOrmd
-else:unix: LIBS += -L$$PWD/../../../../../../../QT/libraries/QxOrm/lib/ -lQxOrm
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/libs/QxOrmLib/lib/ -lQxOrm
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/libs/QxOrmLib/lib/ -lQxOrmd
+else:unix: LIBS += -L$$PWD/libs/QxOrmLib/lib/ -lQxOrm
 
-INCLUDEPATH += $$PWD/../../../../../../../QT/libraries/QxOrm/include
-DEPENDPATH += $$PWD/../../../../../../../QT/libraries/QxOrm/include
+INCLUDEPATH += $$PWD/libs/QxOrmLib/include
+DEPENDPATH += $$PWD/libs/QxOrmLib/include

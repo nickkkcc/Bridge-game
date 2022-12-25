@@ -21,17 +21,17 @@ public:
     bool writeUserToBase(QString login, QString password,
                     QString questionType, QString answer, double score);
     bool readUserFromBase(QString login);
-    QString getUserLogin();
-    QString getuserPassword();
-    QString getUserQuestionType();
-    QString getUseranswer();
+    const QString getUserLogin() const;
+    const QString getuserPassword() const;
+    const QString getUserQuestionType() const;
+    const QString getUseranswer() const;
     int getUserScore();
+    ~DataBase();
 
-private:
+  private:
     QSharedPointer<Users> userPtr;
     QVector<Users> usersList;
-signals:
-
+  signals:
 };
 
 #endif // DATABASE_H

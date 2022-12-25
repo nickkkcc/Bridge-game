@@ -18,10 +18,9 @@ public:
     bool isBidValid(const Bid &bid) const;
     bool isCardValid(const Card &card) const;
     const CardKit& getDeck();
-    PlayerGameState getPlayerGameState(PlayerPosition player, QVector<ClientNetwork*> players,
+    PlayerGameState getPlayerGameState(PlayerPosition player, const QVector<ClientNetwork *> &players,
                                        GameEvent gameEvent);
     void startMatch(qint32 maxRubbers);
-    // Functions for unit testing purposes
     const QMap<PlayerPosition, CardKit>& getPlayerHands() const;
     void setPlayerHands(const QMap<PlayerPosition, CardKit> &playerHands);
 signals:

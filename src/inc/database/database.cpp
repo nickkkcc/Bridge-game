@@ -1,13 +1,8 @@
 #include "database.h"
 
-DataBase::DataBase(QString dataBaseName,
-                   QString hostName,
-                   int port,
-                   QString userName,
-                   QString password,
-                   QString driverName,
-                   QObject *parent)
-    : QObject{parent}
+DataBase::DataBase(QString dataBaseName, QString hostName, int port, QString userName, QString password,
+                   QString driverName, QObject *parent)
+    : QObject(parent)
 {
     qx::QxSqlDatabase::getSingleton()->setDatabaseName(dataBaseName);
     qx::QxSqlDatabase::getSingleton()->setDriverName(driverName);
@@ -20,7 +15,10 @@ DataBase::DataBase(QString dataBaseName,
 bool DataBase::writeUserToBase(QString login, QString password,
                           QString questionType, QString answer, double score)
 {
-    if(readUserFromBase(login)){
+
+    if (readUserFromBase(login))
+    {
+
         return false;
     }
 
@@ -39,6 +37,7 @@ bool DataBase::writeUserToBase(QString login, QString password,
 
 bool DataBase::readUserFromBase(QString login)
 {
+
     usersList.clear();
     qx_query query;
     query.where("t_users.login").isEqualTo(login);
@@ -47,33 +46,45 @@ bool DataBase::readUserFromBase(QString login)
     return !usersList.isEmpty();
 }
 
-QString DataBase::getUserLogin()
+const QString DataBase::getUserLogin() const
 {
-    if(!usersList.isEmpty()){
-       return usersList[0].getlogin();
+
+    if (!usersList.isEmpty())
+    {
+
+        return usersList[0].getlogin();
     }
     return "";
 }
 
-QString DataBase::getuserPassword()
+const QString DataBase::getuserPassword() const
 {
-    if(!usersList.isEmpty()){
+
+    if (!usersList.isEmpty())
+    {
+
         return usersList[0].getpassword();
     }
     return "";
 }
 
-QString DataBase::getUserQuestionType()
+const QString DataBase::getUserQuestionType() const
 {
-    if(!usersList.isEmpty()){
+
+    if (!usersList.isEmpty())
+    {
+
         return usersList[0].getquestion_type();
     }
     return "";
 }
 
-QString DataBase::getUseranswer()
+const QString DataBase::getUseranswer() const
 {
-    if(!usersList.isEmpty()){
+
+    if (!usersList.isEmpty())
+    {
+
         return usersList[0].getanswer();
     }
     return "";
@@ -81,9 +92,18 @@ QString DataBase::getUseranswer()
 
 int DataBase::getUserScore()
 {
-    if(!usersList.isEmpty()){
+
+    if (!usersList.isEmpty())
+    {
+
         return usersList[0].getscore();
     }
     return 0;
 }
 
+DataBase::~DataBase()
+{
+
+    qx::QxSqlDatabase::getSingleton()->closeAllDatabases();
+    qInfo() << "Server: DataBase ---> deleted";
+}

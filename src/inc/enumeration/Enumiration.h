@@ -44,7 +44,8 @@ enum GameEvent{
     TRICK_END, // Взятка закончена в фазе игры.
     PLAY_END, // Фаза игры закончена
     MATCH_END, // Матч завершен
-    RUBBER_COMPLETED // Один роббер завершен
+    RUBBER_COMPLETED, // Один роббер завершен
+    PLAY_STOP // Остановка игры
 };
 
 enum GamePhase{

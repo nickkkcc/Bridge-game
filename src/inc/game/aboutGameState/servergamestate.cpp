@@ -125,6 +125,7 @@ void ServerGameState::updateBidState(const Bid &bid)
     if(bid.getBidCall() == PASS){
         ++ passCount;
     }
+
     // Проверяем, действительна ли ставка
     else if(isBidValid(bid)){
         // Сброс счетчика проходов
@@ -284,12 +285,14 @@ const CardKit& ServerGameState::getDeck()
 }
 
 // Генерируем и возвращаем состояние игры, адаптированное для игрока
-PlayerGameState ServerGameState::getPlayerGameState(PlayerPosition player, QVector<ClientNetwork*> players, GameEvent gameEvent)
+PlayerGameState ServerGameState::getPlayerGameState(PlayerPosition player, const QVector<ClientNetwork *> &players,
+                                                    GameEvent gameEvent)
 {
     // Create player positions map and card count map
     QMap<PlayerPosition, QString> playerPositions;
     QMap<PlayerPosition, qint8> playerCardCount;
-    for(const ClientNetwork* client: players){
+    for (auto client : players)
+    {
         playerPositions.insert(client->getPosition(), client->getName());
         playerCardCount.insert(client->getPosition(), playerHands.value(client->getPosition()).getCardCount());
     }

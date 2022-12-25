@@ -17,42 +17,33 @@
 class ServerNetwork : public QObject
 {
     Q_OBJECT
-public:
+  public:
     explicit ServerNetwork(QObject *parent = nullptr);
     ~ServerNetwork();
-    //void forceError();
-
-    QTcpSocket* getPlayerSoc(QString playerName);
     void setPassword(QString password);
-    bool initServer(quint16 port,
-                    int maxPlayers,
-                    int maxLoginLength,
-                    int minLoginLength);
+    bool initServer(quint16 port, int maxPlayers, int maxLoginLength, int minLoginLength);
     void stopListening();
     void deleteAllClients();
 
-private slots:
+  private slots:
     void connectClient();
     void validateClientText(const QString &message);
     void disconnectTempClient();
-    void disconnectClient(ClientNetwork* sender);
+    void disconnectClient(ClientNetwork *const sender);
 
-signals:
+  signals:
     void connectionResult(int status,quint16 uport, QString errorMsg);
     void generalError(QString errorMsg);
-
-    void playerJoined(QString playerName);
     void playerDisconnected(QString playerName);
-    void started(bool start);
     void startTimer();
 
-private:
-    QVector<ClientNetwork*> clients;
-    QVector<QWebSocket*> clientSocTemp;
-    QWebSocketServer* server;
-    LobbyManager* lobbyManager;
-    DataBase *base;
-    MsgHandler *msgHandler;
+  private:
+    QVector<ClientNetwork *> clients;
+    QVector<QWebSocket *> clientSocTemp;
+    QWebSocketServer *server = nullptr;
+    LobbyManager *lobbyManager = nullptr;
+    DataBase *dataBase = nullptr;
+    MsgHandler *msgHandler = nullptr;
 
     bool bAllowNewClientConnection;
     int maxPlayers = 100;
@@ -60,9 +51,8 @@ private:
     int minLoginLength = 3;
     quint16 port;
 
-
-private:
-    void connectClientToLobbyManager(ClientNetwork* client);
+  private:
+    void connectClientToLobbyManager(ClientNetwork *const client);
 };
 
 #endif // SERVERNETWORK_H

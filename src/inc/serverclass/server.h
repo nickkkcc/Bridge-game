@@ -12,7 +12,6 @@
 #include <QtNetwork/QSslKey>
 
 #include "inc/network/servernetwork.h"
-#include "inc/lobbymanager/lobbymanager.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class Server; }
@@ -22,14 +21,11 @@ class Server : public QMainWindow
 {
     Q_OBJECT
 
-public:
+  public:
     Server(QWidget *parent = nullptr);
-    const ServerNetwork& getServerNetwork() const;
+    const ServerNetwork &getServerNetwork() const;
 
-
-public slots:
-    void closeServer();
-private slots:
+  private slots:
     //    void clientDisconnected();
     void on_CreateBtn_clicked();
     void on_RestartBtn_clicked();
@@ -43,14 +39,13 @@ private slots:
 
     void on_DeleteAllClientBtn_clicked();
 
-private:
-    ServerNetwork* serverNetwork = nullptr;
-    LobbyManager* lobbyManager = nullptr;
-    Ui::Server *ui;
-    QUrl ipAddress;
-    ushort port;
-    int maxLoginLength;
-    int maxPlayers;
-    int minLoginLength;
+    private:
+      ServerNetwork *serverNetwork = nullptr;
+      Ui::Server *ui;
+      QUrl ipAddress;
+      ushort port;
+      int maxLoginLength;
+      int maxPlayers;
+      int minLoginLength;
 };
 #endif // SERVER_H

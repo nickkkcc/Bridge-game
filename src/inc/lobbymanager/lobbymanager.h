@@ -12,47 +12,48 @@
 class LobbyManager : public QObject
 {
     Q_OBJECT
-public:
-    explicit LobbyManager(QObject *parent = nullptr, int maxLobbyCount = 1, QVector<ClientNetwork*> *clients = nullptr);
-    int getLobbyCount();
-    Lobby *findLobby(QUuid uuidLobby);
-    Lobby *findLobby(ClientNetwork* owner);
-    Lobby *findLobby(QString playerName);
-    ClientNetwork* findPlayer(QString playerName);
-    ClientNetwork *findPlayer(QUuid plaerUuid);
+  public:
+    explicit LobbyManager(QObject *const parent = nullptr, int maxLobbyCount = 1,
+                          QVector<ClientNetwork *> *const clients = nullptr);
+    ~LobbyManager();
+    const int getLobbyCount() const;
+    Lobby *const findLobby(QUuid uuidLobby) const;
+    Lobby *const findLobby(ClientNetwork *const owner) const;
+    Lobby *const findLobby(QString playerName) const;
+    ClientNetwork *const findPlayer(QString playerName) const;
+    ClientNetwork *const findPlayer(QUuid playerUuid) const;
 
-public slots:
-    void createLobby(ClientNetwork* client);
-    void closeLobby(QUuid uuidLobby, ClientNetwork *sender);
-    void acceptSelectTeam(Team team, QUuid uuidLobby, ClientNetwork* client);
-    void selectTeamAdmin(Team team, QUuid uuidLobby, ClientNetwork* client);
-    void invitePlayers(QString logins, QUuid uuidLobby, ClientNetwork *sender);
-    void startGame(QUuid uuidLobby, ClientNetwork *sender);
+  public slots:
+    void createLobby(ClientNetwork *const client);
+    void closeLobby(const QUuid &uuidLobby, ClientNetwork *const sender);
+    void acceptSelectTeam(Team team, QUuid uuidLobby, ClientNetwork *const client);
+    void selectTeamAdmin(Team team, QUuid uuidLobby, ClientNetwork *const client);
+    void invitePlayers(QString logins, QUuid uuidLobby, ClientNetwork *const sender);
+    void startGame(QUuid uuidLobby, ClientNetwork *const sender);
     void startTimer();
-    void clientDisconnected(ClientNetwork* sender);
-    void joinLobby(bool join, ClientNetwork* sender);
-    void acceptInvitePlayers(QUuid uuidLobby, bool successful, ClientNetwork* sender);
+    void clientDisconnected(ClientNetwork *const sender);
+    void joinLobby(bool join, ClientNetwork *const sender);
+    void acceptInvitePlayers(QUuid uuidLobby, bool successful, ClientNetwork *const sender);
 
+  signals:
+    void disconnectClient(ClientNetwork *const sender);
 
-signals:
-    void disconnectClient(ClientNetwork* sender);
-
-private slots:
+  private slots:
     void onPlayersOnline();
     void onPlayerCount();
 
-
-private:
+  private:
+    static constexpr quint8 maxTeamPLayers = 2;
     int maxLobbyCount;
-    QVector<ClientNetwork*> *clients;
-    QVector<Lobby*> lobbies;
-    QTimer *timer;
-private:
-    void lobbyClose(Lobby* lobby);
-    void txAll(const QJsonObject &tx);
+    QVector<ClientNetwork *> *clients = nullptr;
+    QVector<Lobby *> lobbies;
+    QTimer *timer = nullptr;
+
+  private:
+    void lobbyClose(Lobby *const lobby);
     QHash<QString, QString> getFinderPlayers();
-    void txAll(QJsonObject tx, ClientNetwork* sender);
-    void sendSelectTeamClient(QUuid uuidLobby, ClientNetwork* client);
+    void txAll(QJsonObject tx, ClientNetwork *const sender);
+    void sendSelectTeamClient(QUuid uuidLobby, ClientNetwork *const client);
 };
 
 #endif // LOBBYMANAGER_H
