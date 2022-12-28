@@ -11,7 +11,6 @@ ClientNetwork::ClientNetwork(QObject *parent, QString name, QWebSocket *clientSo
     this->name = name;
     this->uuid = uuid;
     this->clientSoc = clientSoc;
-    gameTerminatedOnce = false;
 
     connect(clientSoc, &QWebSocket::disconnected, this, &ClientNetwork::onClientDisconnected);
     connect(clientSoc, &QWebSocket::textMessageReceived, this, &ClientNetwork::rxAll);
@@ -73,7 +72,7 @@ void ClientNetwork::updateGameState(PlayerGameState state)
 
     QJsonObject gameState;
     state.writeToJson(gameState);
-
+    //    qInfo() << gameState;
     QJsonObject tx;
     tx["id"] = uuid.toString(QUuid::WithoutBraces);
     tx["type"] = "update_game_state";
@@ -154,24 +153,42 @@ void ClientNetwork::rxAll(const QString& message)
 
             rxBidSelectedDeserialization(rx["data"].toObject()["bid"].toObject());
         }
-        // Кейс для случая, если игрок хочет выйти из самой игры. В таком случае игра останавливается у всех.
-        // Лобби уничтожается. Очки не сохраняются в базу данных.
-        //        if (rx["type"] == "exit_from_game")
+        // Кейс для добавления игрока в друзья. Ответ клиенту добавлен ли указанный клиент в друзья
+        // в базе данных.
+        //        if (rx["type"] == "add_to_friends")
         //        {
-        //            rxExitFromGame();
+        //            rxAddToFriends();
         //        }
-        // Кейс для приглашения игрока в друзья. Необходимо подтверждение игрока, которого пригласили.
-        //        if (rx["type"] == "invite_to_friends")
+
+        // Кейс для удаления игрока из друзья. Ответ клиенту удален ли указанный клиент из друзей
+        // в базе данных.
+        //        if (rx["type"] == "delete_from_friends")
         //        {
-        //            rxInvaiteToFriends();
+        //            rxDeleteToFriends();
         //        }
-        // Кейс для согласия или отвержения дружбы. Отправляется игроку, который приглашает в друзья.
-        // Если ответ положительный игрок записывается в друзья для игрока в базу данных. Оповещение игрока,
-        // который пришлашал в друзья.
-        // Если ответ отрицательный - оповещение игрока об отказе.
-        //        if (rx["type"] == "accept_for_invite_to_friends")
+
+        // Кейс для запроса списка друзей клиента с базы данных.
+        // Если запрос выполнен успешно - отправка клиенту списка друзей.
+        // Если запрос не выполнен успешно - отправка клиенту причину ошибки.
+        //        if (rx["type"] == "request_friends_list")
         //        {
-        //            rxInvaiteToFriends();
+        //            rxRequestFriendsList();
+        //        }
+
+        // Кейс для запроса истории игр клиента с базы данных.
+        // Если запрос выполнен успешно - отправка клиенту списка сыгранных игр.
+        // Если запрос не выполнен успешно - отправка клиенту причину ошибки.
+        //        if (rx["type"] == "request_history_list")
+        //        {
+        //            rxRequestHistoryList();
+        //        }
+
+        // Кейс для запроса на удаление клиента из базы данных.
+        // Если запрос выполнен успешно - отправка клиенту статус успешного удаления клиента из базы данных.
+        // Если запрос не выполнен успешно - отправка клиенту причину ошибки.
+        //        if (rx["type"] == "delete_client")
+        //        {
+        //            rxDeleteClient();
         //        }
     }
 }
@@ -192,6 +209,11 @@ void ClientNetwork::rxBidSelectedDeserialization(QJsonObject bid)
     Bid tempbid;
     tempbid.readFromJson(bid);
     emit rxBidSelected(tempbid);
+}
+
+void ClientNetwork::setClientSoc(QWebSocket *newClientSoc)
+{
+    clientSoc = newClientSoc;
 }
 
 QVector<ClientNetwork *> &ClientNetwork::getClientFriends()
@@ -244,10 +266,7 @@ ClientNetwork::~ClientNetwork()
     qInfo() << "Server: client --->" << uuid.toString(QUuid::WithBraces) << "--->" << name << "is disconnected.";
     if (clientSoc)
     {
-
-        clientSoc->abort();
-        delete clientSoc;
-        clientSoc = nullptr;
+        clientSoc->deleteLater();
     }
 }
 

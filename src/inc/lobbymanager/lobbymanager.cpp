@@ -24,7 +24,6 @@ LobbyManager::~LobbyManager()
         ClientNetwork *client = clients->takeAt(var);
         if (client)
         {
-            client = nullptr;
             delete client;
         }
     }
@@ -33,15 +32,13 @@ LobbyManager::~LobbyManager()
     {
         if (lobby)
         {
-            lobby = nullptr;
             delete lobby;
         }
     }
 
     if (timer)
     {
-        timer = nullptr;
-        delete timer;
+        timer->deleteLater();
     }
     qInfo() << "Server: LobbyManager ---> deleted.";
 }
@@ -56,7 +53,7 @@ const int LobbyManager::getLobbyCount() const
 Lobby *const LobbyManager::findLobby(QUuid uuidLobby) const
 {
 
-    for (auto lobby : qAsConst(lobbies))
+    for (Lobby *const lobby : qAsConst(lobbies))
     {
 
         if (lobby->getUuid() == uuidLobby)
@@ -68,10 +65,11 @@ Lobby *const LobbyManager::findLobby(QUuid uuidLobby) const
     return nullptr;
 }
 
-// Поиск лобби по владельцу комнаты.
+// Поиск лобби по владельцу лобби.
+// Если лобби не найдено, то вовращается nullptr.
 Lobby *const LobbyManager::findLobby(ClientNetwork *const owner) const
 {
-    for (auto lobby : qAsConst(lobbies))
+    for (Lobby *const lobby : qAsConst(lobbies))
     {
 
         if (lobby->getOwner() != nullptr && lobby->getOwner() == owner)
@@ -84,6 +82,7 @@ Lobby *const LobbyManager::findLobby(ClientNetwork *const owner) const
 }
 
 // Поиск лобби по по имени игрока.
+// Если лобби не найдено, то вовращается nullptr.
 Lobby *const LobbyManager::findLobby(QString playerName) const
 {
 
@@ -99,6 +98,25 @@ Lobby *const LobbyManager::findLobby(QString playerName) const
     return nullptr;
 }
 
+// Функция для нахождения комнаты и восстановления игрока в игре при неожиданном отключении.
+//
+Lobby *const LobbyManager::findLobbyFromTempClient(QString playerName) const
+{
+
+    for (Lobby *const lobby : lobbies)
+    {
+
+        if (lobby->getDisconnectedPlayers().contains(playerName))
+        {
+
+            return lobby;
+        }
+    }
+    return nullptr;
+}
+
+// Поиск клиента по логину.
+// Если клиент не найден, то вовращается nullptr.
 ClientNetwork *const LobbyManager::findPlayer(QString playerName) const
 {
 
@@ -114,6 +132,8 @@ ClientNetwork *const LobbyManager::findPlayer(QString playerName) const
     return nullptr;
 }
 
+// Поиск клиента по временному идентивикатору.
+// Если клиент не найден, то вовращается nullptr.
 ClientNetwork *const LobbyManager::findPlayer(QUuid playerUuid) const
 {
 
@@ -129,10 +149,61 @@ ClientNetwork *const LobbyManager::findPlayer(QUuid playerUuid) const
     return nullptr;
 }
 
+bool LobbyManager::setReturnedClient(Lobby *const lobby, PlayerPosition position, ClientNetwork *const client)
+{
+    if (lobby)
+    {
+        if (lobby->getPlayers()[position])
+        {
+
+            qInfo() << "Server: setReturnedClient ---> position in vector isn't nullptr";
+            return false;
+        }
+        else if (position == NONE_POSITION)
+        {
+
+            qInfo() << "Server: setReturnedClient ---> position is" << Lobby::playerPositionToString(position);
+            return false;
+        }
+
+        lobby->getPlayers()[position] = client;
+        lobby->getPlayerNames()[position] = client->getName();
+        client->setPosition(position);
+        client->setTeam(client->getTeam(position));
+        switch (position)
+        {
+        case NORTH:
+        case SOUTH:
+            lobby->setFreeSpotsNS(lobby->getFreeSpotsNS() - 1);
+            break;
+        case EAST:
+        case WEST:
+            lobby->setFreeSpotsEW(lobby->getFreeSpotsEW() - 1);
+            break;
+        case NONE_POSITION:
+            break;
+        }
+
+        lobby->setSize(lobby->getSize() + 1);
+        connect(client, &ClientNetwork::rxMoveSelected, lobby, &Lobby::rxMoveSelected);
+        connect(client, &ClientNetwork::rxBidSelected, lobby, &Lobby::rxBidSelected);
+        lobby->getDisconnectedPlayers().remove(client->getName());
+        if (lobby->getOwnerName() == client->getName())
+        {
+
+            client->setLobbyOwnerUuid(lobby->getUuid());
+        }
+        return true;
+    }
+
+    qInfo() << "Server: setReturnedClient ---> lobby is nullptr";
+    return false;
+}
+
 // функция создания лобби.
 void LobbyManager::createLobby(ClientNetwork *const client)
 {
-    if (client != nullptr)
+    if (client)
     {
 
         QJsonObject tx;
@@ -143,9 +214,10 @@ void LobbyManager::createLobby(ClientNetwork *const client)
 
         if (getLobbyCount() < maxLobbyCount && maxLobbyCount != 0)
         {
-
-            lobbies.append(new Lobby(this, client));
-
+            Lobby *const lobby = new Lobby(this, client);
+            lobbies.append(lobby);
+            connect(this, &LobbyManager::sendUpdateGameState, lobby, &Lobby::gameEventOccured);
+            connect(lobby, &Lobby::sendMatchEndToLM, this, &LobbyManager::matchEnd);
             client->setLobbyOwnerUuid(lobbies.last()->getUuid());
             lobbies.last()->setOwnerName(client->getName());
 
@@ -169,7 +241,12 @@ void LobbyManager::createLobby(ClientNetwork *const client)
     }
 }
 
-// Функция удаления лобби со сервера.
+// Функция закрытия лобби. Эта функция используется только в том случае,
+// если клиенты иизъявили желание выйти из
+// комнаты. Это равносильно тому, что:
+// 1. Если эта функция вызывается админом вне начала игры или
+// во время игры - Лобби удаляется, а игроки выходят из лобби.
+// 2. Если клиент выходит из игры
 void LobbyManager::closeLobby(const QUuid &uuidLobby, ClientNetwork *const sender)
 {
     if (sender)
@@ -182,12 +259,12 @@ void LobbyManager::closeLobby(const QUuid &uuidLobby, ClientNetwork *const sende
             if (lobby)
             {
 
-                if (lobby->getOwner() == sender)
+                if (lobby->getGameStarted() || lobby->getOwner() == sender)
                 {
                     data["successful"] = true;
                     data["error"] = "";
                     tx["data"] = data;
-                    for (ClientNetwork *client : qAsConst(lobby->getPlayers()))
+                    for (ClientNetwork *const client : qAsConst(lobby->getPlayers()))
                     {
                         if (client)
                         {
@@ -200,7 +277,8 @@ void LobbyManager::closeLobby(const QUuid &uuidLobby, ClientNetwork *const sende
                             tx["id"] = client->getUuid().toString(QUuid::WithoutBraces);
                             qInfo() << "Admin:"
                                     << "close lobby" << uuidLobby.toString() << "--->" << client->getUuid().toString()
-                                    << "--->" << client->getName() << "exit from lobby.";
+                                    << "--->" << client->getName() << "exit from lobby {"
+                                    << "game started:" << lobby->getGameStarted() << "}";
 
                             txAll(tx, client);
                         }
@@ -216,7 +294,8 @@ void LobbyManager::closeLobby(const QUuid &uuidLobby, ClientNetwork *const sende
                             qInfo() << "Admin:"
                                     << "close lobby" << uuidLobby.toString() << "--->"
                                     << tempClient->getUuid().toString() << "--->" << tempClient->getName()
-                                    << "exit from lobby (as temp client).";
+                                    << "exit from lobby (as temp client) {"
+                                    << "game started:" << lobby->getGameStarted() << "}";
                             txAll(tx, tempClient);
                         }
                     }
@@ -273,9 +352,11 @@ void LobbyManager::acceptSelectTeam(Team team, QUuid uuidLobby, ClientNetwork *c
             tx["id"] = client->getUuid().toString(QUuid::WithoutBraces);
             if (tempLobby->addPlayer(team, client))
             {
-                tempLobby->getTempPlayers().removeAll(client);
+                tempLobby->getTempPlayers().remove(client);
 
-                client->setTeam(team);
+                qInfo() << "Lobby:" << tempLobby->getUuid().toString()
+                        << "{ temp:" << tempLobby->getTempPlayers().count()
+                        << ", clients:" << tempLobby->getAcceptedPlayerCount() << "}";
                 client->setFinder(false);
                 tx["type"] = "accept_select_team";
                 data["lobby_id"] = uuidLobby.toString(QUuid::WithoutBraces);
@@ -352,6 +433,7 @@ void LobbyManager::invitePlayers(QString login, QUuid uuidLobby, ClientNetwork *
                 data["lobby_id"] = uuidLobby.toString(QUuid::WithoutBraces);
                 data["alias"] = sender->getUuid().toString(QUuid::WithoutBraces);
                 tx["data"] = data;
+                sendClient->setFinder(false);
                 qInfo() << "Admin:" << sender->getUuid().toString() << "--->" << sender->getName()
                         << "invited player --->" << sendClient->getName();
                 txAll(tx, sendClient);
@@ -396,7 +478,8 @@ void LobbyManager::startGame(QUuid uuidLobby, ClientNetwork *const sender)
                     // Отправка сообщения админу комнаты, о том, что начать игру не удалось.
                     tx["id"] = sender->getUuid().toString(QUuid::WithoutBraces);
                     data["successful"] = false;
-                    data["error"] = "Not enough players or one of the participants disconnected unexpectedly.";
+                    data["error"] =
+                        "Недостаточно игроков для начала игры: {" + QString::number(tempLobby->getSize()) + " : 4}.";
                     tx["data"] = data;
                     txAll(tx, sender);
                 }
@@ -504,47 +587,98 @@ void LobbyManager::onPlayerCount()
     }
 }
 
+// Сигнал от определенного лобби о том, что игра закончена. Можно закрывать лобби.
+void LobbyManager::matchEnd(Lobby *const sender)
+{
+
+    if (sender)
+    {
+
+            closeLobby(sender->getUuid(), sender->getOwner());
+    }
+}
+
 void LobbyManager::startTimer()
 {
 
     timer->start();
 }
 
+// Функция обработки, когда клиент неожиданно отключился (не через кнопку выйти).
 void LobbyManager::clientDisconnected(ClientNetwork *const sender)
 {
 
     if (sender)
     {
 
-            Lobby *const tempLobby = findLobby(sender);
+            Lobby *const tempLobby = findLobby(sender->getName());
             if (tempLobby)
             {
-                // Если во время самой игры админ отключается - лобби не закрывается.
-                // Предполагается, что клиенты могут присоединиться, если утратили соединение.
-                if (tempLobby->getOwner() == sender)
+                // Если игра еще не началась.
+                if (!tempLobby->getGameStarted())
                 {
-
-                    if (tempLobby->getGameStarted())
+                    tempLobby->deletePlayer(sender->getTeam(), sender);
+                    // Если игрок админ лобби.
+                    if (tempLobby->getOwner() == sender)
                     {
+                        // Оповещаем клиентов, что лобби закрыто.
+                        QJsonObject tx;
+                        QJsonObject data;
+                        tx["type"] = "exit_lobby";
+                        data["lobby_id"] = tempLobby->getUuid().toString(QUuid::WithoutBraces);
+                        data["successful"] = true;
+                        data["error"] = "";
+                        tx["data"] = data;
+                        for (ClientNetwork *const client : qAsConst(tempLobby->getPlayers()))
+                        {
+                            if (client)
+                            {
 
-                        tempLobby->setOwner(nullptr);
-                    }
-                    else
-                    {
+                                tx["id"] = client->getUuid().toString(QUuid::WithoutBraces);
+                                qInfo() << "Admin:"
+                                        << "close lobby" << tempLobby->getUuid().toString() << "--->"
+                                        << client->getUuid().toString() << "--->" << client->getName()
+                                        << "exit from lobby (admin disconnected)";
 
-                        closeLobby(tempLobby->getUuid(), sender);
+                                txAll(tx, client);
+                            }
+                        }
+
+                        for (ClientNetwork *tempClient : qAsConst(tempLobby->getTempPlayers()))
+                        {
+                            if (tempClient)
+                            {
+
+                                tempClient->setFinder(false);
+                                tx["id"] = tempClient->getUuid().toString(QUuid::WithoutBraces);
+                                qInfo() << "Admin:"
+                                        << "close lobby" << tempLobby->getUuid().toString() << "--->"
+                                        << tempClient->getUuid().toString() << "--->" << tempClient->getName()
+                                        << "exit from lobby (as temp client) (admin disconnected)";
+                                txAll(tx, tempClient);
+                            }
+                        }
+                        lobbyClose(tempLobby);
                     }
                 }
                 else
                 {
+                    // Если количество игроков в игре == 0, то
+                    // рушим лобби. Очки не сохраняются.
+                    int lobbySize = tempLobby->getSize() - 1;
 
-                    int index = tempLobby->getPlayers().indexOf(sender);
-
-                    // Случай, когда отключается клиент не находящийся в какой-либо лобби.
-                    if (index != -1)
+                    if (lobbySize == 0)
+                    {
+                        qInfo() << "Server: lobby --->" << tempLobby->getUuid().toString()
+                                << "---> closed (all clients disconnected)";
+                        lobbyClose(tempLobby);
+                    }
+                    else
                     {
 
-                        tempLobby->getPlayers().replace(index, nullptr);
+                        tempLobby->getDisconnectedPlayers().insert(sender->getName(), sender->getPosition());
+                        tempLobby->deletePlayer(sender->getTeam(), sender);
+                        emit sendUpdateGameState(PLAY_STOP);
                     }
                 }
             }
@@ -596,7 +730,7 @@ void LobbyManager::acceptInvitePlayers(QUuid uuidLobby, bool successful, ClientN
                     {
 
                         lobby->setAcceptedPlayerCount(lobby->getAcceptedPlayerCount() + 1);
-                        lobby->getTempPlayers().append(sender);
+                        lobby->getTempPlayers().insert(sender);
                         data["successful"] = true;
                         data["error"] = "";
                         tx["data"] = data;
@@ -609,6 +743,7 @@ void LobbyManager::acceptInvitePlayers(QUuid uuidLobby, bool successful, ClientN
                         data["successful"] = true;
                         data["error"] = "";
                         tx["data"] = data;
+                        sender->setFinder(true);
                         txAll(tx, sender);
                     }
                 }

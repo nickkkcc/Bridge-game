@@ -48,6 +48,7 @@ class Player : public QObject
     // Получить команду игрока.
     const Team getTeam() const;
 
+    const Team getTeam(PlayerPosition position) const;
     // Установить команду для игрока.
     void setTeam(Team newTeam);
 
@@ -64,8 +65,8 @@ class Player : public QObject
     // Временный идентификатор игрока на время прибывания на сервере.
     QUuid uuid;
 
-    // Позиция игрока (север, восток, юг, запад)
-    PlayerPosition position;
+    // Позиция игрока (север, восток, юг, запад, нет)
+    PlayerPosition position = NONE_POSITION;
 
     // Команда игрока (NS , EW)
     Team team = Team::NONE_TEAM;

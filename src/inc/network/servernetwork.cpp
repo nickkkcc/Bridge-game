@@ -17,17 +17,13 @@ ServerNetwork::~ServerNetwork()
         }
     }
     server->close();
-    delete server;
-    server = nullptr;
+    server->deleteLater();
 
-    delete lobbyManager;
-    lobbyManager = nullptr;
+    delete lobbyManager;;
 
-    delete dataBase;
-    dataBase = nullptr;
+    delete dataBase;;
 
-    delete msgHandler;
-    msgHandler = nullptr;
+    delete msgHandler;;
 
     qInfo() << "Server: ServerNetwork ---> deleted.";
 }
@@ -132,18 +128,18 @@ void ServerNetwork::validateClientText(const QString &message)
         return;
     }
 
-    qInfo() << "Проверка клиента: Отправитель успешно преобразован.";
-
     QJsonObject rxTxObj = QJsonDocument::fromJson(message.toUtf8()).object();
     qInfo() << rxTxObj;
 
     if (rxTxObj.contains("type") && rxTxObj["type"].isString() && rxTxObj.contains("id") && rxTxObj["id"].isString())
     {
 
-        qWarning() << "Проверка клиента: пользователь не авторизован.";
         if (rxTxObj["type"] == "registration" || rxTxObj["type"] == "registration_questions")
         {
 
+            qWarning() << "Server: client --->"
+                       << tempSocket->peerAddress().toString() + ":" + QString::number(tempSocket->peerPort())
+                       << "try register or request questions.";
             if (!msgHandler->checkTryReg(rxTxObj))
             {
 
@@ -153,34 +149,49 @@ void ServerNetwork::validateClientText(const QString &message)
         else
         {
 
-            qWarning() << "Проверка клиента: пользователь авторизован. Попытка авторизации";
             if (!msgHandler->tryLogin(rxTxObj))
             {
 
-                qWarning() << "Проверка клиента: Ошибка авторизации.";
+                qWarning() << "Server: client --->"
+                           << tempSocket->peerAddress().toString() + ":" + QString::number(tempSocket->peerPort())
+                           << "couldn't login";
             }
             else
             {
 
-                qWarning() << "Проверка клиента: авторизация прошла успешно.";
-                clients.append(new ClientNetwork(this, dataBase->getUserLogin(), tempSocket,
-                                                 QUuid(rxTxObj["data"].toObject()["token"].toString())));
-                clientSocTemp.removeAll(tempSocket);
+                qWarning() << "Server: client --->"
+                           << tempSocket->peerAddress().toString() + ":" + QString::number(tempSocket->peerPort())
+                           << "joined to server as --->" << dataBase->getUserLogin();
 
-                disconnect(tempSocket, &QWebSocket::textMessageReceived, this, &ServerNetwork::validateClientText);
-                disconnect(tempSocket, &QWebSocket::disconnected, this, &ServerNetwork::disconnectTempClient);
-                //              connect(clients.last(), &ClientNetwork::clientDisconnected,this,
-                //              &ServerNetwork::disconnectClient);
-                connectClientToLobbyManager(clients.last());
-                emit startTimer();
+                Lobby *findedLobby = lobbyManager->findLobbyFromTempClient(dataBase->getUserLogin());
+                if (findedLobby)
+                {
+
+                    returnClientToLobby(findedLobby, lobbyManager, tempSocket, dataBase->getUserLogin(),
+                                        QUuid(rxTxObj["data"].toObject()["token"].toString()));
+                    return;
+                }
+                else
+                {
+
+                    clients.append(new ClientNetwork(this, dataBase->getUserLogin(), tempSocket,
+                                                     QUuid(rxTxObj["data"].toObject()["token"].toString())));
+                    clientSocTemp.removeAll(tempSocket);
+
+                    disconnect(tempSocket, &QWebSocket::textMessageReceived, this, &ServerNetwork::validateClientText);
+                    disconnect(tempSocket, &QWebSocket::disconnected, this, &ServerNetwork::disconnectTempClient);
+                    connectClientToLobbyManager(clients.last());
+                    emit startTimer();
+                }
             }
         }
 
         QJsonDocument doc(rxTxObj);
         int tempVal = tempSocket->sendTextMessage(doc.toJson(QJsonDocument::Compact));
 
-        qInfo() << "Проверка клиента: Кол-во байт, отправленные клиенту: " << tempVal;
-        qInfo() << doc;
+        qInfo() << "Server: send to client --->"
+                << tempSocket->peerAddress().toString() + ":" + QString::number(tempSocket->peerPort()) << tempVal
+                << "byte(s)";
 
         if (tempVal == -1)
         {
@@ -222,7 +233,8 @@ void ServerNetwork::disconnectClient(ClientNetwork *const sender)
     if (num != -1)
     {
 
-        delete clients.takeAt(num);
+        ClientNetwork *client = clients.takeAt(num);
+        delete client;
     }
 }
 
@@ -238,4 +250,23 @@ void ServerNetwork::connectClientToLobbyManager(ClientNetwork *const client)
     connect(client, &ClientNetwork::clientDisconnected, this->lobbyManager, &LobbyManager::clientDisconnected);
     connect(client, &ClientNetwork::rxJoinLobby, this->lobbyManager, &LobbyManager::joinLobby);
     connect(client, &ClientNetwork::rxAcceptInvitePlayers, this->lobbyManager, &LobbyManager::acceptInvitePlayers);
+}
+
+void ServerNetwork::returnClientToLobby(Lobby *const lobby, LobbyManager *const lobbyManager, QWebSocket *clientSoc,
+                                        QString clientName, const QUuid &clientUuid)
+{
+    ClientNetwork *const client = new ClientNetwork(this, clientName, clientSoc, clientUuid);
+
+    clients.append(client);
+    clientSocTemp.removeAll(clientSoc);
+    disconnect(clientSoc, &QWebSocket::textMessageReceived, this, &ServerNetwork::validateClientText);
+    disconnect(clientSoc, &QWebSocket::disconnected, this, &ServerNetwork::disconnectTempClient);
+    connectClientToLobbyManager(client);
+
+    lobbyManager->setReturnedClient(lobby, lobby->getDisconnectedPlayers().value(clientName), client);
+    qInfo() << "Server: client --->" << client->getUuid().toString() << "--->" << clientName << "returned to lobby --->"
+            << lobby->getUuid().toString();
+
+    emit lobbyManager->sendUpdateGameState(PLAY_CONTINUES);
+    emit lobbyManager->sendUpdateGameState(lobby->getLastGameEvent());
 };

@@ -11,6 +11,14 @@ class Lobby : public QObject
 {
     Q_OBJECT
   public:
+    static QString bidCallToString(BidCall bid);
+    static QString cardRankToString(CardRank rank);
+    static QString cardSuitToString(CardSuit suit);
+    static QString gameEventToString(GameEvent event);
+    static QString gamePhaseToString(GamePhase phase);
+    static QString playerPositionToString(PlayerPosition position);
+    static QString teamToString(Team team);
+
     explicit Lobby(QObject *const parent = nullptr, ClientNetwork *const owner = nullptr);
 
     bool addPlayer(Team team, ClientNetwork *const client);
@@ -33,7 +41,7 @@ class Lobby : public QObject
     const bool getGameStarted() const;
     const int getPlayerCount() const;
     QVector<ClientNetwork *> &getPlayers();
-    const QVector<QString> &getPlayerNames() const;
+    QVector<QString> &getPlayerNames();
     const int getAcceptedPlayerCount() const;
     const int getMaxPlayerSize() const;
     const QString &getOwnerName() const;
@@ -42,7 +50,17 @@ class Lobby : public QObject
 
     ~Lobby();
 
-    QVector<ClientNetwork *> &getTempPlayers();
+    QSet<ClientNetwork *> &getTempPlayers();
+
+    const int getSize() const;
+    void setSize(int newSize);
+
+    const GameEvent getLastGameEvent() const;
+
+    QHash<QString, PlayerPosition> &getDisconnectedPlayers();
+
+  signals:
+    void sendMatchEndToLM(Lobby *const sender);
 
   public slots:
     void rxBidSelected(Bid bid);
@@ -61,7 +79,8 @@ private:
     QVector<ClientNetwork *> players{4};
     QVector<QString> playerNames{4};
     // Сохраняем игроков, которые находят на стадии выбора команды.
-    QVector<ClientNetwork *> tempPlayers{3};
+    QSet<ClientNetwork *> tempPlayers;
+    QHash<QString, PlayerPosition> disconnectedPlayers;
 
     // Поля для создателя лобби.
     ClientNetwork *owner = nullptr;
@@ -94,6 +113,9 @@ private:
 
     // Количество игроков в лобби на данный момент.
     int size = 0;
+
+    // Последнее игровое событие (перед PLAY_STOP)
+    GameEvent lastGameEvent;
 };
 
 #endif // LOBBY_H

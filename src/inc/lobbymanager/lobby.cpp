@@ -37,8 +37,7 @@ Lobby::~Lobby()
     if (gameState)
     {
 
-        delete gameState;
-        gameState = nullptr;
+        gameState->deleteLater();
     }
     qInfo() << "Server: lobby --->" << uuid.toString() << "---> deleted.";
 }
@@ -99,16 +98,14 @@ void Lobby::gameEventOccured(GameEvent event)
     case INITIALIZE:
 
     {
-        qInfo() << "Lobby:" << uuid.toString() << "---> at state --->"
-                << "INITIALIZE";
+
         break;
     }
 
     case BID_START:
 
     {
-        qInfo() << "Lobby:" << uuid.toString() << "---> at state --->"
-                << "BID_START";
+
         sendUpdatedGameStateToClients(event);
         break;
     }
@@ -116,8 +113,7 @@ void Lobby::gameEventOccured(GameEvent event)
     case BID_RESTART:
 
     {
-        qInfo() << "Lobby:" << uuid.toString() << "---> at state --->"
-                << "BID_RESTART";
+
         sendUpdatedGameStateToClients(event);
         break;
     }
@@ -125,8 +121,7 @@ void Lobby::gameEventOccured(GameEvent event)
     case PLAYER_BID:
 
     {
-        qInfo() << "Lobby:" << uuid.toString() << "---> at state --->"
-                << "PLAYER_BID";
+
         sendUpdatedGameStateToClients(event);
         break;
     }
@@ -134,8 +129,7 @@ void Lobby::gameEventOccured(GameEvent event)
     case BID_END:
 
     {
-        qInfo() << "Lobby:" << uuid.toString() << "---> at state --->"
-                << "BID_END";
+
         sendUpdatedGameStateToClients(event);
         break;
     }
@@ -143,8 +137,7 @@ void Lobby::gameEventOccured(GameEvent event)
     case PLAY_START:
 
     {
-        qInfo() << "Lobby:" << uuid.toString() << "---> at state --->"
-                << "PLAY_START";
+
         sendUpdatedGameStateToClients(event);
         break;
     }
@@ -152,8 +145,7 @@ void Lobby::gameEventOccured(GameEvent event)
     case TRICK_START:
 
     {
-        qInfo() << "Lobby:" << uuid.toString() << "---> at state --->"
-                << "TRICK_START";
+
         sendUpdatedGameStateToClients(event);
         break;
     }
@@ -161,8 +153,7 @@ void Lobby::gameEventOccured(GameEvent event)
     case PLAYER_MOVED:
 
     {
-        qInfo() << "Lobby:" << uuid.toString() << "---> at state --->"
-                << "PLAYER_MOVED";
+
         sendUpdatedGameStateToClients(event);
         break;
     }
@@ -170,8 +161,7 @@ void Lobby::gameEventOccured(GameEvent event)
     case TRICK_END:
 
     {
-        qInfo() << "Lobby:" << uuid.toString() << "---> at state --->"
-                << "TRICK_END";
+
         sendUpdatedGameStateToClients(event);
         break;
     }
@@ -180,8 +170,6 @@ void Lobby::gameEventOccured(GameEvent event)
 
     {
 
-        qInfo() << "Lobby:" << uuid.toString() << "---> at state --->"
-                << "PLAY_END";
         sendUpdatedGameStateToClients(event);
         break;
     }
@@ -189,17 +177,16 @@ void Lobby::gameEventOccured(GameEvent event)
     case MATCH_END:
 
     {
-        qInfo() << "Lobby:" << uuid.toString() << "---> at state --->"
-                << "MATCH_END";
+
         sendUpdatedGameStateToClients(event);
+        emit sendMatchEndToLM(this);
         break;
     }
 
     case RUBBER_COMPLETED:
 
     {
-        qInfo() << "Lobby:" << uuid.toString() << "---> at state --->"
-                << "RUBBER_COMPLETED";
+
         sendUpdatedGameStateToClients(event);
         break;
     }
@@ -207,11 +194,24 @@ void Lobby::gameEventOccured(GameEvent event)
     case PLAY_STOP:
 
     {
-        qInfo() << "Lobby:" << uuid.toString() << "---> at state --->"
-                << "PLAY_STOP";
-        // sendUpdatedGameStateToClients(event);
+
+        sendUpdatedGameStateToClients(event);
         break;
     }
+
+    case PLAY_CONTINUES:
+
+    {
+
+        sendUpdatedGameStateToClients(event);
+        break;
+    }
+    }
+
+    if (event != PLAY_STOP && event != PLAY_CONTINUES)
+    {
+        lastGameEvent = event;
+        qInfo() << "Lobby:" << uuid.toString() << "---> last gamestate --->" << Lobby::gameEventToString(event);
     }
 }
 // Проверить.
@@ -225,11 +225,14 @@ void Lobby::setMatchEnded(bool isCompleted)
 void Lobby::sendUpdatedGameStateToClients(GameEvent event)
 {
 
-    for (auto client : qAsConst(players))
+    for (ClientNetwork *client : qAsConst(players))
     {
+        if (client)
 
-        PlayerGameState state = gameState->getPlayerGameState(client->getPosition(), players, event);
-        client->updateGameState(state);
+        {
+            PlayerGameState state = gameState->getPlayerGameState(client->getPosition(), players, event);
+            client->updateGameState(state);
+        }
     }
 }
 
@@ -265,7 +268,27 @@ void Lobby::nextPlayerTurn()
     }
 }
 
-QVector<ClientNetwork *> &Lobby::getTempPlayers()
+QHash<QString, PlayerPosition> &Lobby::getDisconnectedPlayers()
+{
+    return disconnectedPlayers;
+}
+
+const GameEvent Lobby::getLastGameEvent() const
+{
+    return lastGameEvent;
+}
+
+const int Lobby::getSize() const
+{
+    return size;
+}
+
+void Lobby::setSize(int newSize)
+{
+    size = newSize;
+}
+
+QSet<ClientNetwork *> &Lobby::getTempPlayers()
 {
     return tempPlayers;
 }
@@ -283,30 +306,30 @@ bool Lobby::addPlayer(Team team, ClientNetwork *const client)
         case Team::N_S:
 
         {
-            if (players[PlayerPosition::NORTH] == nullptr)
+            if (players[NORTH] == nullptr)
             {
 
-                players[PlayerPosition::NORTH] = client;
-                playerNames[PlayerPosition::NORTH] = client->getName();
+                players[NORTH] = client;
+                playerNames[NORTH] = client->getName();
                 freeSpotsNS--;
                 size++;
                 total = true;
-                client->setPosition(PlayerPosition::NORTH);
-                client->setTeam(Team::N_S);
+                client->setPosition(NORTH);
+                client->setTeam(N_S);
                 connect(client, &ClientNetwork::rxMoveSelected, this, &Lobby::rxMoveSelected);
                 connect(client, &ClientNetwork::rxBidSelected, this, &Lobby::rxBidSelected);
                 break;
             }
-            else if (players[PlayerPosition::SOUTH] == nullptr)
+            else if (players[SOUTH] == nullptr)
             {
 
-                players[PlayerPosition::SOUTH] = client;
-                playerNames[PlayerPosition::SOUTH] = client->getName();
+                players[SOUTH] = client;
+                playerNames[SOUTH] = client->getName();
                 freeSpotsNS--;
                 size++;
                 total = true;
-                client->setPosition(PlayerPosition::SOUTH);
-                client->setTeam(Team::N_S);
+                client->setPosition(SOUTH);
+                client->setTeam(N_S);
                 connect(client, &ClientNetwork::rxMoveSelected, this, &Lobby::rxMoveSelected);
                 connect(client, &ClientNetwork::rxBidSelected, this, &Lobby::rxBidSelected);
                 break;
@@ -317,30 +340,30 @@ bool Lobby::addPlayer(Team team, ClientNetwork *const client)
         case Team::E_W:
 
         {
-            if (players[PlayerPosition::EAST] == nullptr)
+            if (players[EAST] == nullptr)
             {
 
-                players[PlayerPosition::EAST] = client;
-                playerNames[PlayerPosition::EAST] = client->getName();
+                players[EAST] = client;
+                playerNames[EAST] = client->getName();
                 freeSpotsEW--;
                 size++;
                 total = true;
-                client->setPosition(PlayerPosition::EAST);
-                client->setTeam(Team::E_W);
+                client->setPosition(EAST);
+                client->setTeam(E_W);
                 connect(client, &ClientNetwork::rxMoveSelected, this, &Lobby::rxMoveSelected);
                 connect(client, &ClientNetwork::rxBidSelected, this, &Lobby::rxBidSelected);
                 break;
             }
-            else if (players[PlayerPosition::WEST] == nullptr)
+            else if (players[WEST] == nullptr)
             {
 
-                players[PlayerPosition::WEST] = client;
-                playerNames[PlayerPosition::WEST] = client->getName();
+                players[WEST] = client;
+                playerNames[WEST] = client->getName();
                 freeSpotsEW--;
                 size++;
                 total = true;
-                client->setPosition(PlayerPosition::WEST);
-                client->setTeam(Team::E_W);
+                client->setPosition(WEST);
+                client->setTeam(E_W);
                 connect(client, &ClientNetwork::rxMoveSelected, this, &Lobby::rxMoveSelected);
                 connect(client, &ClientNetwork::rxBidSelected, this, &Lobby::rxBidSelected);
                 break;
@@ -348,11 +371,8 @@ bool Lobby::addPlayer(Team team, ClientNetwork *const client)
             break;
         }
 
-        default:
-
-        {
+        case NONE_TEAM:
             break;
-        }
         }
     }
     return total;
@@ -369,24 +389,24 @@ bool Lobby::deletePlayer(Team team, ClientNetwork *const client)
         switch (team)
         {
 
-        case Team::N_S:
+        case N_S:
 
         {
-            if (players[PlayerPosition::NORTH] == client)
+            if (players[NORTH] == client)
             {
 
-                players.replace(PlayerPosition::NORTH, nullptr);
-                playerNames.replace(PlayerPosition::NORTH, nullptr);
+                players.replace(NORTH, nullptr);
+                playerNames.replace(NORTH, nullptr);
                 freeSpotsNS++;
                 size--;
                 total = true;
                 break;
             }
-            else if (players[PlayerPosition::SOUTH] == client)
+            else if (players[SOUTH] == client)
             {
 
-                players.replace(PlayerPosition::SOUTH, nullptr);
-                playerNames.replace(PlayerPosition::SOUTH, nullptr);
+                players.replace(SOUTH, nullptr);
+                playerNames.replace(SOUTH, nullptr);
                 freeSpotsNS++;
                 size--;
                 total = true;
@@ -397,24 +417,24 @@ bool Lobby::deletePlayer(Team team, ClientNetwork *const client)
             break;
         }
 
-        case Team::E_W:
+        case E_W:
 
         {
-            if (players[PlayerPosition::EAST] == client)
+            if (players[EAST] == client)
             {
 
-                players.replace(PlayerPosition::EAST, nullptr);
-                playerNames.replace(PlayerPosition::EAST, nullptr);
+                players.replace(EAST, nullptr);
+                playerNames.replace(EAST, nullptr);
                 freeSpotsEW++;
                 size--;
                 total = true;
                 break;
             }
-            else if (players[PlayerPosition::WEST] == client)
+            else if (players[WEST] == client)
             {
 
-                players.replace(PlayerPosition::WEST, nullptr);
-                playerNames.replace(PlayerPosition::WEST, nullptr);
+                players.replace(WEST, nullptr);
+                playerNames.replace(WEST, nullptr);
                 freeSpotsEW++;
                 size--;
                 total = true;
@@ -424,6 +444,8 @@ bool Lobby::deletePlayer(Team team, ClientNetwork *const client)
             disconnect(client, &ClientNetwork::rxBidSelected, this, &Lobby::rxBidSelected);
             break;
         }
+        case NONE_TEAM:
+            break;
         }
     }
     return total;
@@ -503,7 +525,7 @@ void Lobby::setOwner(ClientNetwork *const newOwner)
     owner = newOwner;
 }
 
-const QVector<QString> &Lobby::getPlayerNames() const
+QVector<QString> &Lobby::getPlayerNames()
 {
 
     return playerNames;
@@ -551,4 +573,151 @@ void Lobby::setMaxPlayerSize(int newMaxPlayerSize)
 {
 
     maxPlayerSize = newMaxPlayerSize;
+}
+
+QString Lobby::bidCallToString(BidCall bid)
+{
+    switch (bid)
+    {
+
+    case PASS:
+        return "PASS (0)";
+    case BID:
+        return "BID (1)";
+    case DOUBLE_BID:
+        return "DOUBLE_BID (2)";
+    case REDOUBLE_BID:
+        return "REDOUBLE_BID (3)";
+    }
+}
+
+QString Lobby::cardRankToString(CardRank rank)
+{
+    switch (rank)
+    {
+
+    case TWO:
+        return "TWO (1)";
+    case THREE:
+        return "THREE (2)";
+    case FOUR:
+        return "FOUR (3)";
+    case FIVE:
+        return "FIVE (4)";
+    case SIX:
+        return "SIX (5)";
+    case SEVEN:
+        return "SEVEN (6)";
+    case EIGHT:
+        return "EIGHT (7)";
+    case NINE:
+        return "NINE (8)";
+    case TEN:
+        return "TEN (9)";
+    case JACK:
+        return "JACK (10)";
+    case QUEEN:
+        return "QUEEN (11)";
+    case KING:
+        return "KING (12)";
+    case ACE:
+        return "ACE (13)";
+    }
+}
+
+QString Lobby::cardSuitToString(CardSuit suit)
+{
+    switch (suit)
+    {
+
+    case CLUBS:
+        return "CLUBS (0)";
+    case DIAMONDS:
+        return "DIAMONDS (1)";
+    case HEARTS:
+        return "HEARTS (2)";
+    case SPADES:
+        return "SPADES (3)";
+    case NONE:
+        return "NONE (4)";
+    }
+}
+
+QString Lobby::gameEventToString(GameEvent event)
+{
+    switch (event)
+    {
+
+    case INITIALIZE:
+        return "INITIALIZE (0)";
+    case BID_START:
+        return "BID_START (1)";
+    case BID_RESTART:
+        return "BID_RESTART (2)";
+    case PLAYER_BID:
+        return "PLAYER_BID (3)";
+    case BID_END:
+        return "BID_END (4)";
+    case PLAY_START:
+        return "PLAY_START (5)";
+    case TRICK_START:
+        return "TRICK_START (6)";
+    case PLAYER_MOVED:
+        return "PLAYER_MOVED (7)";
+    case TRICK_END:
+        return "TRICK_END (8)";
+    case PLAY_END:
+        return "PLAY_END (9)";
+    case MATCH_END:
+        return "MATCH_END (10)";
+    case RUBBER_COMPLETED:
+        return "RUBBER_COMPLETED (11)";
+    case PLAY_STOP:
+        return "PLAY_STOP (12)";
+    case PLAY_CONTINUES:
+        return "PLAY_CONTINUES (13)";
+    }
+}
+
+QString Lobby::gamePhaseToString(GamePhase phase)
+{
+    switch (phase)
+    {
+
+    case BIDDING:
+        return "BIDDING (0)";
+    case CARDPLAY:
+        return "CARDPLAY (1)";
+    }
+}
+
+QString Lobby::playerPositionToString(PlayerPosition position)
+{
+    switch (position)
+    {
+    case NORTH:
+        return "NORTH (0)";
+    case EAST:
+        return "EAST (1)";
+    case SOUTH:
+        return "SOUTH (2)";
+    case WEST:
+        return "WEST (3)";
+    case NONE_POSITION:
+        break;
+    }
+}
+
+QString Lobby::teamToString(Team team)
+{
+    switch (team)
+    {
+
+    case N_S:
+        return "N_S (0)";
+    case E_W:
+        return "E_W (1)";
+    case NONE_TEAM:
+        return "NONE_TEAM (2)";
+    }
 }

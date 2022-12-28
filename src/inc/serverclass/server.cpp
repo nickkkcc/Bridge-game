@@ -14,12 +14,6 @@ Server::Server(QWidget *parent) : QMainWindow(parent), ui(new Ui::Server)
     connect(serverNetwork, &ServerNetwork::generalError, this, &Server::generalError);
 }
 
-const ServerNetwork &Server::getServerNetwork() const
-{
-
-    return *serverNetwork;
-}
-
 void Server::tryConnect()
 {
 
@@ -89,7 +83,6 @@ void Server::on_CreateBtn_clicked()
     ui->CreateBtn->setEnabled(false);
     ui->StopBtn->setEnabled(true);
     ui->RestartBtn->setEnabled(true);
-    ui->DeleteAllClientBtn->setEnabled(true);
     tryConnect();
 }
 
@@ -110,11 +103,4 @@ void Server::on_StopBtn_clicked()
     ui->CreateBtn->setEnabled(true);
     ui->StopBtn->setEnabled(false);
     ui->RestartBtn->setEnabled(false);
-    ui->DeleteAllClientBtn->setEnabled(false);
-}
-
-void Server::on_DeleteAllClientBtn_clicked()
-{
-
-    serverNetwork->deleteAllClients();
 }

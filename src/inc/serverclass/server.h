@@ -23,7 +23,6 @@ class Server : public QMainWindow
 
   public:
     Server(QWidget *parent = nullptr);
-    const ServerNetwork &getServerNetwork() const;
 
   private slots:
     //    void clientDisconnected();
@@ -33,11 +32,7 @@ class Server : public QMainWindow
     void tryConnect();
     void connectionResult(int status, quint16 port, QString errorMsg);
     void generalError(QString errorMsg);
-
-
     void on_StopBtn_clicked();
-
-    void on_DeleteAllClientBtn_clicked();
 
     private:
       ServerNetwork *serverNetwork = nullptr;

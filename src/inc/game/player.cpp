@@ -35,6 +35,22 @@ const Team Player::getTeam() const
     return team;
 }
 
+const Team Player::getTeam(PlayerPosition position) const
+{
+
+    switch (position)
+    {
+    case NORTH:
+    case SOUTH:
+        return N_S;
+    case EAST:
+    case WEST:
+        return E_W;
+    case NONE_POSITION:
+        return NONE_TEAM;
+    }
+}
+
 void Player::setPosition(PlayerPosition position)
 {
     this->position = position;

@@ -291,10 +291,14 @@ PlayerGameState ServerGameState::getPlayerGameState(PlayerPosition player, const
     // Create player positions map and card count map
     QMap<PlayerPosition, QString> playerPositions;
     QMap<PlayerPosition, qint8> playerCardCount;
-    for (auto client : players)
+    for (ClientNetwork *client : players)
     {
-        playerPositions.insert(client->getPosition(), client->getName());
-        playerCardCount.insert(client->getPosition(), playerHands.value(client->getPosition()).getCardCount());
+        if (client)
+        {
+
+            playerPositions.insert(client->getPosition(), client->getName());
+            playerCardCount.insert(client->getPosition(), playerHands.value(client->getPosition()).getCardCount());
+        }
     }
 
     // Инициализировать пустую руку, отправленную игроку

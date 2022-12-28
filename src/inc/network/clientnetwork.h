@@ -29,6 +29,8 @@ class ClientNetwork : public Player
     QVector<ClientNetwork *> &getClientFriends();
     void setClientFriends(const QVector<ClientNetwork *> &newClientFriends);
 
+    void setClientSoc(QWebSocket *newClientSoc);
+
   private slots:
     void rxAll(const QString &message);
 
@@ -60,7 +62,6 @@ class ClientNetwork : public Player
     QUuid lobbyOwnerUuid;
     QVector<ClientNetwork *> clientFriends;
 
-    bool gameTerminatedOnce;
     bool finder = false;
 };
 

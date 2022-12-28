@@ -20,8 +20,10 @@ class LobbyManager : public QObject
     Lobby *const findLobby(QUuid uuidLobby) const;
     Lobby *const findLobby(ClientNetwork *const owner) const;
     Lobby *const findLobby(QString playerName) const;
+    Lobby *const findLobbyFromTempClient(QString playerName) const;
     ClientNetwork *const findPlayer(QString playerName) const;
     ClientNetwork *const findPlayer(QUuid playerUuid) const;
+    bool setReturnedClient(Lobby *const lobby, PlayerPosition position, ClientNetwork *const client);
 
   public slots:
     void createLobby(ClientNetwork *const client);
@@ -37,13 +39,15 @@ class LobbyManager : public QObject
 
   signals:
     void disconnectClient(ClientNetwork *const sender);
+    void sendUpdateGameState(GameEvent event);
 
   private slots:
     void onPlayersOnline();
     void onPlayerCount();
+    void matchEnd(Lobby *const sender);
 
   private:
-    static constexpr quint8 maxTeamPLayers = 2;
+    static constexpr quint8 maxTeamPLayers = 10;
     int maxLobbyCount;
     QVector<ClientNetwork *> *clients = nullptr;
     QVector<Lobby *> lobbies;
@@ -51,7 +55,6 @@ class LobbyManager : public QObject
 
   private:
     void lobbyClose(Lobby *const lobby);
-    QHash<QString, QString> getFinderPlayers();
     void txAll(QJsonObject tx, ClientNetwork *const sender);
     void sendSelectTeamClient(QUuid uuidLobby, ClientNetwork *const client);
 };

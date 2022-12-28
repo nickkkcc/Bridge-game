@@ -1,14 +1,18 @@
 #ifndef ENUMIRATION_H
 #define ENUMIRATION_H
 
-enum BidCall {
-    PASS = 0,
-    BID = 1,
-    DOUBLE_BID = 2,
-    REDOUBLE_BID = 3
+enum BidCall
+{
+
+    PASS,
+    BID,
+    DOUBLE_BID,
+    REDOUBLE_BID
 };
 
-enum CardRank {
+enum CardRank
+{
+
     TWO = 1,
     THREE = 2,
     FOUR = 3,
@@ -24,15 +28,19 @@ enum CardRank {
     ACE = 13,
 };
 
-enum CardSuit {
-    CLUBS = 0,
-    DIAMONDS = 1,
-    HEARTS = 2,
-    SPADES = 3,
-    NONE = 4
+enum CardSuit
+{
+
+    CLUBS,
+    DIAMONDS,
+    HEARTS,
+    SPADES,
+    NONE
 };
 
-enum GameEvent{
+enum GameEvent
+{
+
     INITIALIZE, // Состояние игры иницилизировано и игра готова к запуску.
     BID_START, // Начало торгов
     BID_RESTART, // Сделано четыре ПАСС. Торги начинаются заново.
@@ -45,24 +53,33 @@ enum GameEvent{
     PLAY_END, // Фаза игры закончена
     MATCH_END, // Матч завершен
     RUBBER_COMPLETED, // Один роббер завершен
-    PLAY_STOP // Остановка игры
+    PLAY_STOP, // Остановка игры моменты, когда один и до 3 игроков неожиданно отключились
+    PLAY_CONTINUES // Продолжение игры после остановки.
 };
 
-enum GamePhase{
+enum GamePhase
+{
+
     BIDDING,
     CARDPLAY
 };
 
-enum PlayerPosition{
-    NORTH = 0,
-    EAST = 1,
-    SOUTH = 2,
-    WEST = 3
+enum PlayerPosition
+{
+
+    NORTH,
+    EAST,
+    SOUTH,
+    WEST,
+    NONE_POSITION
 };
 
-enum Team{
-    N_S = 0,
-    E_W = 1,
-    NONE_TEAM = 2
+enum Team
+{
+
+    N_S,
+    E_W,
+    NONE_TEAM
 };
+
 #endif // ENUMIRATION_H

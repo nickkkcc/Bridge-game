@@ -243,21 +243,6 @@ font-weight: bold;</string>
        </property>
       </widget>
      </item>
-     <item>
-      <widget class="QPushButton" name="DeleteAllClientBtn">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">color:rgb(0, 05, 0);
-font: 75 9pt &quot;MS Shell Dlg 2&quot;;
-font-weight: bold;</string>
-       </property>
-       <property name="text">
-        <string>DELETE ALL</string>
-       </property>
-      </widget>
-     </item>
     </layout>
    </widget>
   </widget>
