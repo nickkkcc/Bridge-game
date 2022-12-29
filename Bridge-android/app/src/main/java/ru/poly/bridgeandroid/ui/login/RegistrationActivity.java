@@ -42,7 +42,7 @@ import ru.poly.bridgeandroid.model.menu.Question;
 import ru.poly.bridgeandroid.model.menu.RegistrationToClient;
 import ru.poly.bridgeandroid.model.menu.RegistrationToServer;
 
-public class RegistrationActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+public class RegistrationActivity extends AppCompatActivity {
 
     private static final String TOKEN = "token";
     private static final String LOGIN = "login";
@@ -79,11 +79,15 @@ public class RegistrationActivity extends AppCompatActivity implements AdapterVi
             questionsList.add(question.getQuestion());
         }
 
-        spinner.setOnItemSelectedListener(this);
-
         ArrayAdapter<String> adapter = new ArrayAdapter(this, R.layout.spinner_item, questionsList);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
+        spinner.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                questionIndex = position;
+            }
+        });
 
         loginViewModel.getLoginFormState().observe(this, new Observer<LoginFormState>() {
             @Override
@@ -167,16 +171,6 @@ public class RegistrationActivity extends AppCompatActivity implements AdapterVi
                 EventBus.getDefault().post(gson.toJson(message));
             }
         });
-    }
-
-    @Override
-    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-        questionIndex = i;
-    }
-
-    @Override
-    public void onNothingSelected(AdapterView<?> adapterView) {
-
     }
 
     @Override

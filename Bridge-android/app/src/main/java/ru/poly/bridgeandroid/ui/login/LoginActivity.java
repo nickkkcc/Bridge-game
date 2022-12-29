@@ -26,9 +26,14 @@ import com.google.gson.JsonObject;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
+import ru.poly.bridgeandroid.GameActivity;
 import ru.poly.bridgeandroid.MenuActivity;
 import ru.poly.bridgeandroid.R;
+import ru.poly.bridgeandroid.enums.GameEvent;
+import ru.poly.bridgeandroid.model.game.PlayerGameState;
+import ru.poly.bridgeandroid.model.game.UpdateGameState;
 import ru.poly.bridgeandroid.model.menu.LoginToClient;
 import ru.poly.bridgeandroid.model.menu.LoginToServer;
 import ru.poly.bridgeandroid.model.Message;
@@ -40,9 +45,12 @@ public class LoginActivity extends AppCompatActivity {
     private static final String LOGIN = "login";
     private static final String PREFERENCE = "preference";
     private Gson gson;
+    private String login;
     private LoginViewModel loginViewModel;
     private EditText usernameEditText;
     private ProgressBar loadingProgressBar;
+    private boolean isStartGame;
+    private Intent gameIntent;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -171,44 +179,82 @@ public class LoginActivity extends AppCompatActivity {
         Toast.makeText(getApplicationContext(), errorString, Toast.LENGTH_SHORT).show();
     }
 
-    @Subscribe
+    @Subscribe(threadMode = ThreadMode.MAIN_ORDERED)
     public void onMessage(Message message) {
-        if (message.getType().equals("registration_questions")) {
-            RegistrationQuestionsToClient questions = message.getData(
-                    RegistrationQuestionsToClient.class);
-            Intent intent = new Intent(LoginActivity.this, RegistrationActivity.class);
-            intent.putParcelableArrayListExtra("questions", questions.getQuestions());
-            startActivity(intent);
-            finish();
-            return;
-        }
-        if (!message.getType().equals("login")) {
-            throw new RuntimeException();
-        }
-        runOnUiThread(() -> loadingProgressBar.setVisibility(View.GONE));
+        switch (message.getType()) {
+            case "registration_questions":
+                RegistrationQuestionsToClient questions = message.getData(
+                        RegistrationQuestionsToClient.class);
+                Intent intent = new Intent(LoginActivity.this, RegistrationActivity.class);
+                intent.putParcelableArrayListExtra("questions", questions.getQuestions());
+                startActivity(intent);
+                finish();
+                break;
+            case "login":
+                runOnUiThread(() -> loadingProgressBar.setVisibility(View.GONE));
 
-        LoginToClient loginToClient = message.getData(LoginToClient.class);
-        if (loginToClient.isSuccessful()) {
-            SharedPreferences sharedPreferences = getSharedPreferences(PREFERENCE, MODE_PRIVATE);
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putString(TOKEN, loginToClient.getToken());
-            editor.putString(LOGIN, usernameEditText.getText().toString());
-            editor.apply();
+                LoginToClient loginToClient = message.getData(LoginToClient.class);
+                if (loginToClient.isSuccessful()) {
+                    login = usernameEditText.getText().toString();
+                    SharedPreferences sharedPreferences = getSharedPreferences(PREFERENCE, MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString(TOKEN, loginToClient.getToken());
+                    editor.putString(LOGIN, login);
+                    editor.apply();
 
-            Intent intent = new Intent(LoginActivity.this, MenuActivity.class);
-            startActivity(intent);
-            finish();
+                    Intent intentMenu = new Intent(LoginActivity.this, MenuActivity.class);
+                    startActivity(intentMenu);
+                    finish();
 
-            runOnUiThread(() -> {
-                Toast toast = Toast.makeText(getBaseContext(),
-                        "Вы успешно авторизовались", Toast.LENGTH_SHORT);
-                toast.show();
-            });
-        } else {
-            runOnUiThread(() -> {
-                Toast toast = Toast.makeText(getBaseContext(), loginToClient.getError(), Toast.LENGTH_SHORT);
-                toast.show();
-            });
+                    runOnUiThread(() -> {
+                        Toast toast = Toast.makeText(getBaseContext(),
+                                "Вы успешно авторизовались", Toast.LENGTH_SHORT);
+                        toast.show();
+                    });
+                } else {
+                    runOnUiThread(() -> {
+                        Toast toast = Toast.makeText(getBaseContext(), loginToClient.getError(), Toast.LENGTH_SHORT);
+                        toast.show();
+                    });
+                }
+                break;
+            case "update_game_state":
+                UpdateGameState updateGameState = message.getData(UpdateGameState.class);
+                PlayerGameState gameState = updateGameState.getGameState();
+                if (gameState.getGameEvent().equals(GameEvent.PLAY_CONTINUES)) {
+                    isStartGame = true;
+                    runOnUiThread(() -> {
+                        Toast toast = Toast.makeText(getBaseContext(), "Игра продолжается.", Toast.LENGTH_SHORT);
+                        toast.show();
+                    });
+                    return;
+                }
+                if (!isStartGame) {
+                    runOnUiThread(() -> {
+                        Toast toast = Toast.makeText(getBaseContext(), "update_game_state error", Toast.LENGTH_SHORT);
+                        toast.show();
+                    });
+                }
+                gameIntent = new Intent(LoginActivity.this, GameActivity.class);
+                gameIntent.putExtra("gameState", gameState);
+                if (!gameState.getPlayerTurn().equals(gameState.getPlayerPositionForLogin(login))) {
+                    startActivity(gameIntent);
+                    finish();
+                }
+                break;
+            case "notify_bid_turn":
+                if (!isStartGame) {
+                    runOnUiThread(() -> {
+                        Toast toast = Toast.makeText(getBaseContext(), "notify_bid_turn error", Toast.LENGTH_SHORT);
+                        toast.show();
+                    });
+                }
+                gameIntent.putExtra("notifyBidTurn", true);
+                startActivity(gameIntent);
+                finish();
+                break;
+            default:
+                throw new RuntimeException();
         }
     }
 }

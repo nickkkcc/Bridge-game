@@ -4,15 +4,15 @@
     tools:ignore="HardcodedText">
 
     <item
-        android:id="@+id/nav_account"
-        android:title="Score" />
+        android:id="@+id/nav_scores"
+        android:title="Очки" />
 
     <item
         android:id="@+id/nav_settings"
-        android:title="Settings" />
+        android:title="Настройки" />
 
     <item
-        android:id="@+id/nav_logout"
-        android:title="Exit" />
+        android:id="@+id/nav_exit"
+        android:title="Выход" />
 
 </menu>

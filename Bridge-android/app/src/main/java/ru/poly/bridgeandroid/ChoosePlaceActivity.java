@@ -19,6 +19,7 @@ import java.util.ArrayList;
 
 import ru.poly.bridgeandroid.model.menu.AcceptSelectTeamToClient;
 import ru.poly.bridgeandroid.model.Message;
+import ru.poly.bridgeandroid.model.menu.ExitLobbyToClient;
 import ru.poly.bridgeandroid.model.menu.Player;
 import ru.poly.bridgeandroid.model.menu.PlayersCountLobbyToClient;
 import ru.poly.bridgeandroid.model.menu.PlayersOnlineToClient;
@@ -187,6 +188,23 @@ public class ChoosePlaceActivity extends AppCompatActivity {
                 } else {
                     runOnUiThread(() -> {
                         Toast toast = Toast.makeText(getBaseContext(), playersCountLobby.getError(), Toast.LENGTH_SHORT);
+                        toast.show();
+                    });
+                }
+                break;
+            case "exit_lobby":
+                ExitLobbyToClient exitLobby = message.getData(ExitLobbyToClient.class);
+                if (exitLobby.isSuccessful()) {
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.remove(LOBBY);
+                    editor.apply();
+
+                    Intent intent = new Intent(ChoosePlaceActivity.this, MenuActivity.class);
+                    startActivity(intent);
+                    finish();
+                } else {
+                    runOnUiThread(() -> {
+                        Toast toast = Toast.makeText(getBaseContext(), exitLobby.getError(), Toast.LENGTH_SHORT);
                         toast.show();
                     });
                 }

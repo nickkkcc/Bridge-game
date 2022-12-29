@@ -26,7 +26,6 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,15 +34,13 @@ import java.util.Objects;
 
 import ru.poly.bridgeandroid.enums.BidCall;
 import ru.poly.bridgeandroid.enums.CardSuit;
-import ru.poly.bridgeandroid.enums.GameEvent;
 import ru.poly.bridgeandroid.enums.PlayerPosition;
 import ru.poly.bridgeandroid.model.Message;
 import ru.poly.bridgeandroid.model.game.Bid;
 import ru.poly.bridgeandroid.model.game.BidSelected;
-import ru.poly.bridgeandroid.model.game.NotifyBidRejected;
+import ru.poly.bridgeandroid.model.game.NotifyRejected;
 import ru.poly.bridgeandroid.model.game.PlayerGameState;
 import ru.poly.bridgeandroid.model.game.UpdateGameState;
-import ru.poly.bridgeandroid.model.menu.InvitePlayersToServer;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -255,11 +252,11 @@ public class BargainingFragment extends Fragment {
                 getActivity().runOnUiThread(() -> passButton.setEnabled(true));
                 break;
             case "notify_bid_rejected":
-                NotifyBidRejected notifyBidRejected = message.getData(NotifyBidRejected.class);
+                NotifyRejected notifyBidRejected = message.getData(NotifyRejected.class);
                 getActivity().runOnUiThread(() -> Toast.makeText(getActivity(), notifyBidRejected.getReason(), Toast.LENGTH_SHORT).show());
                 break;
             default:
-                throw new RuntimeException();
+//                throw new RuntimeException();
         }
     }
 
@@ -311,7 +308,7 @@ public class BargainingFragment extends Fragment {
                 getActivity().runOnUiThread(() -> Toast.makeText(getActivity(), "Игрок спасовал.", Toast.LENGTH_SHORT).show());
                 return;
         }
-//        setClickableBidsFromIndex(currentBidIndex + 1);
+
         for (int i = 0; i < currentBidIndex; i++) {
             int bidIndex = i;
             getActivity().runOnUiThread(() -> {

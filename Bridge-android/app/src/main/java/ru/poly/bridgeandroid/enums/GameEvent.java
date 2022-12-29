@@ -13,7 +13,9 @@ public enum GameEvent {
     TRICK_END(8),
     PLAY_END(9),
     MATCH_END(10),
-    RUBBER_COMPLETED(11);
+    RUBBER_COMPLETED(11),
+    PLAY_STOP(12),
+    PLAY_CONTINUES(13);
 
     private final int eventIndex;
 

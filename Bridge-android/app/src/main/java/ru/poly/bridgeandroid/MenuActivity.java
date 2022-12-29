@@ -19,6 +19,9 @@ import com.google.gson.JsonObject;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
+import ru.poly.bridgeandroid.enums.GameEvent;
+import ru.poly.bridgeandroid.model.game.PlayerGameState;
+import ru.poly.bridgeandroid.model.game.UpdateGameState;
 import ru.poly.bridgeandroid.model.menu.AcceptInvitePlayersToClient;
 import ru.poly.bridgeandroid.model.menu.AcceptInvitePlayersToServer;
 import ru.poly.bridgeandroid.model.menu.CreateLobbyToClient;
@@ -33,14 +36,17 @@ public class MenuActivity extends AppCompatActivity {
 
     private static final String TOKEN = "token";
     private static final String LOBBY = "lobby";
+    private static final String LOGIN = "login";
     private static final String PREFERENCE = "preference";
     private String token;
+    private String login;
     private boolean isAccepted;
     private boolean readyToJoin;
+    private boolean isStartGame;
     private Gson gson;
-    private TextView loadingTextView;
     private ProgressBar loadingProgressBar;
     private SharedPreferences sharedPreferences;
+    private Intent gameIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,13 +56,13 @@ public class MenuActivity extends AppCompatActivity {
         final Button createButton = findViewById(R.id.create_button);
         final Button joinButton = findViewById(R.id.join_button);
         final Button exitButton = findViewById(R.id.exit_account_button);
-        //loadingTextView = findViewById(R.id.joining_text);
         loadingProgressBar = findViewById(R.id.loading_menu);
 
         gson = new Gson();
 
         sharedPreferences = getSharedPreferences(PREFERENCE, MODE_PRIVATE);
         token = sharedPreferences.getString(TOKEN, "");
+        login = sharedPreferences.getString(LOGIN, "");
 
         createButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -159,6 +165,7 @@ public class MenuActivity extends AppCompatActivity {
                         }
                     });
                     AlertDialog dialog = builder.create();
+                    dialog.setCanceledOnTouchOutside(false);
                     dialog.show();
                 });
                 break;
@@ -212,6 +219,41 @@ public class MenuActivity extends AppCompatActivity {
                     });
                 }
                 switchLoadingVisibility();
+                break;
+            case "update_game_state":
+                UpdateGameState updateGameState = message.getData(UpdateGameState.class);
+                PlayerGameState gameState = updateGameState.getGameState();
+                if (gameState.getGameEvent().equals(GameEvent.PLAY_CONTINUES)) {
+                    isStartGame = true;
+                    runOnUiThread(() -> {
+                        Toast toast = Toast.makeText(getBaseContext(), "Игра продолжается.", Toast.LENGTH_SHORT);
+                        toast.show();
+                    });
+                    return;
+                }
+                if (!isStartGame) {
+                    runOnUiThread(() -> {
+                        Toast toast = Toast.makeText(getBaseContext(), "update_game_state error", Toast.LENGTH_SHORT);
+                        toast.show();
+                    });
+                }
+                gameIntent = new Intent(MenuActivity.this, GameActivity.class);
+                gameIntent.putExtra("gameState", gameState);
+                if (!gameState.getPlayerTurn().equals(gameState.getPlayerPositionForLogin(login))) {
+                    startActivity(gameIntent);
+                    finish();
+                }
+                break;
+            case "notify_bid_turn":
+                if (!isStartGame) {
+                    runOnUiThread(() -> {
+                        Toast toast = Toast.makeText(getBaseContext(), "notify_bid_turn error", Toast.LENGTH_SHORT);
+                        toast.show();
+                    });
+                }
+                gameIntent.putExtra("notifyBidTurn", true);
+                startActivity(gameIntent);
+                finish();
                 break;
             default:
                 throw new RuntimeException();

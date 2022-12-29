@@ -80,4 +80,24 @@ public class Score {
     public int[] getRubberBonuses() {
         return rubberBonuses;
     }
+
+    public int getAllScores(int teamIndex) {
+        return sumArray(contractPoints[teamIndex]) + backScore[teamIndex] + overtricks[teamIndex] +
+                undertricks[teamIndex] + honors[teamIndex] + slamBonuses[teamIndex] +
+                doubleBonuses[teamIndex] + redoubleBonuses[teamIndex] + rubberBonuses[teamIndex];
+    }
+
+    public int getBonusScores(int teamIndex) {
+        return backScore[teamIndex] + overtricks[teamIndex] + undertricks[teamIndex] +
+                honors[teamIndex] + slamBonuses[teamIndex] + doubleBonuses[teamIndex] +
+                redoubleBonuses[teamIndex] + rubberBonuses[teamIndex];
+    }
+
+    private int sumArray(int[] array) {
+        int sum = 0;
+        for (int value : array) {
+            sum += value;
+        }
+        return sum;
+    }
 }

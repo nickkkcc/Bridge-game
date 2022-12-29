@@ -1,16 +1,23 @@
 package ru.poly.bridgeandroid;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
@@ -22,10 +29,13 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.google.android.material.navigation.NavigationView;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,15 +43,22 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
 
 import ru.poly.bridgeandroid.enums.BidCall;
 import ru.poly.bridgeandroid.enums.CardSuit;
 import ru.poly.bridgeandroid.enums.GamePhase;
 import ru.poly.bridgeandroid.enums.PlayerPosition;
 import ru.poly.bridgeandroid.model.Message;
+import ru.poly.bridgeandroid.model.game.Bid;
+import ru.poly.bridgeandroid.model.game.BidSelected;
 import ru.poly.bridgeandroid.model.game.Card;
+import ru.poly.bridgeandroid.model.game.MoveSelected;
 import ru.poly.bridgeandroid.model.game.PlayerGameState;
 import ru.poly.bridgeandroid.model.game.UpdateGameState;
+import ru.poly.bridgeandroid.model.menu.AcceptInvitePlayersToServer;
+import ru.poly.bridgeandroid.model.menu.ExitLobbyToClient;
+import ru.poly.bridgeandroid.model.menu.ExitLobbyToServer;
 
 public class GameActivity extends AppCompatActivity {
 
@@ -65,9 +82,17 @@ public class GameActivity extends AppCompatActivity {
     private PlayerGameState gameState;
     private PlayerPosition mainPlayerPosition;
     private boolean notifyBidTurn;
-    private Map<PlayerPosition, Integer> newPlayerPositions = new HashMap<>();
+    private boolean notifyMoveTurn;
+    private boolean isBiddingPhase;
+    private boolean isMatchEnded;
+    private int tricksToWin;
+    private int enemyTricksToWin;
+    private int ourTeamIndex;
+    private int theyTeamIndex;
+    private HashMap<PlayerPosition, Integer> newPlayerPositions = new HashMap<>();
 
     private DrawerLayout drawerLayout;
+    private NavigationView navigationView;
     private ActionBarDrawerToggle actionBarDrawerToggleMenu;
     private final List<ImageView> playerCardsImageView = new ArrayList<>(14);
     private final List<ImageView> teammateCardsImageView = new ArrayList<>(14);
@@ -75,7 +100,12 @@ public class GameActivity extends AppCompatActivity {
     private final List<ImageView> rightEnemyCardsImageView = new ArrayList<>(14);
     private ImageView contractBidImageView;
     private TextView localScoreTextView;
-    private View gameFragment;
+    private TextView globalScoreTextView;
+
+    private List<Card> playerCards = new ArrayList<>(13);
+    private List<Card> teammateCards = new ArrayList<>(13);
+
+    AlertDialog dialog;
 
     private final Map<Integer, String> suitDrawableNames = new HashMap<Integer, String>() {{
         put(0, "c");
@@ -124,13 +154,16 @@ public class GameActivity extends AppCompatActivity {
         Intent myIntent = getIntent();
         gameState = myIntent.getParcelableExtra("gameState");
         notifyBidTurn = myIntent.getBooleanExtra("notifyBidTurn", false);
+        isBiddingPhase = true;
 
         drawerLayout = findViewById(R.id.game_drawer_layout);
+        navigationView = findViewById(R.id.game_navigation_view);
         actionBarDrawerToggleMenu = new ActionBarDrawerToggle(this, drawerLayout,
                 R.string.nav_open, R.string.nav_close);
 
         contractBidImageView = findViewById(R.id.game_table_contract_bid);
         localScoreTextView = findViewById(R.id.local_score);
+        globalScoreTextView = findViewById(R.id.global_score);
 
         // Player
         for (int i = 0; i < NORTH_SOUTH_ROWS_COUNT; i++) {
@@ -164,11 +197,32 @@ public class GameActivity extends AppCompatActivity {
             }
         }
 
-//        gameFragment = findViewById(R.id.game_fragment);
         loadFragment(BargainingFragment.newInstance(gameState, notifyBidTurn));
 
         drawerLayout.addDrawerListener(actionBarDrawerToggleMenu);
         actionBarDrawerToggleMenu.syncState();
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.nav_scores:
+                        // TODO: таблица очков
+                        showScoresDialog();
+                        return true;
+                    case R.id.nav_settings:
+                        // TODO: настройки или вообще убрать
+                        Log.i("onOptionsItemSelected", "Settings");
+                        return true;
+                    case R.id.nav_exit:
+                        ExitLobbyToServer exitGame = new ExitLobbyToServer(lobbyId, true);
+                        JsonObject jsonObject = (JsonObject) gson.toJsonTree(exitGame);
+                        Message message = new Message(token, "exit_lobby", jsonObject);
+                        EventBus.getDefault().post(gson.toJson(message));
+                        return true;
+                }
+                return true;
+            }
+        });
 
         Toolbar toolbar = findViewById(R.id.game_toolbar);
         setSupportActionBar(toolbar);
@@ -176,26 +230,64 @@ public class GameActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        for (ImageView cardImageView : playerCardsImageView) {
-            cardImageView.setClickable(true);
+        for (int i = 0; i < playerCardsImageView.size(); i++) {
+            ImageView cardImageView = playerCardsImageView.get(i);
+            int cardIndex = i;
             cardImageView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    // TODO: нажатие на карту
+                    Card card = playerCards.get(cardIndex);
+                    MoveSelected moveSelected = new MoveSelected(gson.fromJson(gson.toJson(card), JsonObject.class));
+                    JsonObject jsonObject = (JsonObject) gson.toJsonTree(moveSelected);
+                    Message message = new Message(token, "move_send", jsonObject);
+                    EventBus.getDefault().post(gson.toJson(message));
                 }
             });
+            cardImageView.setClickable(false);
+        }
+
+        for (int i = 0; i < teammateCardsImageView.size(); i++) {
+            ImageView cardImageView = teammateCardsImageView.get(i);
+            int cardIndex = i;
+            cardImageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Card card = teammateCards.get(cardIndex);
+                    MoveSelected moveSelected = new MoveSelected(gson.fromJson(gson.toJson(card), JsonObject.class));
+                    JsonObject jsonObject = (JsonObject) gson.toJsonTree(moveSelected);
+                    Message message = new Message(token, "move_send", jsonObject);
+                    EventBus.getDefault().post(gson.toJson(message));
+                }
+            });
+            cardImageView.setClickable(false);
         }
 
         initializeNewPlayerPositions();
+        ourTeamIndex = mainPlayerPosition.equals(PlayerPosition.NORTH) ||
+                mainPlayerPosition.equals(PlayerPosition.SOUTH) ? 0 : 1;
+        theyTeamIndex = 1 - ourTeamIndex;
+
         updateGameUI();
+
+        int ourTeamScores = gameState.getScore().getAllScores(ourTeamIndex);
+        int theyTeamScores = gameState.getScore().getAllScores(theyTeamIndex);
+        changeGlobalScoreTextView(ourTeamScores, theyTeamScores, gameState.getDealNumber(),
+                gameState.getGameNumber(), gameState.getRubberNumber());
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        Log.i("onOptionsItemSelected", String.valueOf(item.getItemId()));
         if (actionBarDrawerToggleMenu.onOptionsItemSelected(item)) {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.game_menu, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -210,19 +302,61 @@ public class GameActivity extends AppCompatActivity {
         super.onStop();
     }
 
-    @Subscribe
+    @Subscribe(threadMode = ThreadMode.MAIN_ORDERED)
     public void onMessage(Message message) {
         switch (message.getType()) {
             case "update_game_state":
                 UpdateGameState updateGameState = message.getData(UpdateGameState.class);
                 gameState = updateGameState.getGameState();
                 notifyBidTurn = false;
+                notifyMoveTurn = false;
                 updateGameUI();
                 break;
             case "notify_bid_turn":
                 notifyBidTurn = true;
                 break;
             case "notify_bid_rejected":
+                break;
+            case "notify_move_turn":
+                notifyMoveTurn = true;
+                if (gameState.getHandToPlay().equals(mainPlayerPosition)) {
+                    playerCards = getSortedCards(true);
+                } else {
+                    teammateCards = getSortedCards(false);
+                }
+                setClickableCards(!gameState.getHandToPlay().equals(mainPlayerPosition), true);
+                break;
+            case "notify_move_rejected":
+                break;
+            case "exit_lobby":
+                ExitLobbyToClient exitLobby = message.getData(ExitLobbyToClient.class);
+                if (exitLobby.isSuccessful()) {
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.remove(LOBBY);
+                    editor.apply();
+
+                    if (isMatchEnded) {
+                        showScoresGameEndDialog();
+                    } else {
+                        runOnUiThread(() -> {
+                            Toast toast = Toast.makeText(getBaseContext(),
+                                    "Один из игроков покинул игру.", Toast.LENGTH_SHORT);
+                            toast.show();
+                            if (dialog != null) {
+                                dialog.dismiss();
+                            }
+                        });
+
+                        Intent intent = new Intent(GameActivity.this, MenuActivity.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                } else {
+                    runOnUiThread(() -> {
+                        Toast toast = Toast.makeText(getBaseContext(), exitLobby.getError(), Toast.LENGTH_SHORT);
+                        toast.show();
+                    });
+                }
                 break;
             default:
                 throw new RuntimeException();
@@ -232,23 +366,122 @@ public class GameActivity extends AppCompatActivity {
     private void updateGameUI() {
         switch (gameState.getGameEvent()) {
             case BID_START:
+                if (!isBiddingPhase) {
+                    loadFragment(BargainingFragment.newInstance(gameState,
+                            gameState.getPlayerTurn().equals(gameState.getPlayerPositionForLogin(login))));
+                }
+                for (PlayerPosition playerPosition : PlayerPosition.values()) {
+                    changeCardsVisibility(playerPosition, gameState.getPlayerCardCountMap().get(playerPosition));
+                }
+                highlightPlayer(gameState.getPlayerTurn());
+                showCards(true, true);
+                break;
             case BID_RESTART:
                 for (PlayerPosition playerPosition : PlayerPosition.values()) {
                     changeCardsVisibility(playerPosition, gameState.getPlayerCardCountMap().get(playerPosition));
                 }
                 highlightPlayer(gameState.getPlayerTurn());
-                showCards(true);
+                showCards(true, true);
                 break;
-                // TODO: тоже самое, что и BID_START
             case PLAYER_BID:
                 highlightPlayer(gameState.getPlayerTurn());
                 break;
             case BID_END:
-                loadFragment(DrawFragment.newInstance(gameState));
                 runOnUiThread(() -> {
-                    contractBidImageView.setImageResource(getBidDrawableId(gameState.getContractBid().getCardSuit(),
+                    contractBidImageView.setImageResource(getBidDrawableId(
+                            gameState.getContractBid().getCardSuit(),
                             gameState.getContractBid().getTricksAbove()));
-                    localScoreTextView.setVisibility(View.VISIBLE);
+                    Toast.makeText(this, "Торги закончены", Toast.LENGTH_SHORT).show();
+                });
+                isBiddingPhase = false;
+                break;
+            case PLAY_START:
+                if (newPlayerPositions.get(gameState.getContractBid().getPlayerPosition()) == 0 ||
+                        newPlayerPositions.get(gameState.getContractBid().getPlayerPosition()) == 2) {
+                    tricksToWin = 6 + gameState.getContractBid().getTricksAbove();
+                    enemyTricksToWin = 14 - tricksToWin;
+                } else {
+                    enemyTricksToWin = 6 + gameState.getContractBid().getTricksAbove();
+                    tricksToWin = 14 - enemyTricksToWin;
+                }
+                changeLocalScoreTextView(0, tricksToWin, 0, enemyTricksToWin);
+                loadFragment(DrawFragment.newInstance(gameState, newPlayerPositions));
+                break;
+            case TRICK_START:
+            case PLAYER_MOVED:
+                for (PlayerPosition playerPosition : PlayerPosition.values()) {
+                    changeCardsVisibility(playerPosition, gameState.getPlayerCardCountMap().get(playerPosition));
+                }
+                highlightPlayer(gameState.getHandToPlay());
+                showCards(true, true);
+                showCards(false, true);
+                setClickableCards(false, false);
+                setClickableCards(true, false);
+                // TODO: тоже самое, что и для TRICK_START и PLAYER_MOVED
+                break;
+            case TRICK_END:
+                for (PlayerPosition playerPosition : PlayerPosition.values()) {
+                    changeCardsVisibility(playerPosition, gameState.getPlayerCardCountMap().get(playerPosition));
+                }
+                highlightPlayer(gameState.getHandToPlay()); // TODO: Нужно ли подсвечивать при TRICK_END
+                showCards(true, true);
+                showCards(false, true);
+                setClickableCards(false, false);
+                setClickableCards(true, false);
+                Map<PlayerPosition, Integer> tricksWon = gameState.getTricksWon();
+                int ourScores = 0;
+                int theyScores = 0;
+                for (int i = 0; i < newPlayerPositions.size(); i++) {
+                    if (i % 2 == 0) {
+                        ourScores += tricksWon.get(getKey(newPlayerPositions, i));
+                    } else {
+                        theyScores += tricksWon.get(getKey(newPlayerPositions, i));
+                    }
+                }
+                changeLocalScoreTextView(ourScores, tricksToWin, theyScores, enemyTricksToWin);
+                break;
+            case PLAY_END:
+                int ourTeamScores = gameState.getScore().getAllScores(ourTeamIndex);
+                int theyTeamScores = gameState.getScore().getAllScores(theyTeamIndex);
+                changeGlobalScoreTextView(ourTeamScores, theyTeamScores, gameState.getDealNumber(),
+                        gameState.getGameNumber(), gameState.getRubberNumber());
+                showCards(false, false);
+                setClickableCards(false, false);
+                setClickableCards(true, false);
+                runOnUiThread(() -> contractBidImageView.setImageResource(0));
+                localScoreTextView.setText("");
+                break;
+            case MATCH_END:
+                isMatchEnded = true;
+                break;
+            case RUBBER_COMPLETED:
+                break;
+            case PLAY_STOP:
+                runOnUiThread(() -> {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setTitle("Потеряно соединение с одним из игроков.");
+                    builder.setMessage("Вы можете подождать игрока некоторое время или выйти из игры.");
+                    builder.setPositiveButton("Выйти из игры", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            ExitLobbyToServer exitGame = new ExitLobbyToServer(lobbyId, true);
+                            JsonObject jsonObject = (JsonObject) gson.toJsonTree(exitGame);
+                            Message message = new Message(token, "exit_lobby", jsonObject);
+                            EventBus.getDefault().post(gson.toJson(message));
+                        }
+                    });
+                    dialog = builder.create();
+                    dialog.setCanceledOnTouchOutside(false);
+                    dialog.show();
+                });
+                break;
+            case PLAY_CONTINUES:
+                runOnUiThread(() -> {
+                    Toast toast = Toast.makeText(getBaseContext(),
+                            "Игрок снова присоединился в игру.", Toast.LENGTH_SHORT);
+                    toast.show();
+                    if (dialog != null) {
+                        dialog.dismiss();
+                    }
                 });
                 break;
         }
@@ -262,12 +495,10 @@ public class GameActivity extends AppCompatActivity {
                 case 0:
                     if (i == clientPlayerPosition) {
                         for (ImageView cardImageView : playerCardsImageView) {
-                            cardImageView.setClickable(gameState.getPhase().equals(GamePhase.CARD_PLAY));
                             cardImageView.clearColorFilter();
                         }
                     } else {
                         for (ImageView cardImageView : playerCardsImageView) {
-                            cardImageView.setClickable(false);
                             cardImageView.setColorFilter(ContextCompat.getColor(GameActivity.this, R.color.black_overlay_cards));
                         }
                     }
@@ -347,9 +578,68 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
-    private void showCards(boolean isPlayerHand) {
+    private void showCards(boolean isPlayerHand, boolean isVisible) {
+        PlayerPosition teammatePosition = gameState.getDeclarer().getPositionIndex() < 2 ?
+                PlayerPosition.getPlayerPosition(gameState.getDeclarer().getPositionIndex() + 2) :
+                PlayerPosition.getPlayerPosition(gameState.getDeclarer().getPositionIndex() - 2);
         int playerPosition = isPlayerHand ? newPlayerPositions.get(mainPlayerPosition) :
-                newPlayerPositions.get(gameState.getPlayerTurn());
+                newPlayerPositions.get(teammatePosition);
+        List<Card> cards = getSortedCards(isPlayerHand);
+        int cardsSize = isVisible ? cards.size() : 13;
+
+        switch (playerPosition) {
+            case 0:
+                for (int i = 0; i < cardsSize; i++) {
+                    ImageView cardImageView = playerCardsImageView.get(i);
+                    cardImageView.setVisibility(View.VISIBLE);
+                    if (isVisible) {
+                        cardImageView.setImageResource(getCardDrawableId(cards.get(i)));
+                    } else {
+                        cardImageView.setImageResource(getResources().getIdentifier("back", "drawable",
+                                getPackageName()));
+                    }
+                }
+                break;
+            case 1:
+                for (int i = 0; i < cardsSize; i++) {
+                    ImageView cardImageView = leftEnemyCardsImageView.get(i);
+                    cardImageView.setVisibility(View.VISIBLE);
+                    if (isVisible) {
+                        cardImageView.setImageResource(getCardDrawableId(cards.get(i)));
+                    } else {
+                        cardImageView.setImageResource(getResources().getIdentifier("back", "drawable",
+                                getPackageName()));
+                    }
+                }
+                break;
+            case 2:
+                for (int i = 0; i < cardsSize; i++) {
+                    ImageView cardImageView = teammateCardsImageView.get(i);
+                    cardImageView.setVisibility(View.VISIBLE);
+                    if (isVisible) {
+                        cardImageView.setImageResource(getCardDrawableId(cards.get(i)));
+                    } else {
+                        cardImageView.setImageResource(getResources().getIdentifier("back", "drawable",
+                                getPackageName()));
+                    }
+                }
+                break;
+            case 3:
+                for (int i = 0; i < cardsSize; i++) {
+                    ImageView cardImageView = rightEnemyCardsImageView.get(i);
+                    cardImageView.setVisibility(View.VISIBLE);
+                    if (isVisible) {
+                        cardImageView.setImageResource(getCardDrawableId(cards.get(i)));
+                    } else {
+                        cardImageView.setImageResource(getResources().getIdentifier("back", "drawable",
+                                getPackageName()));
+                    }
+                }
+                break;
+        }
+    }
+
+    private List<Card> getSortedCards(boolean isPlayerHand) {
         List<Card> cards = isPlayerHand ? gameState.getPlayerHand().getCards() :
                 gameState.getDummyHand().getCards();
 
@@ -359,37 +649,7 @@ public class GameActivity extends AppCompatActivity {
             return compareSuit != 0 ? compareSuit :
                     Integer.compare(card1.getRank().getRankIndex(), card2.getRank().getRankIndex());
         });
-
-        switch (playerPosition) {
-            case 0:
-                for (int i = 0; i < cards.size(); i++) {
-                    ImageView cardImageView = playerCardsImageView.get(i);
-                    cardImageView.setVisibility(View.VISIBLE);
-                    cardImageView.setImageResource(getCardDrawableId(cards.get(i)));
-                }
-                break;
-            case 1:
-                for (int i = 0; i < cards.size(); i++) {
-                    ImageView cardImageView = leftEnemyCardsImageView.get(i);
-                    cardImageView.setVisibility(View.VISIBLE);
-                    cardImageView.setImageResource(getCardDrawableId(cards.get(i)));
-                }
-                break;
-            case 2:
-                for (int i = 0; i < cards.size(); i++) {
-                    ImageView cardImageView = teammateCardsImageView.get(i);
-                    cardImageView.setVisibility(View.VISIBLE);
-                    cardImageView.setImageResource(getCardDrawableId(cards.get(i)));
-                }
-                break;
-            case 3:
-                for (int i = 0; i < cards.size(); i++) {
-                    ImageView cardImageView = rightEnemyCardsImageView.get(i);
-                    cardImageView.setVisibility(View.VISIBLE);
-                    cardImageView.setImageResource(getCardDrawableId(cards.get(i)));
-                }
-                break;
-        }
+        return cards;
     }
 
     private int getCardDrawableId(Card card) {
@@ -454,5 +714,134 @@ public class GameActivity extends AppCompatActivity {
         String suitName = suitBidNames.get(cardSuit);
         return getResources().getIdentifier("bargaining_" + suitName + "_" + tricksAbove, "drawable",
                 getPackageName());
+    }
+
+    private void changeLocalScoreTextView(int ourScores, int ourMaxScores,
+                                            int theyScores, int theyMaxScores) {
+        String scoreText = "Мы: " + ourScores + "/" + ourMaxScores + "\nОни: " +
+                theyScores + "/" + theyMaxScores;
+        runOnUiThread(() -> {
+            localScoreTextView.setVisibility(View.VISIBLE);
+            localScoreTextView.setText(scoreText);
+        });
+    }
+
+    private void changeGlobalScoreTextView(int ourScores, int theyScores, int dealNumber,
+                                           int gameNumber, int rubberNumber) {
+        String scoreText = "Мы: " + ourScores+ "\nОни: " + theyScores + "\nСделка: " + dealNumber +
+                "\nГейм: " + gameNumber + "\nРоббер: " + rubberNumber;
+        runOnUiThread(() -> {
+            globalScoreTextView.setVisibility(View.VISIBLE);
+            globalScoreTextView.setText(scoreText);
+        });
+    }
+
+    private void setClickableCards(boolean isDummy, boolean isClickable) {
+        if (isDummy) {
+            for (int i = 0; i < teammateCardsImageView.size(); i++) {
+                int cardIndex = i;
+                runOnUiThread(() -> {
+                    teammateCardsImageView.get(cardIndex).setClickable(isClickable);
+                });
+            }
+        } else {
+            for (int i = 0; i < playerCardsImageView.size(); i++) {
+                int cardIndex = i;
+                runOnUiThread(() -> {
+                    playerCardsImageView.get(cardIndex).setClickable(isClickable);
+                });
+            }
+        }
+    }
+
+    private void showScoresDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View view = LayoutInflater.from(this).inflate(R.layout.fragment_scores, findViewById(R.id.score_layout));
+        builder.setView(view);
+
+        TextView bonusesTextView1 = view.findViewById(R.id.score_bonuses_team1);
+        TextView bonusesTextView2 = view.findViewById(R.id.score_bonuses_team2);
+        TextView contractTextView1 = view.findViewById(R.id.score_contract_team1);
+        TextView contractTextView2 = view.findViewById(R.id.score_contract_team2);
+        TextView allTextView1 = view.findViewById(R.id.score_all_team1);
+        TextView allTextView2 = view.findViewById(R.id.score_all_team2);
+
+        bonusesTextView1.setText(String.valueOf(gameState.getScore().getBonusScores(ourTeamIndex)));
+        bonusesTextView2.setText(String.valueOf(gameState.getScore().getBonusScores(theyTeamIndex)));
+
+        int[] ourContractScoresArray = gameState.getScore().getContractPoints()[ourTeamIndex];
+        int[] theyContractScoresArray = gameState.getScore().getContractPoints()[theyTeamIndex];
+        StringBuilder ourContractScores = new StringBuilder();
+        StringBuilder theyContractScores = new StringBuilder();
+
+        for (int score : ourContractScoresArray) {
+            ourContractScores.append(score).append("\n");
+        }
+        for (int score : theyContractScoresArray) {
+            theyContractScores.append(score).append("\n");
+        }
+        contractTextView1.setText(ourContractScores.substring(0, ourContractScores.length() - 1));
+        contractTextView2.setText(theyContractScores.substring(0, theyContractScores.length() - 1));
+
+        allTextView1.setText(String.valueOf(gameState.getScore().getAllScores(ourTeamIndex)));
+        allTextView2.setText(String.valueOf(gameState.getScore().getAllScores(theyTeamIndex)));
+
+        final AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+    private void showScoresGameEndDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Игра окончена");
+        View view = LayoutInflater.from(this).inflate(R.layout.fragment_scores, findViewById(R.id.score_layout));
+        builder.setView(view);
+
+        TextView bonusesTextView1 = view.findViewById(R.id.score_bonuses_team1);
+        TextView bonusesTextView2 = view.findViewById(R.id.score_bonuses_team2);
+        TextView contractTextView1 = view.findViewById(R.id.score_contract_team1);
+        TextView contractTextView2 = view.findViewById(R.id.score_contract_team2);
+        TextView allTextView1 = view.findViewById(R.id.score_all_team1);
+        TextView allTextView2 = view.findViewById(R.id.score_all_team2);
+
+        bonusesTextView1.setText(String.valueOf(gameState.getScore().getBonusScores(ourTeamIndex)));
+        bonusesTextView2.setText(String.valueOf(gameState.getScore().getBonusScores(theyTeamIndex)));
+
+        int[] ourContractScoresArray = gameState.getScore().getContractPoints()[ourTeamIndex];
+        int[] theyContractScoresArray = gameState.getScore().getContractPoints()[theyTeamIndex];
+        StringBuilder ourContractScores = new StringBuilder();
+        StringBuilder theyContractScores = new StringBuilder();
+
+        for (int score : ourContractScoresArray) {
+            ourContractScores.append(score).append("\n");
+        }
+        for (int score : theyContractScoresArray) {
+            theyContractScores.append(score).append("\n");
+        }
+        contractTextView1.setText(ourContractScores.substring(0, ourContractScores.length() - 1));
+        contractTextView2.setText(theyContractScores.substring(0, theyContractScores.length() - 1));
+
+        allTextView1.setText(String.valueOf(gameState.getScore().getAllScores(ourTeamIndex)));
+        allTextView2.setText(String.valueOf(gameState.getScore().getAllScores(theyTeamIndex)));
+
+        builder.setNegativeButton("Выход", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                Intent intent = new Intent(GameActivity.this, MenuActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
+
+        final AlertDialog alertDialog = builder.create();
+        alertDialog.setCanceledOnTouchOutside(false);
+        alertDialog.show();
+    }
+
+    private <K, V> K getKey(Map<K, V> map, V value) {
+        for (Map.Entry<K, V> entry : map.entrySet()) {
+            if (entry.getValue().equals(value)) {
+                return entry.getKey();
+            }
+        }
+        return null;
     }
 }

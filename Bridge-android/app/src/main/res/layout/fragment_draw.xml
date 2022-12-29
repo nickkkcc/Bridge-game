@@ -48,10 +48,12 @@
             app:srcCompat="@drawable/s_5" />
 
         <ImageView
+            android:id="@+id/draw_pointer"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             app:srcCompat="@drawable/ic_baseline_arrow_upward_24"
+            android:rotation="0"
             android:tint="@color/white"/>
 
         <ImageView
