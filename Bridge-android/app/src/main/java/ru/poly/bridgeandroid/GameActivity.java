@@ -277,17 +277,10 @@ public class GameActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        Log.i("onOptionsItemSelected", String.valueOf(item.getItemId()));
         if (actionBarDrawerToggleMenu.onOptionsItemSelected(item)) {
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.game_menu, menu);
-        return super.onCreateOptionsMenu(menu);
     }
 
     @Override

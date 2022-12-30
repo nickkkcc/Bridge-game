@@ -16,13 +16,16 @@
 
         <activity
             android:name=".ChoosePlaceActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_choose_place"
             android:exported="true"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.BridgeAndroid.FullscreenGameNoActionBar">
         </activity>
 
         <activity
             android:name=".CreateGameActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
             android:exported="true"
             android:label="@string/title_activity_create_game"
             android:screenOrientation="portrait"
