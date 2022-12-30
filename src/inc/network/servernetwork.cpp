@@ -45,7 +45,7 @@ bool ServerNetwork::initServer(quint16 port, int maxPlayers, int maxLoginLength,
                                 &this->minLoginLength, &this->clients, this);
 
     // Подключение лобби - менеджера.
-    lobbyManager = new LobbyManager(this, 2, &this->clients);
+    lobbyManager = new LobbyManager(this, 2, &this->clients, dataBase);
 
     connect(this, &ServerNetwork::startTimer, lobbyManager, &LobbyManager::startTimer);
     connect(lobbyManager, &LobbyManager::disconnectClient, this, &ServerNetwork::disconnectClient);
@@ -167,20 +167,36 @@ void ServerNetwork::validateClientText(const QString &message)
                 if (findedLobby)
                 {
 
+                    QJsonDocument doc(rxTxObj);
+                    int tempVal = tempSocket->sendTextMessage(doc.toJson(QJsonDocument::Compact));
+
+                    qInfo() << "Server: send to client --->"
+                            << tempSocket->peerAddress().toString() + ":" + QString::number(tempSocket->peerPort())
+                            << tempVal << "byte(s)";
+
+                    if (tempVal == -1)
+                    {
+
+                        emit generalError(
+                            "Произошла ошибка при отправке данных клиенту. Предлагается перезапустить игру.");
+                    }
                     returnClientToLobby(findedLobby, lobbyManager, tempSocket, dataBase->getUserLogin(),
-                                        QUuid(rxTxObj["data"].toObject()["token"].toString()));
+                                        QUuid(rxTxObj["data"].toObject()["token"].toString()),
+                                        dataBase->getUserAlias());
                     return;
                 }
                 else
                 {
-
-                    clients.append(new ClientNetwork(this, dataBase->getUserLogin(), tempSocket,
-                                                     QUuid(rxTxObj["data"].toObject()["token"].toString())));
+                    ClientNetwork *const client = new ClientNetwork(
+                        this, dataBase->getUserLogin(), tempSocket,
+                        QUuid(rxTxObj["data"].toObject()["token"].toString()), dataBase->getUserAlias());
+                    clients.append(client);
+                    client->setClientFriendLogins(dataBase->getFriendsList(client));
                     clientSocTemp.removeAll(tempSocket);
 
                     disconnect(tempSocket, &QWebSocket::textMessageReceived, this, &ServerNetwork::validateClientText);
                     disconnect(tempSocket, &QWebSocket::disconnected, this, &ServerNetwork::disconnectTempClient);
-                    connectClientToLobbyManager(clients.last());
+                    connectClientToLobbyManager(client);
                     emit startTimer();
                 }
             }
@@ -210,19 +226,8 @@ void ServerNetwork::disconnectTempClient()
     {
 
         clientSocTemp.removeAll(tempSocket);
-        qInfo() << "Отключение клиента: Отключение сокета.";
-    }
-
-    for (ClientNetwork *client : qAsConst(clients))
-    {
-
-        if (client->getClientSoc() == tempSocket)
-        {
-
-            QString name = client->getName();
-            qInfo() << "Отключение клиента: Отключение сокета. Игрок: " + name;
-            clients.removeAll(client);
-        }
+        qInfo() << "Server: socket disconnected --->"
+                << tempSocket->peerAddress().toString() + ":" + QString::number(tempSocket->peerPort());
     }
 }
 
@@ -250,12 +255,15 @@ void ServerNetwork::connectClientToLobbyManager(ClientNetwork *const client)
     connect(client, &ClientNetwork::clientDisconnected, this->lobbyManager, &LobbyManager::clientDisconnected);
     connect(client, &ClientNetwork::rxJoinLobby, this->lobbyManager, &LobbyManager::joinLobby);
     connect(client, &ClientNetwork::rxAcceptInvitePlayers, this->lobbyManager, &LobbyManager::acceptInvitePlayers);
+    connect(client, &ClientNetwork::rxAddToFriends, this->lobbyManager, &LobbyManager::addToFriends);
+    connect(client, &ClientNetwork::rxDeleteToFriends, this->lobbyManager, &LobbyManager::deleteToFriends);
+    connect(client, &ClientNetwork::rxRequestHistoryList, this->lobbyManager, &LobbyManager::requestHistoryList);
 }
 
 void ServerNetwork::returnClientToLobby(Lobby *const lobby, LobbyManager *const lobbyManager, QWebSocket *clientSoc,
-                                        QString clientName, const QUuid &clientUuid)
+                                        QString clientName, const QUuid &clientUuid, const QUuid &clientAlias)
 {
-    ClientNetwork *const client = new ClientNetwork(this, clientName, clientSoc, clientUuid);
+    ClientNetwork *const client = new ClientNetwork(this, clientName, clientSoc, clientUuid, clientAlias);
 
     clients.append(client);
     clientSocTemp.removeAll(clientSoc);
@@ -269,4 +277,5 @@ void ServerNetwork::returnClientToLobby(Lobby *const lobby, LobbyManager *const 
 
     emit lobbyManager->sendUpdateGameState(PLAY_CONTINUES);
     emit lobbyManager->sendUpdateGameState(lobby->getLastGameEvent());
+    emit lobbyManager->sendNextPlayerTurn();
 };

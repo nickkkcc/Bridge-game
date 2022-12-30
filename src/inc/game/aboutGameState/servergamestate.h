@@ -3,7 +3,6 @@
 
 #include "gamestate.h"
 #include <inc/network/clientnetwork.h>
-#include "inc/game/player.h"
 #include "playergamestate.h"
 #include <QObject>
 

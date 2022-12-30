@@ -179,6 +179,11 @@ void Lobby::gameEventOccured(GameEvent event)
     {
 
         sendUpdatedGameStateToClients(event);
+        gameHistory.setGame_end(QDateTime::currentDateTime());
+        gameHistory.setWinner_team(gameState->getScore().getGameWinner());
+        gameHistory.setTotal_score_NS(gameState->getScore().getTotalScore(Team::N_S));
+        gameHistory.setTotal_score_EW(gameState->getScore().getTotalScore(Team::E_W));
+        emit sendHistoryToLM(gameHistory);
         emit sendMatchEndToLM(this);
         break;
     }
@@ -249,6 +254,16 @@ ClientNetwork *Lobby::getClient(PlayerPosition position) const
         }
     }
     return nullptr;
+}
+
+History &Lobby::getGameHistory()
+{
+    return gameHistory;
+}
+
+void Lobby::setGameHistory(History newGameHistory)
+{
+    gameHistory = newGameHistory;
 }
 
 // Проверить.
@@ -454,6 +469,21 @@ bool Lobby::deletePlayer(Team team, ClientNetwork *const client)
 // Проверить.
 void Lobby::startMatch()
 {
+
+    gameHistory.setGame_start(QDateTime::currentDateTime());
+    gameHistory.setOwner_login(ownerName);
+    gameHistory.setOwner_alias(owner->getAlias());
+    gameHistory.setPlayer_N_login(playerNames[PlayerPosition::NORTH]);
+    gameHistory.setPlayer_N_alias(players[PlayerPosition::NORTH]->getAlias());
+
+    gameHistory.setPlayer_S_login(playerNames[PlayerPosition::SOUTH]);
+    gameHistory.setPlayer_S_alias(players[PlayerPosition::SOUTH]->getAlias());
+
+    gameHistory.setPlayer_E_login(playerNames[PlayerPosition::EAST]);
+    gameHistory.setPlayer_E_alias(players[PlayerPosition::EAST]->getAlias());
+
+    gameHistory.setPlayer_W_login(playerNames[PlayerPosition::WEST]);
+    gameHistory.setPlayer_W_alias(players[PlayerPosition::WEST]->getAlias());
 
     gameState = new ServerGameState();
 

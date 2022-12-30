@@ -13,7 +13,8 @@ class MsgHandler : public QObject
     Q_OBJECT
   private:
     DataBase *base = nullptr;
-    QStringList questions{"How Are You?", "City where you were born?", "What is your mother's name?"};
+    QStringList questions{"Какой у вас был первый номер телефона?", "Кто ваш любимый учитель?",
+                          "Кто ваш любимый певец?", "Как зовут вашу мать?"};
     bool *bAllowNewClientConnection = nullptr;
     int *maxPlayers = nullptr;
     int *maxLoginLength = nullptr;

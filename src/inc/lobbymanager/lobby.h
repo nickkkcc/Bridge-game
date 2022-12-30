@@ -1,11 +1,11 @@
 #ifndef LOBBY_H
 #define LOBBY_H
 
+#include "bridgeServer_all_include.gen.h"
+#include "inc/enumeration/Enumiration.h"
+#include "inc/network/clientnetwork.h"
 #include <QObject>
 #include <inc/game/aboutGameState/servergamestate.h>
-#include "inc/network/clientnetwork.h"
-#include "inc/enumeration/Enumiration.h"
-
 
 class Lobby : public QObject
 {
@@ -59,18 +59,23 @@ class Lobby : public QObject
 
     QHash<QString, PlayerPosition> &getDisconnectedPlayers();
 
+    History &getGameHistory();
+    void setGameHistory(History newGameHistory);
+
   signals:
     void sendMatchEndToLM(Lobby *const sender);
+    void sendHistoryToLM(const History &history);
 
   public slots:
     void rxBidSelected(Bid bid);
     void rxMoveSelected(Card card);
     void gameEventOccured(GameEvent event);
     void setMatchEnded(bool isCompleted);
-private:
+    void nextPlayerTurn();
+
+  private:
     void sendUpdatedGameStateToClients(GameEvent event);
     ClientNetwork *getClient(PlayerPosition position) const;
-    void nextPlayerTurn();
 
   private:
     // Класс игровой логики для всего лобби в общем.
@@ -116,6 +121,8 @@ private:
 
     // Последнее игровое событие (перед PLAY_STOP)
     GameEvent lastGameEvent;
+
+    History gameHistory;
 };
 
 #endif // LOBBY_H

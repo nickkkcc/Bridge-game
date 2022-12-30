@@ -6,15 +6,16 @@
 #include <QObject>
 #include <QTimer>
 
-#include <inc/network/clientnetwork.h>
+#include <inc/database/database.h>
 #include <inc/enumeration/Enumiration.h>
+#include <inc/network/clientnetwork.h>
 
 class LobbyManager : public QObject
 {
     Q_OBJECT
   public:
     explicit LobbyManager(QObject *const parent = nullptr, int maxLobbyCount = 1,
-                          QVector<ClientNetwork *> *const clients = nullptr);
+                          QVector<ClientNetwork *> *const clients = nullptr, DataBase *const db = nullptr);
     ~LobbyManager();
     const int getLobbyCount() const;
     Lobby *const findLobby(QUuid uuidLobby) const;
@@ -36,15 +37,20 @@ class LobbyManager : public QObject
     void clientDisconnected(ClientNetwork *const sender);
     void joinLobby(bool join, ClientNetwork *const sender);
     void acceptInvitePlayers(QUuid uuidLobby, bool successful, ClientNetwork *const sender);
+    void addToFriends(QString login, ClientNetwork *const sender);
+    void deleteToFriends(QString login, ClientNetwork *const sender);
+    void requestHistoryList(ClientNetwork *const sender);
 
   signals:
     void disconnectClient(ClientNetwork *const sender);
     void sendUpdateGameState(GameEvent event);
+    void sendNextPlayerTurn();
 
   private slots:
     void onPlayersOnline();
     void onPlayerCount();
     void matchEnd(Lobby *const sender);
+    void updateHistory(const History &history);
 
   private:
     static constexpr quint8 maxTeamPLayers = 10;
@@ -52,6 +58,7 @@ class LobbyManager : public QObject
     QVector<ClientNetwork *> *clients = nullptr;
     QVector<Lobby *> lobbies;
     QTimer *timer = nullptr;
+    DataBase *db;
 
   private:
     void lobbyClose(Lobby *const lobby);

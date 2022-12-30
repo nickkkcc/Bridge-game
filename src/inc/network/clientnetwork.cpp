@@ -5,18 +5,20 @@
 
 #include "clientnetwork.h"
 
-ClientNetwork::ClientNetwork(QObject *parent, QString name, QWebSocket *clientSoc, const QUuid &uuid)
+ClientNetwork::ClientNetwork(QObject *parent, QString name, QWebSocket *clientSoc, const QUuid &uuid,
+                             const QUuid &alias)
 {
 
+    this->setParent(parent);
     this->name = name;
     this->uuid = uuid;
+    this->alias = alias;
     this->clientSoc = clientSoc;
 
     connect(clientSoc, &QWebSocket::disconnected, this, &ClientNetwork::onClientDisconnected);
     connect(clientSoc, &QWebSocket::textMessageReceived, this, &ClientNetwork::rxAll);
 }
 
-// Проверить работоспособность.
 void ClientNetwork::bidTurn()
 {
 
@@ -28,7 +30,6 @@ void ClientNetwork::bidTurn()
     txAll(tx);
 }
 
-// Проверить работоспособность.
 void ClientNetwork::moveTurn()
 {
 
@@ -40,7 +41,6 @@ void ClientNetwork::moveTurn()
     txAll(tx);
 }
 
-// Проверить работоспособность.
 void ClientNetwork::bidRejected(QString reason)
 {
 
@@ -53,7 +53,6 @@ void ClientNetwork::bidRejected(QString reason)
     txAll(tx);
 }
 
-// Проверить работоспособность.
 void ClientNetwork::moveRejected(QString reason)
 {
 
@@ -66,7 +65,6 @@ void ClientNetwork::moveRejected(QString reason)
     txAll(tx);
 }
 
-// Проверить работоспособность.
 void ClientNetwork::updateGameState(PlayerGameState state)
 {
 
@@ -82,7 +80,6 @@ void ClientNetwork::updateGameState(PlayerGameState state)
     txAll(tx);
 }
 
-// Проверить работоспособность.
 void ClientNetwork::rxAll(const QString& message)
 {
 
@@ -153,35 +150,27 @@ void ClientNetwork::rxAll(const QString& message)
 
             rxBidSelectedDeserialization(rx["data"].toObject()["bid"].toObject());
         }
-        // Кейс для добавления игрока в друзья. Ответ клиенту добавлен ли указанный клиент в друзья
-        // в базе данных.
-        //        if (rx["type"] == "add_to_friends")
-        //        {
-        //            rxAddToFriends();
-        //        }
+        //         Кейс для добавления игрока в друзья. Ответ клиенту добавлен ли указанный клиент в друзья
+        //         в базе данных.
+        if (rx["type"] == "add_friend")
+        {
+            emit rxAddToFriends(rx["data"].toObject()["login"].toString(), this);
+        }
 
-        // Кейс для удаления игрока из друзья. Ответ клиенту удален ли указанный клиент из друзей
+        // Кейс для удаления игрока из друзей. Ответ клиенту удален ли указанный клиент из друзей
         // в базе данных.
-        //        if (rx["type"] == "delete_from_friends")
-        //        {
-        //            rxDeleteToFriends();
-        //        }
-
-        // Кейс для запроса списка друзей клиента с базы данных.
-        // Если запрос выполнен успешно - отправка клиенту списка друзей.
-        // Если запрос не выполнен успешно - отправка клиенту причину ошибки.
-        //        if (rx["type"] == "request_friends_list")
-        //        {
-        //            rxRequestFriendsList();
-        //        }
+        if (rx["type"] == "delete_from_friends")
+        {
+            emit rxDeleteToFriends(rx["data"].toObject()["login"].toString(), this);
+        }
 
         // Кейс для запроса истории игр клиента с базы данных.
         // Если запрос выполнен успешно - отправка клиенту списка сыгранных игр.
         // Если запрос не выполнен успешно - отправка клиенту причину ошибки.
-        //        if (rx["type"] == "request_history_list")
-        //        {
-        //            rxRequestHistoryList();
-        //        }
+        if (rx["type"] == "request_history_list")
+        {
+            emit rxRequestHistoryList(this);
+        }
 
         // Кейс для запроса на удаление клиента из базы данных.
         // Если запрос выполнен успешно - отправка клиенту статус успешного удаления клиента из базы данных.
@@ -193,7 +182,6 @@ void ClientNetwork::rxAll(const QString& message)
     }
 }
 
-// Проверить работоспособность.
 void ClientNetwork::rxMoveSelectedDeserialization(QJsonObject card)
 {
 
@@ -202,7 +190,6 @@ void ClientNetwork::rxMoveSelectedDeserialization(QJsonObject card)
     emit rxMoveSelected(tempCard);
 }
 
-// Проверить работоспособность.
 void ClientNetwork::rxBidSelectedDeserialization(QJsonObject bid)
 {
 
@@ -211,19 +198,29 @@ void ClientNetwork::rxBidSelectedDeserialization(QJsonObject bid)
     emit rxBidSelected(tempbid);
 }
 
+const QHash<QString, QUuid> &ClientNetwork::getClientFriendLogins() const
+{
+    return clientFriendLogins;
+}
+
+void ClientNetwork::setClientFriendLogins(const QHash<QString, QUuid> &newClientFriendLogins)
+{
+    clientFriendLogins = newClientFriendLogins;
+}
+
+const QUuid ClientNetwork::getAlias() const
+{
+    return alias;
+}
+
+void ClientNetwork::setAlias(const QUuid &newAlias)
+{
+    alias = newAlias;
+}
+
 void ClientNetwork::setClientSoc(QWebSocket *newClientSoc)
 {
     clientSoc = newClientSoc;
-}
-
-QVector<ClientNetwork *> &ClientNetwork::getClientFriends()
-{
-    return clientFriends;
-}
-
-void ClientNetwork::setClientFriends(const QVector<ClientNetwork *> &newClientFriends)
-{
-    clientFriends = newClientFriends;
 }
 
 void ClientNetwork::setFinder(bool newFinder)
@@ -276,4 +273,55 @@ void ClientNetwork::txAll(QJsonObject data)
 
     QJsonDocument txDoc(data);
     clientSoc->sendTextMessage(txDoc.toJson(QJsonDocument::Compact));
+}
+
+QString ClientNetwork::getName() const
+{
+    return name;
+}
+
+PlayerPosition ClientNetwork::getPosition() const
+{
+    return position;
+}
+
+void ClientNetwork::setName(QString name)
+{
+    this->name = name;
+}
+
+const QUuid &ClientNetwork::getUuid() const
+{
+    return uuid;
+}
+
+void ClientNetwork::setTeam(Team newTeam)
+{
+    team = newTeam;
+}
+
+const Team ClientNetwork::getTeam() const
+{
+    return team;
+}
+
+const Team ClientNetwork::getTeam(PlayerPosition position) const
+{
+
+    switch (position)
+    {
+    case NORTH:
+    case SOUTH:
+        return N_S;
+    case EAST:
+    case WEST:
+        return E_W;
+    case NONE_POSITION:
+        return NONE_TEAM;
+    }
+}
+
+void ClientNetwork::setPosition(PlayerPosition position)
+{
+    this->position = position;
 }

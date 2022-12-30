@@ -27,7 +27,7 @@ void Score::updateScore(const Bid &contractBid, QMap<PlayerPosition, CardKit> pl
         defendingTeam = N_S;
 
     // Установление статуса неконтра-контра-реконтра заявки.
-    qint8 multiplier = 1;
+    uint multiplier = 1;
     bool doubled = false;
     bool redoubled = false;
     if(contractBid.getBidCall() == DOUBLE_BID){
@@ -45,8 +45,8 @@ void Score::updateScore(const Bid &contractBid, QMap<PlayerPosition, CardKit> pl
     // Если контракт завершен
     if(declarerTricksWon >= contractBid.getTricksValue() + 6){
         // Выдать очки за каждый trick.
-        qint8 trickPoints;
-        qint8 overtrickPoints;
+        uint trickPoints;
+        uint overtrickPoints;
         switch(contractBid.getTrumpCardSuit()){
             // Некозырная и старшая масть.
             case NONE:
@@ -75,7 +75,7 @@ void Score::updateScore(const Bid &contractBid, QMap<PlayerPosition, CardKit> pl
 
 
         // Корректировка начисления для случая некозырной масти.
-        qint8 noTrumpAdjust = 0;
+        uint noTrumpAdjust = 0;
         if(contractBid.getTrumpCardSuit() == NONE)
             noTrumpAdjust = 10 * multiplier;
 
@@ -83,7 +83,7 @@ void Score::updateScore(const Bid &contractBid, QMap<PlayerPosition, CardKit> pl
         this->contractPoints[biddingTeam].last() += (contractBid.getTricksValue() * trickPoints) + noTrumpAdjust;
 
         // Обновить очки за перевыполнение контракта.
-        qint8 overTricks = declarerTricksWon - (contractBid.getTricksValue() + 6);
+        uint overTricks = declarerTricksWon - (contractBid.getTricksValue() + 6);
         this->overtricks[biddingTeam] += overTricks * overtrickPoints;
 
         // Применить слэм бонусы.
@@ -110,7 +110,7 @@ void Score::updateScore(const Bid &contractBid, QMap<PlayerPosition, CardKit> pl
     // Контракт не был выполнен.
     else{
         // Количество невыполненных контрактов.
-        qint8 numUndertricks = contractBid.getTricksValue() + 6 - declarerTricksWon;
+        uint numUndertricks = contractBid.getTricksValue() + 6 - declarerTricksWon;
 
         // Начисление штрафных очков за первый trick.
         if(bidderVulnerable){
@@ -132,7 +132,7 @@ void Score::updateScore(const Bid &contractBid, QMap<PlayerPosition, CardKit> pl
 
         // Начисление штрафных очков за 2 и 3 trick.
         if(numUndertricks >= 2){
-            qint8 numTricks;
+            uint numTricks;
             if(numUndertricks == 2)
                 numTricks = 1;
             else if(numUndertricks > 2)
@@ -160,7 +160,7 @@ void Score::updateScore(const Bid &contractBid, QMap<PlayerPosition, CardKit> pl
         // Применяем штрафные очки за 4-ю и последующие trick-и
         // Применить штрафные очки за 2-ю и 3-ю trick-и
         if(numUndertricks >= 4){
-            qint8 numTricks = numUndertricks - 3;
+            uint numTricks = numUndertricks - 3;
 
             // Начисление штрафных очков.
             if(bidderVulnerable){
@@ -428,11 +428,13 @@ bool Score::getTeamVulnerable(Team team) const
 void Score::readFromJson(const QJsonObject &json)
 {
     QJsonArray jsonConPointsTeams = json["contract_points"].toArray();
-    for (qint8 team = N_S; team <= E_W; ++ team) {
+    for (quint8 team = N_S; team <= E_W; ++team)
+    {
         QJsonArray jsonConPointsGames = jsonConPointsTeams[team].toArray();
         QVector<quint32> conPointsGames;
         conPointsGames.reserve(jsonConPointsGames.size());
-        for (qint8 game = 0; game < jsonConPointsGames.size(); ++ game) {
+        for (quint8 game = 0; game < jsonConPointsGames.size(); ++game)
+        {
             quint32 points = jsonConPointsGames[game].toInt();
             conPointsGames.append(points);
         }
@@ -440,44 +442,51 @@ void Score::readFromJson(const QJsonObject &json)
     }
 
     QJsonArray jsonBackScoreArray = json["back_score"].toArray();
-    for (qint8 index = 0; index < jsonBackScoreArray.size(); ++ index) {
-        qint32 backScoreElement = jsonBackScoreArray[index].toInt();
+    for (quint8 index = 0; index < jsonBackScoreArray.size(); ++index)
+    {
+        quint32 backScoreElement = jsonBackScoreArray[index].toInt();
         this->backScore[index] = backScoreElement;
     }
 
     QJsonArray jsonOvertricksArray = json["overtricks"].toArray();
-    for (qint8 index = 0; index < jsonOvertricksArray.size(); ++ index) {
-        qint32 overtricksElement = jsonOvertricksArray[index].toInt();
+    for (quint8 index = 0; index < jsonOvertricksArray.size(); ++index)
+    {
+        quint32 overtricksElement = jsonOvertricksArray[index].toInt();
         this->overtricks[index] = overtricksElement;
     }
 
     QJsonArray jsonUndertricksArray = json["undertricks"].toArray();
-    for (qint8 index = 0; index < jsonUndertricksArray.size(); ++ index) {
-        qint32 undertricksElement = jsonUndertricksArray[index].toInt();
+    for (quint8 index = 0; index < jsonUndertricksArray.size(); ++index)
+    {
+        quint32 undertricksElement = jsonUndertricksArray[index].toInt();
         this->undertricks[index] = undertricksElement;
     }
 
     QJsonArray jsonHonorsArray = json["honors"].toArray();
-    for (qint8 index = 0; index < jsonHonorsArray.size(); ++ index) {
-        qint32 honorsElement = jsonHonorsArray[index].toInt();
+    for (quint8 index = 0; index < jsonHonorsArray.size(); ++index)
+    {
+        quint32 honorsElement = jsonHonorsArray[index].toInt();
         this->honors[index] = honorsElement;
     }
 
     QJsonArray jsonslamBonusesArray = json["slam_bonuses"].toArray();
-    for (qint8 index = 0; index < jsonslamBonusesArray.size(); ++ index) {
-        qint32 slamBonusesElement = jsonslamBonusesArray[index].toInt();
+    for (quint8 index = 0; index < jsonslamBonusesArray.size(); ++index)
+    {
+        quint32 slamBonusesElement = jsonslamBonusesArray[index].toInt();
         this->slamBonuses[index] = slamBonusesElement;
     }
 
     QJsonArray jsonDoubleBonusesArray = json["double_bonuses"].toArray();
-    for (qint8 index = 0; index < jsonDoubleBonusesArray.size(); ++ index) {
-        qint32 doubleBonusesElement = jsonDoubleBonusesArray[index].toInt();
+    for (quint8 index = 0; index < jsonDoubleBonusesArray.size(); ++index)
+    {
+        quint32 doubleBonusesElement = jsonDoubleBonusesArray[index].toInt();
         this->doubleBonuses[index] = doubleBonusesElement;
     }
 
     QJsonArray jsonRubberBonusesArray = json["rubber_bonuses"].toArray();
-    for (qint8 index = 0; index < jsonRubberBonusesArray.size(); ++ index) {
-        qint32 rubberBonusesElement = jsonRubberBonusesArray[index].toInt();
+    for (quint8 index = 0; index < jsonRubberBonusesArray.size(); ++index)
+    {
+        quint32 rubberBonusesElement = jsonRubberBonusesArray[index].toInt();
         this->rubberBonuses[index] = rubberBonusesElement;
     }
 }
@@ -486,54 +495,66 @@ void Score::readFromJson(const QJsonObject &json)
 void Score::writeToJson(QJsonObject &json) const
 {
     QJsonArray jsonConPointsTeams;
-    for (qint8 team = N_S; team <= E_W; ++ team) {
+    for (quint8 team = N_S; team <= E_W; ++team)
+    {
         QVector<quint32> conPointsGames = contractPoints[team];
         QJsonArray jsonConPointsGames;
-        for (qint8 game = 0; game < conPointsGames.size(); ++ game) {
-            qint32 points = conPointsGames.value(game);
-            jsonConPointsGames.append(points);
+        for (quint8 game = 0; game < conPointsGames.size(); ++game)
+        {
+            qint64 points = conPointsGames.value(game);
+            jsonConPointsGames.push_back(points);
         }
         jsonConPointsTeams.append(jsonConPointsGames);
     }
     json["contract_points"] = jsonConPointsTeams;
 
     QJsonArray jsonBackScoreArray;
-    for (const qint32 &backScoreElement: this->backScore)
+    for (const qint32 &backScoreElement : this->backScore)
+    {
         jsonBackScoreArray.append(backScoreElement);
+    }
     json["back_score"] = jsonBackScoreArray;
 
     QJsonArray jsonOvertricksArray;
-    for (const qint32 overTricksElement: this->overtricks)
+    for (const qint32 &overTricksElement : this->overtricks)
+    {
+
         jsonOvertricksArray.append(overTricksElement);
+    }
     json["overtricks"] = jsonOvertricksArray;
 
     QJsonArray jsonUndertricksArray;
-    for (const qint32 &undertricksElement: this->undertricks)
+    for (const qint32 &undertricksElement : this->undertricks)
+    {
+
         jsonUndertricksArray.append(undertricksElement);
+    }
     json["undertricks"] = jsonUndertricksArray;
 
     QJsonArray jsonHonorsArray;
-    for (const qint32 &honorsElement: this->honors)
+    for (const qint32 &honorsElement : this->honors)
+    {
         jsonHonorsArray.append(honorsElement);
+    }
     json["honors"] = jsonHonorsArray;
 
     QJsonArray jsonslamBonusesArray;
-    for (const qint32 &slamBonusesElement: this->slamBonuses)
+    for (const qint32 &slamBonusesElement : this->slamBonuses)
         jsonslamBonusesArray.append(slamBonusesElement);
     json["slam_bonuses"] = jsonslamBonusesArray;
 
     QJsonArray jsonDoubleBonusesArray;
-    for (const qint32 &doubleBonusesElement: this->doubleBonuses)
+    for (const qint32 &doubleBonusesElement : this->doubleBonuses)
         jsonDoubleBonusesArray.append(doubleBonusesElement);
     json["double_bonuses"] = jsonDoubleBonusesArray;
 
     QJsonArray jsonRedoubleBonusesArray;
-    for (const qint32 &redoubleBonusesElement: this->redoubleBonuses)
+    for (const qint32 &redoubleBonusesElement : this->redoubleBonuses)
         jsonRedoubleBonusesArray.append(redoubleBonusesElement);
     json["redouble_bonuses"] = jsonRedoubleBonusesArray;
 
     QJsonArray jsonRubberBonusesArray;
-    for (const qint32 &rubberBonusesElement: this->rubberBonuses)
+    for (const qint32 &rubberBonusesElement : this->rubberBonuses)
         jsonRubberBonusesArray.append(rubberBonusesElement);
     json["rubber_bonuses"] = jsonRubberBonusesArray;
 }

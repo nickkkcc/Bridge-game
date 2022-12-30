@@ -54,7 +54,7 @@ class ServerNetwork : public QObject
   private:
     void connectClientToLobbyManager(ClientNetwork *const client);
     void returnClientToLobby(Lobby *const lobby, LobbyManager *const lobbyManager, QWebSocket *client,
-                             QString clientName, const QUuid &clientUuid);
+                             QString clientName, const QUuid &clientUuid, const QUuid &clientAlias);
 };
 
 #endif // SERVERNETWORK_H

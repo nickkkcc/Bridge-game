@@ -4,10 +4,11 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 
-LobbyManager::LobbyManager(QObject *parent, int maxLobbyCount, QVector<ClientNetwork *> *const clients)
+LobbyManager::LobbyManager(QObject *parent, int maxLobbyCount, QVector<ClientNetwork *> *const clients,
+                           DataBase *const db)
     : QObject(parent)
 {
-
+    this->db = db;
     this->maxLobbyCount = maxLobbyCount;
     this->clients = clients;
     timer = new QTimer(this);
@@ -218,6 +219,7 @@ void LobbyManager::createLobby(ClientNetwork *const client)
             lobbies.append(lobby);
             connect(this, &LobbyManager::sendUpdateGameState, lobby, &Lobby::gameEventOccured);
             connect(lobby, &Lobby::sendMatchEndToLM, this, &LobbyManager::matchEnd);
+            connect(this, &LobbyManager::sendNextPlayerTurn, lobby, &Lobby::nextPlayerTurn);
             client->setLobbyOwnerUuid(lobbies.last()->getUuid());
             lobbies.last()->setOwnerName(client->getName());
 
@@ -240,7 +242,6 @@ void LobbyManager::createLobby(ClientNetwork *const client)
             txAll(tx, client);
     }
 }
-
 // Функция закрытия лобби. Эта функция используется только в том случае,
 // если клиенты иизъявили желание выйти из
 // комнаты. Это равносильно тому, что:
@@ -503,7 +504,7 @@ void LobbyManager::onPlayersOnline()
                 {
 
                     invitePlayersLogins.append(client->getName());
-                    invitePlayersAliases.append(client->getUuid().toString(QUuid::WithoutBraces));
+                    invitePlayersAliases.append(client->getAlias().toString(QUuid::WithoutBraces));
                 }
             }
 
@@ -516,6 +517,13 @@ void LobbyManager::onPlayersOnline()
                     // Доделать фичу с списком друзей.
                     QStringList inviteFriendsLogins;
                     QStringList inviteFriendsAliases;
+
+                    for (const QString &login : lobby->getOwner()->getClientFriendLogins().keys())
+                    {
+                        inviteFriendsLogins.append(login);
+                        inviteFriendsAliases.append(
+                            lobby->getOwner()->getClientFriendLogins().value(login).toString(QUuid::WithoutBraces));
+                    }
 
                     QJsonObject tx;
                     QJsonObject data;
@@ -595,6 +603,18 @@ void LobbyManager::matchEnd(Lobby *const sender)
     {
 
             closeLobby(sender->getUuid(), sender->getOwner());
+    }
+}
+
+void LobbyManager::updateHistory(const History &history)
+{
+    Lobby *const lobby = qobject_cast<Lobby *>(sender());
+    if (lobby)
+    {
+            for (ClientNetwork *const client : lobby->getPlayers())
+            {
+                db->addHistory(client, history);
+            }
     }
 }
 
@@ -759,12 +779,56 @@ void LobbyManager::acceptInvitePlayers(QUuid uuidLobby, bool successful, ClientN
     }
 }
 
+void LobbyManager::addToFriends(QString login, ClientNetwork *const sender)
+{
+    if (sender)
+    {
+            for (ClientNetwork *const client : qAsConst(*clients))
+            {
+                if (client->getName() == login)
+                {
+                    QJsonObject tx;
+                    QJsonObject data;
+                    tx["type"] = "add_friend";
+                    tx["id"] = sender->getUuid().toString(QUuid::WithoutBraces);
+                    if (db->addFriend(sender, client))
+                    {
+                        data["successful"] = true;
+                        data["error"] = "";
+                        qInfo() << "Server: client --->" << sender->getUuid().toString() << "--->" << sender->getName()
+                                << " add client --->" << client->getUuid().toString() << "--->" << client->getName()
+                                << "to friend";
+                    }
+                    else
+                    {
+                        data["successful"] = false;
+                        data["error"] = "Не удалось добавить данного клиента в друзья!";
+                        qInfo() << "Server: client --->" << sender->getUuid().toString() << "--->" << sender->getName()
+                                << "try to add client --->" << client->getUuid().toString() << "--->"
+                                << client->getName() << "to friend (fail)";
+                    }
+                    tx["data"] = data;
+                    txAll(tx, sender);
+                    return;
+                }
+            }
+    }
+}
+
+void LobbyManager::deleteToFriends(QString login, ClientNetwork *const sender)
+{
+}
+
+void LobbyManager::requestHistoryList(ClientNetwork *const sender)
+{
+}
+
 void LobbyManager::lobbyClose(Lobby *const lobby)
 {
 
     qInfo() << "Lobby:" << lobby->getUuid().toString() << "is closed.";
     lobbies.removeAll(lobby);
-    delete lobby;
+    lobby->deleteLater();
 }
 
 void LobbyManager::txAll(QJsonObject tx, ClientNetwork *const sender)

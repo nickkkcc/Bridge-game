@@ -10,7 +10,6 @@ CONFIG += c++11
 
 SOURCES += \
     inc/database/database.cpp \
-    inc/game/player.cpp \
     inc/game/aboutCard/bid.cpp \
     inc/game/aboutCard/card.cpp \
     inc/game/aboutCard/cardkit.cpp \
@@ -28,7 +27,6 @@ SOURCES += \
 
 HEADERS += \
     inc/enumeration/Enumiration.h \
-    inc/game/player.h \
     inc/game/aboutCard/bid.h \
     inc/game/aboutCard/card.h \
     inc/game/aboutCard/cardkit.h \
@@ -52,6 +50,8 @@ FORMS += \
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+
 
 
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/libs/DataBaseLib/bin/ -lbridgeServer

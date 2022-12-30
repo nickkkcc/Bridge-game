@@ -9,13 +9,4 @@ enum MsgType
     QUESTIONS
 };
 
-enum QuestionsType
-{
-
-    FIRST_PHONE_NUMBER,
-    FAVOURITE_TEACHER,
-    FAVOURITE_SINGER,
-    MOTHERS_NAME
-};
-
 #endif // MSGTYPE_H

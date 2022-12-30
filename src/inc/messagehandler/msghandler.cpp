@@ -13,19 +13,18 @@ bool MsgHandler::checkTryReg(QJsonObject &obj)
     {
 
         bool playerIs = base->readUserFromBase(obj["data"].toObject()["login"].toString());
-        qDebug() << base->getUserLogin();
         if (playerIs)
         {
 
             obj = generateAnswer(MsgType::REGISTRATION, false,
-                                 "An account with this username already exists. Choose another login");
+                                 "Клиент с таким логином уже определен. Выберите себе другой логин!");
         }
         else
         {
 
-            base->writeUserToBase(obj["data"].toObject()["login"].toString(),
+            base->writeUserToBase(obj["data"].toObject()["login"].toString(), QUuid::createUuid(),
                                   obj["data"].toObject()["password"].toString(),
-                                  questions.at(obj["data"].toObject()["question"].toInt()),
+                                  QuestionsType::enum_QuestionsType(obj["data"].toObject()["question"].toInt()),
                                   obj["data"].toObject()["answer"].toString(), 0);
             obj = generateAnswer(MsgType::REGISTRATION, true, "");
         }
@@ -44,14 +43,14 @@ bool MsgHandler::tryLogin(QJsonObject &obj)
     if (!bAllowNewClientConnection)
     {
 
-        obj = generateAnswer(MsgType::LOGIN, false, "Game already started.");
+        obj = generateAnswer(MsgType::LOGIN, false, "Игра уже началась.");
         return false;
     }
 
     if (clients->count() >= *maxPlayers)
     {
 
-        obj = generateAnswer(MsgType::LOGIN, false, "Server is full.");
+        obj = generateAnswer(MsgType::LOGIN, false, "Сервер переполнен.");
         return false;
     }
 
@@ -60,24 +59,24 @@ bool MsgHandler::tryLogin(QJsonObject &obj)
     {
 
         obj = generateAnswer(MsgType::LOGIN, false,
-                             "Length of login must be greater than " + QString::number(*maxLoginLength) +
-                                 " and less than " + QString::number(*minLoginLength));
+                             "Длина логина должна быть больше, чем " + QString::number(*maxLoginLength) +
+                                 " и меньше, чем " + QString::number(*minLoginLength));
         return false;
     }
 
     if (!base->readUserFromBase(obj["data"].toObject()["login"].toString()))
     {
 
-        obj = generateAnswer(MsgType::LOGIN, false, "Такого логина нет в базе данных. Choose another login");
+        obj = generateAnswer(MsgType::LOGIN, false, "Такого логина нет в базе данных. Выберите другой логин!");
         return false;
     }
     else
     {
 
-        if (obj["data"].toObject()["password"] != base->getuserPassword())
+        if (obj["data"].toObject()["password"] != base->getUserPassword())
         {
 
-            obj = generateAnswer(MsgType::LOGIN, false, "Password is wrong");
+            obj = generateAnswer(MsgType::LOGIN, false, "Пароль неверен!");
             return false;
         }
         else
@@ -103,7 +102,7 @@ bool MsgHandler::tryLogin(QJsonObject &obj)
             else
             {
 
-                obj = generateAnswer(MsgType::LOGIN, false, "Such a client is already online");
+                obj = generateAnswer(MsgType::LOGIN, false, "Такой клиент уже авторизован!");
                 return false;
             }
         }
@@ -135,7 +134,8 @@ QJsonObject MsgHandler::generateAnswer(const MsgType &type, bool successful, con
 
         QJsonArray arr;
         QJsonObject question;
-        for (int i = 0; i < questions.count(); i++)
+        for (int i = QuestionsType::enum_QuestionsType::FIRST_PHONE_NUMBER;
+             i <= QuestionsType::enum_QuestionsType::MOTHERS_NAME; i++)
         {
 
             question["question_id"] = i;

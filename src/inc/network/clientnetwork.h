@@ -3,34 +3,43 @@
 
 #include <QObject>
 #include "inc/enumeration/Enumiration.h"
-#include "inc/game/player.h"
 #include "inc/game/aboutGameState/playergamestate.h"
 #include <QWebSocket>
 
-class ClientNetwork : public Player
+class ClientNetwork : public QObject
 {
     Q_OBJECT
   public:
     explicit ClientNetwork(QObject *parent = nullptr, QString playerName = QString("Player"),
-                           QWebSocket *clientSoc = nullptr, const QUuid &uuid = nullptr);
+                           QWebSocket *clientSoc = nullptr, const QUuid &uuid = nullptr, const QUuid &alias = nullptr);
     void bidTurn();
     void moveTurn();
     void bidRejected(QString reason);
     void moveRejected(QString reason);
     void updateGameState(PlayerGameState state);
-    // void gameTerminated(QString reason);
+
     QWebSocket *const getClientSoc() const;
     const bool getFinder() const;
     const QUuid &getLobbyOwnerUuid() const;
+    QString getName() const;
+    PlayerPosition getPosition() const;
+    const Team getTeam() const;
+    const Team getTeam(PlayerPosition position) const;
+    const QUuid &getUuid() const;
+    const QUuid getAlias() const;
+    const QHash<QString, QUuid> &getClientFriendLogins() const;
+
     void setLobbyOwnerUuid(const QUuid &newLobbyOwnerUuid);
     void setFinder(bool newFinder);
-    ~ClientNetwork();
-
-    QVector<ClientNetwork *> &getClientFriends();
-    void setClientFriends(const QVector<ClientNetwork *> &newClientFriends);
-
+    void setName(QString name);
+    void setPosition(PlayerPosition position);
+    void setTeam(Team newTeam);
+    void setUuid(const QUuid &newUuid);
     void setClientSoc(QWebSocket *newClientSoc);
+    void setAlias(const QUuid &newAlias);
+    void setClientFriendLogins(const QHash<QString, QUuid> &newClientFriendLogins);
 
+    ~ClientNetwork();
   private slots:
     void rxAll(const QString &message);
 
@@ -50,6 +59,9 @@ class ClientNetwork : public Player
     void rxAcceptInvitePlayers(QUuid uuidLobby, bool successful, ClientNetwork *const sender);
     void rxMoveSelected(Card card);
     void rxBidSelected(Bid bid);
+    void rxAddToFriends(QString login, ClientNetwork *const sender);
+    void rxDeleteToFriends(QString login, ClientNetwork *const sender);
+    void rxRequestHistoryList(ClientNetwork *const sender);
 
   private:
     void txAll(QJsonObject data);
@@ -59,8 +71,13 @@ class ClientNetwork : public Player
 
   private:
     QWebSocket *clientSoc = nullptr;
+    QString name;
+    QUuid uuid;
+    PlayerPosition position = NONE_POSITION;
+    Team team = Team::NONE_TEAM;
     QUuid lobbyOwnerUuid;
-    QVector<ClientNetwork *> clientFriends;
+    QUuid alias;
+    QHash<QString, QUuid> clientFriendLogins;
 
     bool finder = false;
 };
