@@ -25,7 +25,7 @@ bool MsgHandler::checkTryReg(QJsonObject &obj)
             base->writeUserToBase(obj["data"].toObject()["login"].toString(), QUuid::createUuid(),
                                   obj["data"].toObject()["password"].toString(),
                                   QuestionsType::enum_QuestionsType(obj["data"].toObject()["question"].toInt()),
-                                  obj["data"].toObject()["answer"].toString(), 0);
+                                  obj["data"].toObject()["answer"].toString(), 0, 0, 0);
             obj = generateAnswer(MsgType::REGISTRATION, true, "");
         }
         return true;

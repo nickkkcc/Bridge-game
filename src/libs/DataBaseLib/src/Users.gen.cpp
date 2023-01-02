@@ -1,5 +1,5 @@
 /************************************************************************************************
-** File created by QxEntityEditor 1.2.6 (2022/12/29 03:00) : please, do NOT modify this file ! **
+** File created by QxEntityEditor 1.2.6 (2022/12/30 22:01) : please, do NOT modify this file ! **
 ************************************************************************************************/
 
 #include "../include/bridgeServer_precompiled_header.gen.h"
@@ -33,6 +33,8 @@ void register_class(QxClass<Users> & t)
    pData = t.data(& Users::m_Question_type, "Question_type", 0, true, true);
    pData = t.data(& Users::m_Question_answer, "Question_answer", 0, true, true);
    pData = t.data(& Users::m_Score, "Score", 0, true, true);
+   pData = t.data(& Users::m_Win_game_count, "Win_game_count", 0, true, true);
+   pData = t.data(& Users::m_All_game_count, "All_game_count", 0, true, true);
 
    pRelation = t.relationManyToMany(& Users::m_list_of_History, "list_of_History", "t_qxee_History_Users", "Users_id", "History_id", 0);
    pRelation = t.relationOneToMany(& Users::m_list_of_Friends, "list_of_Friends", "Users_id", 0);
@@ -44,13 +46,15 @@ void register_class(QxClass<Users> & t)
    pAllValidator->add_NotNull("Question_type");
    pAllValidator->add_NotNull("Question_answer");
    pAllValidator->add_NotNull("Score");
+   pAllValidator->add_NotNull("Win_game_count");
+   pAllValidator->add_NotNull("All_game_count");
 }
 
 } // namespace qx
 
-Users::Users() : m_Users_id(0), m_Score(0) { ; }
+Users::Users() : m_Users_id(0), m_Score(0), m_Win_game_count(0), m_All_game_count(0) { ; }
 
-Users::Users(const long & id) : m_Users_id(id), m_Score(0) { ; }
+Users::Users(const long & id) : m_Users_id(id), m_Score(0), m_Win_game_count(0), m_All_game_count(0) { ; }
 
 Users::~Users() { ; }
 
@@ -67,6 +71,10 @@ QuestionsType::enum_QuestionsType Users::getQuestion_type() const { return m_Que
 QString Users::getQuestion_answer() const { return m_Question_answer; }
 
 double Users::getScore() const { return m_Score; }
+
+unsigned long Users::getWin_game_count() const { return m_Win_game_count; }
+
+unsigned long Users::getAll_game_count() const { return m_All_game_count; }
 
 Users::type_list_of_History Users::getlist_of_History() const { return m_list_of_History; }
 
@@ -93,6 +101,10 @@ void Users::setQuestion_type(const QuestionsType::enum_QuestionsType & val) { m_
 void Users::setQuestion_answer(const QString & val) { m_Question_answer = val; }
 
 void Users::setScore(const double & val) { m_Score = val; }
+
+void Users::setWin_game_count(const unsigned long & val) { m_Win_game_count = val; }
+
+void Users::setAll_game_count(const unsigned long & val) { m_All_game_count = val; }
 
 void Users::setlist_of_History(const Users::type_list_of_History & val) { m_list_of_History = val; }
 

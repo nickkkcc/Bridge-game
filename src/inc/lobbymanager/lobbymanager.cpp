@@ -90,7 +90,7 @@ Lobby *const LobbyManager::findLobby(QString playerName) const
     for (auto lobby : qAsConst(lobbies))
     {
 
-        if (lobby->getPlayerNames().contains(playerName))
+        if (lobby->getPlayerNames().contains(playerName) || lobby->getOwnerName() == playerName)
         {
 
             return lobby;
@@ -100,7 +100,6 @@ Lobby *const LobbyManager::findLobby(QString playerName) const
 }
 
 // Функция для нахождения комнаты и восстановления игрока в игре при неожиданном отключении.
-//
 Lobby *const LobbyManager::findLobbyFromTempClient(QString playerName) const
 {
 
@@ -220,6 +219,7 @@ void LobbyManager::createLobby(ClientNetwork *const client)
             connect(this, &LobbyManager::sendUpdateGameState, lobby, &Lobby::gameEventOccured);
             connect(lobby, &Lobby::sendMatchEndToLM, this, &LobbyManager::matchEnd);
             connect(this, &LobbyManager::sendNextPlayerTurn, lobby, &Lobby::nextPlayerTurn);
+            connect(lobby, &Lobby::sendHistoryToLM, this, &LobbyManager::updateHistory);
             client->setLobbyOwnerUuid(lobbies.last()->getUuid());
             lobbies.last()->setOwnerName(client->getName());
 
@@ -374,7 +374,7 @@ void LobbyManager::acceptSelectTeam(Team team, QUuid uuidLobby, ClientNetwork *c
                 tx["type"] = "accept_select_team";
                 data["lobby_id"] = uuidLobby.toString(QUuid::WithoutBraces);
                 data["successful"] = false;
-                data["error"] = "Error";
+                data["error"] = "Выбранная вами команда уже заполнена!";
                 tx["data"] = data;
                 txAll(tx, client);
                 sendSelectTeamClient(uuidLobby, client);
@@ -460,7 +460,6 @@ void LobbyManager::startGame(QUuid uuidLobby, ClientNetwork *const sender)
                 {
 
                     tempLobby->setGameStarted(true);
-
                     // Отправка оповещений игрокам о том, что игра началась.
                     for (auto client : qAsConst(tempLobby->getPlayers()))
                     {
@@ -518,11 +517,17 @@ void LobbyManager::onPlayersOnline()
                     QStringList inviteFriendsLogins;
                     QStringList inviteFriendsAliases;
 
-                    for (const QString &login : lobby->getOwner()->getClientFriendLogins().keys())
+                    for (ClientNetwork *const client : *clients)
                     {
-                        inviteFriendsLogins.append(login);
-                        inviteFriendsAliases.append(
-                            lobby->getOwner()->getClientFriendLogins().value(login).toString(QUuid::WithoutBraces));
+                        if (lobby->getOwner()->getName() != client->getName())
+                        {
+                            if (client->getFinder() &&
+                                lobby->getOwner()->getClientFriendLogins().contains(client->getName()))
+                            {
+                                inviteFriendsLogins.append(client->getName());
+                                inviteFriendsAliases.append(client->getAlias().toString(QUuid::WithoutBraces));
+                            }
+                        }
                     }
 
                     QJsonObject tx;
@@ -611,9 +616,17 @@ void LobbyManager::updateHistory(const History &history)
     Lobby *const lobby = qobject_cast<Lobby *>(sender());
     if (lobby)
     {
-            for (ClientNetwork *const client : lobby->getPlayers())
+            int winnerTeam = history.getWinner_team();
+            for (ClientNetwork *const client : qAsConst(lobby->getPlayers()))
             {
-                db->addHistory(client, history);
+                if (winnerTeam == client->getTeam())
+                {
+                    db->addHistory(client, history, true);
+                }
+                else
+                {
+                    db->addHistory(client, history, false);
+                }
             }
     }
 }
@@ -771,7 +784,7 @@ void LobbyManager::acceptInvitePlayers(QUuid uuidLobby, bool successful, ClientN
                 {
 
                     data["successful"] = false;
-                    data["error"] = "This lobby is no longer available";
+                    data["error"] = "Этого лобби больше не существует!";
                     tx["data"] = data;
                     txAll(tx, sender);
                 }
@@ -779,48 +792,116 @@ void LobbyManager::acceptInvitePlayers(QUuid uuidLobby, bool successful, ClientN
     }
 }
 
-void LobbyManager::addToFriends(QString login, ClientNetwork *const sender)
+void LobbyManager::addFriend(QString login, ClientNetwork *const sender)
 {
     if (sender)
     {
-            for (ClientNetwork *const client : qAsConst(*clients))
-            {
-                if (client->getName() == login)
-                {
                     QJsonObject tx;
                     QJsonObject data;
                     tx["type"] = "add_friend";
                     tx["id"] = sender->getUuid().toString(QUuid::WithoutBraces);
-                    if (db->addFriend(sender, client))
+                    if (db->addFriend(sender, login))
                     {
-                        data["successful"] = true;
-                        data["error"] = "";
-                        qInfo() << "Server: client --->" << sender->getUuid().toString() << "--->" << sender->getName()
-                                << " add client --->" << client->getUuid().toString() << "--->" << client->getName()
-                                << "to friend";
+
+                data["successful"] = true;
+                data["error"] = "";
+                qInfo() << "Server: client --->" << sender->getUuid().toString() << "--->" << sender->getName()
+                        << " add client --->" << login << "to friend";
                     }
                     else
                     {
-                        data["successful"] = false;
-                        data["error"] = "Не удалось добавить данного клиента в друзья!";
-                        qInfo() << "Server: client --->" << sender->getUuid().toString() << "--->" << sender->getName()
-                                << "try to add client --->" << client->getUuid().toString() << "--->"
-                                << client->getName() << "to friend (fail)";
+
+                data["successful"] = false;
+                data["error"] = "Не удалось добавить данного клиента в друзья! (такой клиент не зарегистрирован)";
+                qInfo() << "Server: client --->" << sender->getUuid().toString() << "--->" << sender->getName()
+                        << "try to add client --->" << login << "to friend (fail)";
                     }
                     tx["data"] = data;
                     txAll(tx, sender);
                     return;
-                }
-            }
     }
 }
 
-void LobbyManager::deleteToFriends(QString login, ClientNetwork *const sender)
+void LobbyManager::deleteFriend(QString login, ClientNetwork *const sender)
 {
+    if (sender)
+    {
+            QJsonObject tx;
+            QJsonObject data;
+            tx["id"] = sender->getUuid().toString(QUuid::WithoutBraces);
+            tx["type"] = "delete_friend";
+
+            if (db->deleteFriend(login, sender))
+            {
+                data["successful"] = true;
+                data["error"] = "";
+                qInfo() << "Server: client" << sender->getUuid().toString(QUuid::WithoutBraces) << "--->"
+                        << sender->getName() << "deleted friend --->" << login;
+            }
+            else
+            {
+                data["successful"] = false;
+                data["error"] = "Такого клиента нет в базе данных!";
+                qInfo() << "Server: client" << sender->getUuid().toString(QUuid::WithoutBraces) << "--->"
+                        << sender->getName() << "couldn't delete friend --->" << login;
+            }
+            tx["data"] = data;
+            txAll(tx, sender);
+    }
 }
 
 void LobbyManager::requestHistoryList(ClientNetwork *const sender)
 {
+    QJsonObject tx;
+    QJsonObject data;
+    tx["id"] = sender->getUuid().toString(QUuid::WithoutBraces);
+    tx["type"] = "request_history_list";
+    data["history_list"] = db->getHistory(sender);
+    tx["data"] = data;
+    txAll(tx, sender);
+}
+
+void LobbyManager::deleteAccount(ClientNetwork *const sender)
+{
+    if (sender)
+    {
+            QJsonObject tx;
+            QJsonObject data;
+            tx["id"] = sender->getUuid().toString(QUuid::WithoutBraces);
+            tx["type"] = "delete_account";
+            if (db->deleteClient(sender))
+            {
+                data["successful"] = true;
+                data["error"] = "";
+                qInfo() << "Server: client" << sender->getUuid().toString() << "--->" << sender->getName()
+                        << "deleted account.";
+            }
+            else
+            {
+                data["successful"] = false;
+                data["error"] = "Такого аккаунта нет в базе данных!";
+                qInfo() << "Server: client" << sender->getUuid().toString() << "--->" << sender->getName()
+                        << "couldn't delete account.";
+            }
+            tx["data"] = data;
+            txAll(tx, sender);
+    }
+}
+
+void LobbyManager::requestScore(ClientNetwork *const sender)
+{
+    if (sender)
+    {
+            QJsonObject tx;
+            QJsonObject data;
+            tx["id"] = sender->getUuid().toString(QUuid::WithoutBraces);
+            tx["type"] = "request_score";
+            data["score"] = QString::number(sender->getScore());
+            data["all_game_count"] = QString::number(sender->getAllGameCount());
+            data["win_game_count"] = QString::number(sender->getWinGameCount());
+            tx["data"] = data;
+            txAll(tx, sender);
+    }
 }
 
 void LobbyManager::lobbyClose(Lobby *const lobby)

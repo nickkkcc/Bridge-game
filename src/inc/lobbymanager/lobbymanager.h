@@ -14,6 +14,9 @@ class LobbyManager : public QObject
 {
     Q_OBJECT
   public:
+    static constexpr quint8 maxTeamPLayers = 2;
+
+  public:
     explicit LobbyManager(QObject *const parent = nullptr, int maxLobbyCount = 1,
                           QVector<ClientNetwork *> *const clients = nullptr, DataBase *const db = nullptr);
     ~LobbyManager();
@@ -37,9 +40,11 @@ class LobbyManager : public QObject
     void clientDisconnected(ClientNetwork *const sender);
     void joinLobby(bool join, ClientNetwork *const sender);
     void acceptInvitePlayers(QUuid uuidLobby, bool successful, ClientNetwork *const sender);
-    void addToFriends(QString login, ClientNetwork *const sender);
-    void deleteToFriends(QString login, ClientNetwork *const sender);
+    void addFriend(QString login, ClientNetwork *const sender);
+    void deleteFriend(QString login, ClientNetwork *const sender);
     void requestHistoryList(ClientNetwork *const sender);
+    void deleteAccount(ClientNetwork *const sender);
+    void requestScore(ClientNetwork *const sender);
 
   signals:
     void disconnectClient(ClientNetwork *const sender);
@@ -53,7 +58,6 @@ class LobbyManager : public QObject
     void updateHistory(const History &history);
 
   private:
-    static constexpr quint8 maxTeamPLayers = 10;
     int maxLobbyCount;
     QVector<ClientNetwork *> *clients = nullptr;
     QVector<Lobby *> lobbies;

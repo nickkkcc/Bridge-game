@@ -1,5 +1,5 @@
 /************************************************************************************************
-** File created by QxEntityEditor 1.2.6 (2022/12/29 03:00) : please, do NOT modify this file ! **
+** File created by QxEntityEditor 1.2.6 (2022/12/30 22:01) : please, do NOT modify this file ! **
 ************************************************************************************************/
 
 #ifndef _BRIDGESERVER_USERS_H_
@@ -29,6 +29,8 @@ protected:
    QuestionsType::enum_QuestionsType m_Question_type;
    QString m_Question_answer;
    double m_Score;
+   unsigned long m_Win_game_count;
+   unsigned long m_All_game_count;
    type_list_of_History m_list_of_History;
    type_list_of_Friends m_list_of_Friends;
 
@@ -45,6 +47,8 @@ public:
    QuestionsType::enum_QuestionsType getQuestion_type() const;
    QString getQuestion_answer() const;
    double getScore() const;
+   unsigned long getWin_game_count() const;
+   unsigned long getAll_game_count() const;
    type_list_of_History getlist_of_History() const;
    type_list_of_History & list_of_History();
    const type_list_of_History & list_of_History() const;
@@ -59,6 +63,8 @@ public:
    void setQuestion_type(const QuestionsType::enum_QuestionsType & val);
    void setQuestion_answer(const QString & val);
    void setScore(const double & val);
+   void setWin_game_count(const unsigned long & val);
+   void setAll_game_count(const unsigned long & val);
    void setlist_of_History(const type_list_of_History & val);
    void setlist_of_Friends(const type_list_of_Friends & val);
 
@@ -81,6 +87,8 @@ public:
    static QString column_Question_type(bool key = false) { Q_UNUSED(key); return "Question_type"; }
    static QString column_Question_answer(bool key = false) { Q_UNUSED(key); return "Question_answer"; }
    static QString column_Score(bool key = false) { Q_UNUSED(key); return "Score"; }
+   static QString column_Win_game_count(bool key = false) { Q_UNUSED(key); return "Win_game_count"; }
+   static QString column_All_game_count(bool key = false) { Q_UNUSED(key); return "All_game_count"; }
 
 public:
 

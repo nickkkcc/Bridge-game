@@ -192,6 +192,9 @@ void ServerNetwork::validateClientText(const QString &message)
                         QUuid(rxTxObj["data"].toObject()["token"].toString()), dataBase->getUserAlias());
                     clients.append(client);
                     client->setClientFriendLogins(dataBase->getFriendsList(client));
+                    client->setScore(dataBase->getUserScore());
+                    client->setAllGameCount(dataBase->getAllGameCount());
+                    client->setWinGameCount(dataBase->getWinGameCount());
                     clientSocTemp.removeAll(tempSocket);
 
                     disconnect(tempSocket, &QWebSocket::textMessageReceived, this, &ServerNetwork::validateClientText);
@@ -255,9 +258,11 @@ void ServerNetwork::connectClientToLobbyManager(ClientNetwork *const client)
     connect(client, &ClientNetwork::clientDisconnected, this->lobbyManager, &LobbyManager::clientDisconnected);
     connect(client, &ClientNetwork::rxJoinLobby, this->lobbyManager, &LobbyManager::joinLobby);
     connect(client, &ClientNetwork::rxAcceptInvitePlayers, this->lobbyManager, &LobbyManager::acceptInvitePlayers);
-    connect(client, &ClientNetwork::rxAddToFriends, this->lobbyManager, &LobbyManager::addToFriends);
-    connect(client, &ClientNetwork::rxDeleteToFriends, this->lobbyManager, &LobbyManager::deleteToFriends);
+    connect(client, &ClientNetwork::rxAddFriend, this->lobbyManager, &LobbyManager::addFriend);
+    connect(client, &ClientNetwork::rxDeleteFriend, this->lobbyManager, &LobbyManager::deleteFriend);
     connect(client, &ClientNetwork::rxRequestHistoryList, this->lobbyManager, &LobbyManager::requestHistoryList);
+    connect(client, &ClientNetwork::rxDeleteAccount, this->lobbyManager, &LobbyManager::deleteAccount);
+    connect(client, &ClientNetwork::rxRequestScore, this->lobbyManager, &LobbyManager::requestScore);
 }
 
 void ServerNetwork::returnClientToLobby(Lobby *const lobby, LobbyManager *const lobbyManager, QWebSocket *clientSoc,
@@ -270,6 +275,9 @@ void ServerNetwork::returnClientToLobby(Lobby *const lobby, LobbyManager *const 
     disconnect(clientSoc, &QWebSocket::textMessageReceived, this, &ServerNetwork::validateClientText);
     disconnect(clientSoc, &QWebSocket::disconnected, this, &ServerNetwork::disconnectTempClient);
     connectClientToLobbyManager(client);
+    client->setScore(dataBase->getUserScore());
+    client->setAllGameCount(dataBase->getAllGameCount());
+    client->setWinGameCount(dataBase->getWinGameCount());
 
     lobbyManager->setReturnedClient(lobby, lobby->getDisconnectedPlayers().value(clientName), client);
     qInfo() << "Server: client --->" << client->getUuid().toString() << "--->" << clientName << "returned to lobby --->"

@@ -1,5 +1,5 @@
 /************************************************************************************************
-** File created by QxEntityEditor 1.2.6 (2022/12/29 06:21) : please, do NOT modify this file ! **
+** File created by QxEntityEditor 1.2.6 (2022/12/30 19:31) : please, do NOT modify this file ! **
 ************************************************************************************************/
 
 #include "../include/bridgeServer_precompiled_header.gen.h"
@@ -28,9 +28,7 @@ void register_class(QxClass<History> & t)
    pData = t.data(& History::m_Game_start, "Game_start", 0, true, true);
    pData = t.data(& History::m_Game_end, "Game_end", 0, true, true);
    pData = t.data(& History::m_Owner_login, "Owner_login", 0, true, true);
-   pData->setIsUnique(true);
    pData = t.data(& History::m_Owner_alias, "Owner_alias", 0, true, true);
-   pData->setIsUnique(true);
    pData = t.data(& History::m_Winner_team, "Winner_team", 0, true, true);
    pData = t.data(& History::m_Player_N_login, "Player_N_login", 0, true, true);
    pData = t.data(& History::m_Player_N_alias, "Player_N_alias", 0, true, true);

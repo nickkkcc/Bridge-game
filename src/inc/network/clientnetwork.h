@@ -1,9 +1,9 @@
 #ifndef CLIENTNETWORK_H
 #define CLIENTNETWORK_H
 
-#include <QObject>
 #include "inc/enumeration/Enumiration.h"
 #include "inc/game/aboutGameState/playergamestate.h"
+#include <QObject>
 #include <QWebSocket>
 
 class ClientNetwork : public QObject
@@ -40,6 +40,15 @@ class ClientNetwork : public QObject
     void setClientFriendLogins(const QHash<QString, QUuid> &newClientFriendLogins);
 
     ~ClientNetwork();
+    double getScore() const;
+    void setScore(double newScore);
+
+    long getAllGameCount() const;
+    void setAllGameCount(long newAllGameCount);
+
+    long getWinGameCount() const;
+    void setWinGameCount(long newWinGameCount);
+
   private slots:
     void rxAll(const QString &message);
 
@@ -59,9 +68,11 @@ class ClientNetwork : public QObject
     void rxAcceptInvitePlayers(QUuid uuidLobby, bool successful, ClientNetwork *const sender);
     void rxMoveSelected(Card card);
     void rxBidSelected(Bid bid);
-    void rxAddToFriends(QString login, ClientNetwork *const sender);
-    void rxDeleteToFriends(QString login, ClientNetwork *const sender);
+    void rxAddFriend(QString login, ClientNetwork *const sender);
+    void rxDeleteFriend(QString login, ClientNetwork *const sender);
     void rxRequestHistoryList(ClientNetwork *const sender);
+    void rxDeleteAccount(ClientNetwork *const sender);
+    void rxRequestScore(ClientNetwork *const sender);
 
   private:
     void txAll(QJsonObject data);
@@ -78,6 +89,9 @@ class ClientNetwork : public QObject
     QUuid lobbyOwnerUuid;
     QUuid alias;
     QHash<QString, QUuid> clientFriendLogins;
+    double score;
+    long allGameCount;
+    long winGameCount;
 
     bool finder = false;
 };

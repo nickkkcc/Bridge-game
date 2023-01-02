@@ -154,14 +154,14 @@ void ClientNetwork::rxAll(const QString& message)
         //         в базе данных.
         if (rx["type"] == "add_friend")
         {
-            emit rxAddToFriends(rx["data"].toObject()["login"].toString(), this);
+            emit rxAddFriend(rx["data"].toObject()["login"].toString(), this);
         }
 
         // Кейс для удаления игрока из друзей. Ответ клиенту удален ли указанный клиент из друзей
         // в базе данных.
-        if (rx["type"] == "delete_from_friends")
+        if (rx["type"] == "delete_friend")
         {
-            emit rxDeleteToFriends(rx["data"].toObject()["login"].toString(), this);
+            emit rxDeleteFriend(rx["data"].toObject()["login"].toString(), this);
         }
 
         // Кейс для запроса истории игр клиента с базы данных.
@@ -171,14 +171,18 @@ void ClientNetwork::rxAll(const QString& message)
         {
             emit rxRequestHistoryList(this);
         }
+        if (rx["type"] == "request_history_list")
+        {
+            emit rxRequestScore(this);
+        }
 
         // Кейс для запроса на удаление клиента из базы данных.
         // Если запрос выполнен успешно - отправка клиенту статус успешного удаления клиента из базы данных.
         // Если запрос не выполнен успешно - отправка клиенту причину ошибки.
-        //        if (rx["type"] == "delete_client")
-        //        {
-        //            rxDeleteClient();
-        //        }
+        if (rx["type"] == "delete_account")
+        {
+            emit rxDeleteAccount(this);
+        }
     }
 }
 
@@ -196,6 +200,36 @@ void ClientNetwork::rxBidSelectedDeserialization(QJsonObject bid)
     Bid tempbid;
     tempbid.readFromJson(bid);
     emit rxBidSelected(tempbid);
+}
+
+long ClientNetwork::getWinGameCount() const
+{
+    return winGameCount;
+}
+
+void ClientNetwork::setWinGameCount(long newWinGameCount)
+{
+    winGameCount = newWinGameCount;
+}
+
+long ClientNetwork::getAllGameCount() const
+{
+    return allGameCount;
+}
+
+void ClientNetwork::setAllGameCount(long newAllGameCount)
+{
+    allGameCount = newAllGameCount;
+}
+
+double ClientNetwork::getScore() const
+{
+    return score;
+}
+
+void ClientNetwork::setScore(double newScore)
+{
+    score = newScore;
 }
 
 const QHash<QString, QUuid> &ClientNetwork::getClientFriendLogins() const

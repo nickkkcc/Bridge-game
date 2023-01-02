@@ -13,7 +13,8 @@ DataBase::DataBase(QString dataBaseName, QString hostName, int port, QString use
 }
 
 bool DataBase::writeUserToBase(QString login, QUuid alias, QString password,
-                               QuestionsType::enum_QuestionsType questionType, QString answer, double score)
+                               QuestionsType::enum_QuestionsType questionType, QString answer, double score,
+                               unsigned long winGameCount, unsigned long allGameCount)
 {
 
     users_ptr.reset(new Users());
@@ -23,6 +24,8 @@ bool DataBase::writeUserToBase(QString login, QUuid alias, QString password,
     users_ptr->setQuestion_answer(answer);
     users_ptr->setQuestion_type(questionType);
     users_ptr->setScore(score);
+    users_ptr->setAll_game_count(allGameCount);
+    users_ptr->setWin_game_count(winGameCount);
 
     QSqlError err = qx::dao::insert(users_ptr);
     switch (err.type())
@@ -93,9 +96,9 @@ bool DataBase::readUserFromBaseWithRelations(QString login)
 }
 
 // Добавление друзей по указанному клиенту.
-bool DataBase::addFriend(ClientNetwork *const client, ClientNetwork *const newFriend)
+bool DataBase::addFriend(ClientNetwork *const client, QString friendLogin)
 {
-    if (readUserFromBase(newFriend->getName()))
+    if (readUserFromBase(friendLogin))
     {
         QSharedPointer<Users> newFriendClient = users_ptr;
 
@@ -104,11 +107,8 @@ bool DataBase::addFriend(ClientNetwork *const client, ClientNetwork *const newFr
 
         friends->setLogin(newFriendClient->getLogin());
         friends->setAlias(newFriendClient->getAlias());
-        friends->setPassword(newFriendClient->getPassword());
-        friends->setQuestion_anwer(newFriendClient->getQuestion_answer());
-        friends->setQuestion_type(newFriendClient->getQuestion_type());
-        friends->setScore(newFriendClient->getScore());
         friends->setUsers_id(users_ptr);
+
         QVector<QSharedPointer<Friends>> friendVec;
         friendVec.append(friends);
         users_ptr->setlist_of_Friends(friendVec);
@@ -131,20 +131,58 @@ bool DataBase::addFriend(ClientNetwork *const client, ClientNetwork *const newFr
 }
 
 // Функция добавляет историю для конкретного клиента.
-bool DataBase::addHistory(ClientNetwork *const client, History history)
+bool DataBase::addHistory(ClientNetwork *const client, const History &history, bool winner)
 {
     if (client)
     {
-        if (readUserFromBase(client->getName()))
+        if (readUserFromBaseWithRelations(client->getName()))
         {
-            QVector<QSharedPointer<History>> historyList;
+            QVector<QSharedPointer<History>> oldHistoryList = users_ptr->getlist_of_History();
+
+            QSharedPointer<History> newHistory = QSharedPointer<History>(new History());
+            newHistory->setGame_start(history.getGame_start());
+            newHistory->setGame_end(history.getGame_end());
+            newHistory->setOwner_alias(history.getOwner_alias());
+            newHistory->setOwner_login(history.getOwner_login());
+            newHistory->setPlayer_N_alias(history.getPlayer_N_alias());
+            newHistory->setPlayer_N_login(history.getPlayer_N_login());
+
+            newHistory->setPlayer_S_alias(history.getPlayer_S_alias());
+            newHistory->setPlayer_S_login(history.getPlayer_S_login());
+
+            newHistory->setPlayer_E_alias(history.getPlayer_E_alias());
+            newHistory->setPlayer_E_login(history.getPlayer_E_login());
+
+            newHistory->setPlayer_W_alias(history.getPlayer_W_alias());
+            newHistory->setPlayer_W_login(history.getPlayer_W_login());
+
+            newHistory->setWinner_team(history.getWinner_team());
+            newHistory->setTotal_score_NS(history.getTotal_score_NS());
+            newHistory->setTotal_score_EW(history.getTotal_score_EW());
+
+            // Если игрок находился в команде, которая выиграла. Сетаем ему выигрыш.
+            if (winner)
+            {
+                users_ptr->setWin_game_count(users_ptr->getWin_game_count() + 1);
+                client->setWinGameCount(users_ptr->getWin_game_count() + 1);
+            }
+
+            // Сетаем общее количество игр. И Среднее количество выигранных игр.
+            users_ptr->setAll_game_count(users_ptr->getAll_game_count() + 1);
+            client->setAllGameCount(users_ptr->getAll_game_count() + 1);
+
+            users_ptr->setScore(users_ptr->getWin_game_count() / users_ptr->getAll_game_count() * 100);
+            client->setScore(users_ptr->getWin_game_count() / users_ptr->getAll_game_count() * 100);
+
             QVector<QSharedPointer<Users>> usersList;
             usersList.append(users_ptr);
-            history.setlist_of_Users(usersList);
-            historyList.append(QSharedPointer<History>(&history));
-            users_ptr->setlist_of_History(historyList);
-            users_ptr->setScore(users_ptr->getScore() + 1);
+            newHistory->setlist_of_Users(usersList);
+
+            oldHistoryList.append(newHistory);
+            users_ptr->setlist_of_History(oldHistoryList);
+
             QSqlError err = qx::dao::update_with_all_relation(users_ptr);
+
             switch (err.type())
             {
             case QSqlError::NoError:
@@ -158,6 +196,61 @@ bool DataBase::addHistory(ClientNetwork *const client, History history)
             }
             return true;
         }
+    }
+    return false;
+}
+
+// Удаляет клиента из базы данных со всеми зависимостями.
+bool DataBase::deleteClient(ClientNetwork *const client)
+{
+    if (client)
+    {
+        if (readUserFromBaseWithRelations(client->getName()))
+        {
+            QSqlError err = qx::dao::delete_by_id(users_ptr);
+            for (QSharedPointer<History> history : users_ptr->getlist_of_History())
+            {
+                qx::dao::delete_by_id(history);
+            }
+
+            switch (err.type())
+            {
+            case QSqlError::NoError:
+                break;
+            case QSqlError::ConnectionError:
+            case QSqlError::StatementError:
+            case QSqlError::TransactionError:
+            case QSqlError::UnknownError:
+                qInfo() << "Server: @deleteClient --->" << err.text();
+                return false;
+            }
+
+            return true;
+        }
+    }
+    return false;
+}
+
+// Удаляет из друзей указанного клиента.
+bool DataBase::deleteFriend(QString login, ClientNetwork *const sender)
+{
+    if (readUserFromBase(sender->getName()))
+    {
+        qx_query query;
+        query.where("t_friends.users_id").isEqualTo(QVariant::fromValue(users_ptr->getUsers_id()));
+        QSqlError err = qx::dao::delete_by_query<Friends>(query);
+        switch (err.type())
+        {
+        case QSqlError::NoError:
+            break;
+        case QSqlError::ConnectionError:
+        case QSqlError::StatementError:
+        case QSqlError::TransactionError:
+        case QSqlError::UnknownError:
+            qInfo() << "Server: @deleteClient --->" << err.text();
+            return false;
+        }
+        return true;
     }
     return false;
 }
@@ -194,17 +287,16 @@ double DataBase::getUserScore()
 }
 
 // Функция считывает указанного клиента из базы данных и дает историю его игр в виде Json объекта.
-const QJsonObject DataBase::getHistory(ClientNetwork *const user)
+const QJsonArray DataBase::getHistory(ClientNetwork *const user)
 {
     if (user->getName() != users_ptr->getLogin())
     {
-        bool result = readUserFromBaseWithRelations(user->getName());
-        if (!result)
+
+        if (!readUserFromBaseWithRelations(user->getName()))
         {
-            return QJsonObject();
+            return QJsonArray();
         }
     }
-    QJsonObject tx;
     QJsonArray history_list;
     QJsonObject history_obj;
     for (const QSharedPointer<History> &history : users_ptr->getlist_of_History())
@@ -226,10 +318,10 @@ const QJsonObject DataBase::getHistory(ClientNetwork *const user)
         history_obj["total_score_ew"] = history->getTotal_score_EW();
         history_list.append(history_obj);
     }
-    tx["history_list"] = history_list;
-    return tx;
+    return history_list;
 }
 
+// Возвращает список друзей для указанного клиента.
 const QHash<QString, QUuid> DataBase::getFriendsList(ClientNetwork *const user)
 {
     QHash<QString, QUuid> friendList;
@@ -242,6 +334,16 @@ const QHash<QString, QUuid> DataBase::getFriendsList(ClientNetwork *const user)
         }
     }
     return friendList;
+}
+
+const unsigned long DataBase::getAllGameCount() const
+{
+    return users_ptr->getAll_game_count();
+}
+
+const unsigned long DataBase::getWinGameCount() const
+{
+    return users_ptr->getWin_game_count();
 }
 
 DataBase::~DataBase()

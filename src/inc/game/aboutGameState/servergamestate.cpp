@@ -1,5 +1,5 @@
 #include "servergamestate.h"
-
+#include <QThread>
 // Инициализирует все атрибуты значениями для начала совпадения.
 ServerGameState::ServerGameState(QObject *parent) : QObject(parent)
 {

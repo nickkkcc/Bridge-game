@@ -1,2 +1,17 @@
 test/bin
 test/*.user
+src/*.user
+src/libs/DataBaseLib/bin/
+src/libs/DataBaseLib/build/
+src/libs/DataBaseLib/*.pro.user
+src/libs/QxOrmLib/build/
+src/libs/QxOrmLib/debug/
+src/libs/QxOrmLib/release/
+src/libs/QxOrmLib/lib/
+src/libs/QxOrmLib/.*pro.user
+src/libs/QxOrmLib/.*.sln
+src/libs/QxOrmLib/.*.pro.user
+src/libs/QxOrmLib/.*.vcxproj
+src/libs/QxOrmLib/.*.vcxproj.filters
+
+

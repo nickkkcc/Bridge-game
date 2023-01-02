@@ -1,4 +1,5 @@
 #include "lobby.h"
+#include <QThread>
 
 Lobby::Lobby(QObject *const parent, ClientNetwork *const owner) : QObject(parent)
 {
@@ -161,7 +162,6 @@ void Lobby::gameEventOccured(GameEvent event)
     case TRICK_END:
 
     {
-
         sendUpdatedGameStateToClients(event);
         break;
     }
