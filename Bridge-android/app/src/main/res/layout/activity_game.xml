@@ -211,11 +211,11 @@
                             app:angle="90"
                             android:layout_margin="2dp">
 
-                        <ImageView
-                            android:id="@+id/game_table_row1_enemy_left_card1"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            app:srcCompat="@drawable/back"/>
+                            <ImageView
+                                android:id="@+id/game_table_row1_enemy_left_card1"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                app:srcCompat="@drawable/back"/>
 
                         </com.github.rongi.rotate_layout.layout.RotateLayout>
 
@@ -728,7 +728,7 @@
                             android:layout_margin="2dp"/>
                     </TableRow>
 
-                    </TableLayout>
+                </TableLayout>
             </LinearLayout>
 
             <LinearLayout

@@ -340,6 +340,7 @@
             android:layout_marginEnd="10dp"
             android:layout_marginRight="10dp"
             android:layout_weight="1"
+            android:textColor="@color/white"
             android:textSize="10sp"
             android:text="@string/contra"
             app:backgroundTint="@color/yellow"/>
@@ -354,6 +355,7 @@
             android:layout_marginRight="10dp"
             android:layout_weight="1"
             android:textSize="10sp"
+            android:textColor="@color/white"
             android:text="@string/recontra"
             app:backgroundTint="@color/orange" />
 
@@ -367,6 +369,7 @@
             android:layout_marginRight="10dp"
             android:layout_weight="1"
             android:textSize="10sp"
+            android:textColor="@color/white"
             android:text="@string/pass"
             app:backgroundTint="@color/red" />
     </LinearLayout>

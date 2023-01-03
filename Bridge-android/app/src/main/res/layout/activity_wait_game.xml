@@ -17,7 +17,7 @@
         android:paddingTop="16dp"
         android:paddingBottom="20dp"
         android:text="Ожидание игроков\n (игроков в лобби: 2)"
-        android:textColor="@color/white"
+        android:textColor="@color/title_text_color"
         android:textSize="@dimen/title_text_size"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"

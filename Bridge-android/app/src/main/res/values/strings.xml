@@ -35,6 +35,7 @@
     <string name="create_team">Создать команду</string>
     <string name="join_team">Присоединиться</string>
     <string name="log_out">Выйти из аккаунта</string>
+    <string name="previous_games">История сеансов</string>
 
     <string name="game_title_en">Rubber Bridge</string>
     <string name="create_team_en">Create new team</string>

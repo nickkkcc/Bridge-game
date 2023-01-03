@@ -718,7 +718,7 @@ public class GameActivity extends AppCompatActivity {
             localScoreTextView.setText(scoreText);
         });
     }
-
+    //ScoreText
     private void changeGlobalScoreTextView(int ourScores, int theyScores, int dealNumber,
                                            int gameNumber, int rubberNumber) {
         String scoreText = "Мы: " + ourScores+ "\nОни: " + theyScores + "\nСделка: " + dealNumber +
@@ -746,7 +746,7 @@ public class GameActivity extends AppCompatActivity {
             }
         }
     }
-
+    //Alerts
     private void showScoresDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         View view = LayoutInflater.from(this).inflate(R.layout.fragment_scores, findViewById(R.id.score_layout));

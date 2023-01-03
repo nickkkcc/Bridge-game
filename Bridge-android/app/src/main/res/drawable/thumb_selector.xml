@@ -4,12 +4,23 @@
     <item android:state_checked="false">
         <shape
             android:dither="true" android:shape="rectangle"
-            android:useLevel="false" android:visible="true">
+            android:useLevel="true" android:visible="true">
             <solid android:color="@color/dark_grey" />
-            <corners android:radius="14dp" />
+            <corners android:radius="10dp"/>
             <size
-                android:width="100dp"
-                android:height="40dp" />
+                android:width="142dp"
+                android:height="35dp" />
+        </shape>
+    </item>
+    <item android:state_checked="true">
+        <shape
+            android:dither="true" android:shape="rectangle"
+            android:useLevel="true" android:visible="true">
+            <solid android:color="@color/dark_grey" />
+            <corners android:radius="10dp" />
+            <size
+                android:width="142dp"
+                android:height="35dp" />
         </shape>
 
     </item>

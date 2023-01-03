@@ -5,12 +5,14 @@
     <color name="dark_grey">#222222</color>
     <color name="menu_yellow">#D1BC00</color>
     <color name="yellow">#FFFF00</color>
+    <color name="yellow_transparent">#aaFFFF00</color>
     <color name="orange">#FFA500</color>
     <color name="red">#FF0000</color>
     <color name="green">#00FF00</color>
     <color name="black">#cc121212</color>
     <color name="black_navigation_bar">#000000</color>
-    <color name="white">#cccccc</color>
+    <color name="white">#eeeeee</color>
+    <color name="title_text_color">#bbbbbb</color>
     <color name="black_overlay">#66000000</color>
     <color name="black_overlay_cards">#DF000000</color>
     <color name="shadow">#A8A8A8</color>

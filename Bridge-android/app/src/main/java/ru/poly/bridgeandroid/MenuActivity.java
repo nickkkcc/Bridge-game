@@ -2,11 +2,15 @@ package ru.poly.bridgeandroid;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
@@ -18,6 +22,9 @@ import com.google.gson.JsonObject;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import ru.poly.bridgeandroid.enums.GameEvent;
 import ru.poly.bridgeandroid.model.game.PlayerGameState;
@@ -55,6 +62,7 @@ public class MenuActivity extends AppCompatActivity {
 
         final Button createButton = findViewById(R.id.create_button);
         final Button joinButton = findViewById(R.id.join_button);
+        final Button previousGames = findViewById(R.id.previous_games);
         final Button exitButton = findViewById(R.id.exit_account_button);
         loadingProgressBar = findViewById(R.id.loading_menu);
 
@@ -87,6 +95,36 @@ public class MenuActivity extends AppCompatActivity {
                 JsonObject jsonObject = (JsonObject) gson.toJsonTree(join);
                 Message message = new Message(token, "join", jsonObject);
                 EventBus.getDefault().post(gson.toJson(message));
+            }
+        });
+
+        previousGames.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //закомментить код ниже
+                //написано для теста диалогового окна
+                runOnUiThread(() -> {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MenuActivity.this, R.style.CustomDialogTheme);
+
+                    builder.setTitle("Новое приглашение");
+                    builder.setMessage("\nИгрок " + "№000" + " отправил Вам приглашение.\n" + "Присоединиться в лобби?");
+                    View view = LayoutInflater.from(MenuActivity.this).inflate(R.layout.fragment_invitation,
+                            findViewById(R.id.invite_layout));
+                    builder.setView(view);
+                    builder.setNegativeButton("Нет", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            isAccepted = false;
+                        }
+                    });
+                    builder.setPositiveButton("Да", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            isAccepted = true;
+                        }
+                    });
+                    AlertDialog dialog = builder.create();
+                    dialog.setCanceledOnTouchOutside(false);
+                    dialog.show();
+                });
             }
         });
 
@@ -141,9 +179,11 @@ public class MenuActivity extends AppCompatActivity {
                 InvitePlayersToClient invitePlayers = message.getData(InvitePlayersToClient.class);
 
                 runOnUiThread(() -> {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.CustomDialogTheme);
                     builder.setTitle("Игрок " + invitePlayers.getAlias() + " отправил Вам приглашение.");
                     builder.setMessage("Присоединиться в лобби?");
+                    View view = LayoutInflater.from(this).inflate(R.layout.fragment_invitation, findViewById(R.id.invite_layout));
+                    builder.setView(view);
                     builder.setNegativeButton("Нет", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
                             isAccepted = false;
