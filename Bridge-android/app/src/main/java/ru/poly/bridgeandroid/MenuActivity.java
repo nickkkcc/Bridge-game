@@ -103,28 +103,28 @@ public class MenuActivity extends AppCompatActivity {
             public void onClick(View v) {
                 //закомментить код ниже
                 //написано для теста диалогового окна
-                runOnUiThread(() -> {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(MenuActivity.this, R.style.CustomDialogTheme);
-
-                    builder.setTitle("Новое приглашение");
-                    builder.setMessage("\nИгрок " + "№000" + " отправил Вам приглашение.\n" + "Присоединиться в лобби?");
-                    View view = LayoutInflater.from(MenuActivity.this).inflate(R.layout.fragment_invitation,
-                            findViewById(R.id.invite_layout));
-                    builder.setView(view);
-                    builder.setNegativeButton("Нет", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            isAccepted = false;
-                        }
-                    });
-                    builder.setPositiveButton("Да", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            isAccepted = true;
-                        }
-                    });
-                    AlertDialog dialog = builder.create();
-                    dialog.setCanceledOnTouchOutside(false);
-                    dialog.show();
-                });
+//                runOnUiThread(() -> {
+//                    AlertDialog.Builder builder = new AlertDialog.Builder(MenuActivity.this, R.style.CustomDialogTheme);
+//
+//                    builder.setTitle("Новое приглашение");
+//                    builder.setMessage("\nИгрок " + "№000" + " отправил Вам приглашение.\n" + "Присоединиться в лобби?");
+//                    View view = LayoutInflater.from(MenuActivity.this).inflate(R.layout.fragment_invitation,
+//                            findViewById(R.id.invite_layout));
+//                    builder.setView(view);
+//                    builder.setNegativeButton("Нет", new DialogInterface.OnClickListener() {
+//                        public void onClick(DialogInterface dialog, int id) {
+//                            isAccepted = false;
+//                        }
+//                    });
+//                    builder.setPositiveButton("Да", new DialogInterface.OnClickListener() {
+//                        public void onClick(DialogInterface dialog, int id) {
+//                            isAccepted = true;
+//                        }
+//                    });
+//                    AlertDialog dialog = builder.create();
+//                    dialog.setCanceledOnTouchOutside(false);
+//                    dialog.show();
+//                });
             }
         });
 

@@ -1,6 +1,8 @@
 package ru.poly.bridgeandroid;
 
 import android.os.Bundle;
+import android.os.CountDownTimer;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +20,7 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 
 import ru.poly.bridgeandroid.enums.PlayerPosition;
 import ru.poly.bridgeandroid.model.Message;
@@ -142,13 +145,20 @@ public class DrawFragment extends Fragment {
                 rotatePointer(currentPlayerPosition);
                 break;
             case PLAYER_MOVED:
-                int newCurrentPosition = newPlayerPositions.get(currentPlayerPosition);
-                int previousPlayerNumber = newCurrentPosition == 0 ? 3 : newCurrentPosition - 1;
-                setTrickCard(previousPlayerNumber);
-                rotatePointer(currentPlayerPosition);
+                List<Cards> cardsList = gameState.getTricks();
+                List<Card> cards = cardsList.get(cardsList.size() - 1).getCards();
+                if (cards.size() != 4) {
+                    int newCurrentPosition = newPlayerPositions.get(currentPlayerPosition);
+                    int previousPlayerNumber = newCurrentPosition == 0 ? 3 : newCurrentPosition - 1;
+                    setTrickCard(previousPlayerNumber);
+                    rotatePointer(currentPlayerPosition);
+                } else {
+                    int trickEndNewCurrentPosition = newPlayerPositions.get(currentPlayerPosition);
+                    setTrickCard(trickEndNewCurrentPosition);
+                    rotatePointer(currentPlayerPosition);
+                }
                 break;
             case TRICK_END:
-                // TODO: По сути ничего не должно происходить
                 break;
             case PLAY_END:
                 // TODO: По сути ничего не должно происходить
@@ -157,45 +167,35 @@ public class DrawFragment extends Fragment {
     }
 
     private void setCardsInvisible() {
-        getActivity().runOnUiThread(() -> {
-            playerCardImageView.setVisibility(View.INVISIBLE);
-            teammateCardImageView.setVisibility(View.INVISIBLE);
-            enemyLeftCardImageView.setVisibility(View.INVISIBLE);
-            enemyRightCardImageView.setVisibility(View.INVISIBLE);
-        });
+        playerCardImageView.setVisibility(View.INVISIBLE);
+        teammateCardImageView.setVisibility(View.INVISIBLE);
+        enemyLeftCardImageView.setVisibility(View.INVISIBLE);
+        enemyRightCardImageView.setVisibility(View.INVISIBLE);
     }
 
     private void rotatePointer(PlayerPosition playerTurnPosition) {
         int clientPlayerPosition = newPlayerPositions.get(playerTurnPosition);
         float rotation = playersRotations.get(clientPlayerPosition);
-        getActivity().runOnUiThread(() -> pointerImageView.setRotation(rotation));
+        pointerImageView.setRotation(rotation);
     }
 
     private void setTrickCard(int clientPlayerPosition) {
         switch (clientPlayerPosition) {
             case 0:
-                getActivity().runOnUiThread(() -> {
-                    playerCardImageView.setVisibility(View.VISIBLE);
-                    playerCardImageView.setImageResource(getCardDrawableId(getLastTricksCard()));
-                });
+                playerCardImageView.setVisibility(View.VISIBLE);
+                playerCardImageView.setImageResource(getCardDrawableId(getLastTricksCard()));
                 break;
             case 1:
-                getActivity().runOnUiThread(() -> {
-                    enemyLeftCardImageView.setVisibility(View.VISIBLE);
-                    enemyLeftCardImageView.setImageResource(getCardDrawableId(getLastTricksCard()));
-                });
+                enemyLeftCardImageView.setVisibility(View.VISIBLE);
+                enemyLeftCardImageView.setImageResource(getCardDrawableId(getLastTricksCard()));
                 break;
             case 2:
-                getActivity().runOnUiThread(() -> {
-                    teammateCardImageView.setVisibility(View.VISIBLE);
-                    teammateCardImageView.setImageResource(getCardDrawableId(getLastTricksCard()));
-                });
+                teammateCardImageView.setVisibility(View.VISIBLE);
+                teammateCardImageView.setImageResource(getCardDrawableId(getLastTricksCard()));
                 break;
             case 3:
-                getActivity().runOnUiThread(() -> {
-                    enemyRightCardImageView.setVisibility(View.VISIBLE);
-                    enemyRightCardImageView.setImageResource(getCardDrawableId(getLastTricksCard()));
-                });
+                enemyRightCardImageView.setVisibility(View.VISIBLE);
+                enemyRightCardImageView.setImageResource(getCardDrawableId(getLastTricksCard()));
                 break;
         }
     }
