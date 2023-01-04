@@ -2,9 +2,10 @@
 #define SERVERGAMESTATE_H
 
 #include "gamestate.h"
-#include <inc/network/clientnetwork.h>
 #include "playergamestate.h"
+#include "qtimer.h"
 #include <QObject>
+#include <inc/network/clientnetwork.h>
 
 // Представляет полное состояние игры для всех игроков в конкртеный момент в игре.
 class ServerGameState: public QObject, public GameState
@@ -22,9 +23,16 @@ public:
     void startMatch(qint32 maxRubbers);
     const QMap<PlayerPosition, CardKit>& getPlayerHands() const;
     void setPlayerHands(const QMap<PlayerPosition, CardKit> &playerHands);
-signals:
+    GameEvent getCurrentGameEvent() const;
+    void setCurrentGameEvent(GameEvent newCurrentGameEvent);
+
+  signals:
     void gameEvent(GameEvent gameEvent);
-private:
+    void nexPlayerTurn();
+  private slots:
+    void doTrickDelay();
+
+  private:
     // Список карт в руке каждого игрока.
     QMap<PlayerPosition, CardKit> playerHands;
 
@@ -33,6 +41,7 @@ private:
 
     // Набор из 52 уникальных карт, которые раздаются в начале каждого раунда
     CardKit deck;
+    int variantEnd = 0;
 
     // Количество последовательных проходов, сделанных на этапе торгов.
     qint8 passCount;
@@ -43,6 +52,8 @@ private:
     void nextTrick();
     void nextGame();
     void nextRubber();
+    QTimer trickEnd;
+    GameEvent currentGameEvent;
 };
 
 #endif // SERVERGAMESTATE_H

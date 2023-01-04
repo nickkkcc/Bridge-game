@@ -98,7 +98,7 @@ bool DataBase::readUserFromBaseWithRelations(QString login)
 // Добавление друзей по указанному клиенту.
 bool DataBase::addFriend(ClientNetwork *const client, QString friendLogin)
 {
-    if (readUserFromBase(friendLogin))
+    if (readUserFromBase(friendLogin) && !client->getClientFriendLogins().keys().contains(friendLogin))
     {
         QSharedPointer<Users> newFriendClient = users_ptr;
 

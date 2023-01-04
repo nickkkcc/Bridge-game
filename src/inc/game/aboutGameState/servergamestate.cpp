@@ -1,5 +1,5 @@
 #include "servergamestate.h"
-#include <QThread>
+#include <QTimer>
 // Инициализирует все атрибуты значениями для начала совпадения.
 ServerGameState::ServerGameState(QObject *parent) : QObject(parent)
 {
@@ -31,6 +31,8 @@ ServerGameState::ServerGameState(QObject *parent) : QObject(parent)
 
     // Отправить сигнал о инициилизации начального состояния игры.
     emit gameEvent(INITIALIZE);
+    connect(&trickEnd, &QTimer::timeout, this, &ServerGameState::doTrickDelay);
+    trickEnd.setInterval(2500);
 }
 
 // Начинаем игру, раздавая все карты игрокам и выбирая игрока для первого хода.
@@ -114,6 +116,16 @@ void ServerGameState::nextRubber()
     dealNumber = 0;
     gameNumber = 1;
     rubberNumber++;
+}
+
+GameEvent ServerGameState::getCurrentGameEvent() const
+{
+    return currentGameEvent;
+}
+
+void ServerGameState::setCurrentGameEvent(GameEvent newCurrentGameEvent)
+{
+    currentGameEvent = newCurrentGameEvent;
 }
 
 // Обновить состояние игры на основе последней сделанной ставки.
@@ -203,6 +215,7 @@ void ServerGameState::updatePlayState(const Card &card)
     if(currentTrick->getCardCount() == 4){
         // Signal that a player has played a card
         emit gameEvent(PLAYER_MOVED);
+        currentGameEvent = PLAYER_MOVED;
 
         // Определяем победителя
         PlayerPosition winner = determineTrickWinner();
@@ -223,13 +236,19 @@ void ServerGameState::updatePlayState(const Card &card)
                 // Проверяем, готовы ли накладки для матча
                 if(rubberNumber == maxRubbers){
                     // Конец совпадения
+
                     emit gameEvent(TRICK_END);
-                    emit gameEvent(PLAY_END);
-                    emit gameEvent(MATCH_END);
+                    currentGameEvent = TRICK_END;
+                    trickEnd.setSingleShot(true);
+                    trickEnd.start();
+                    variantEnd = 1;
+                    //                    emit gameEvent(PLAY_END);
+                    //                    emit gameEvent(MATCH_END);
                     return;
                 }else{
                     // Инициализировать следующую резину
                     emit gameEvent(RUBBER_COMPLETED);
+                    currentGameEvent = RUBBER_COMPLETED;
                     nextRubber();
                 }
 
@@ -245,8 +264,12 @@ void ServerGameState::updatePlayState(const Card &card)
 
             // Сигнал о том, что трюк и игра завершены
             emit gameEvent(TRICK_END);
-            emit gameEvent(PLAY_END);
-            emit gameEvent(BID_START);
+            currentGameEvent = TRICK_END;
+            trickEnd.setSingleShot(true);
+            trickEnd.start();
+            variantEnd = 2;
+            //            emit gameEvent(PLAY_END);
+            //            emit gameEvent(BID_START);
             return;
         }
 
@@ -259,11 +282,15 @@ void ServerGameState::updatePlayState(const Card &card)
 
         // Сигнал о том, что трюк выполнен
         emit gameEvent(TRICK_END);
+        currentGameEvent = TRICK_END;
 
         nextTrick();
 
         // Сигнал о начале следующего трюка
-        emit gameEvent(TRICK_START);
+        trickEnd.setSingleShot(true);
+        trickEnd.start();
+        variantEnd = 0;
+        //        emit gameEvent(TRICK_START);
     }
     // Получить следующую раздачу и позицию игрока
     else{
@@ -275,6 +302,7 @@ void ServerGameState::updatePlayState(const Card &card)
 
         // Сигнал о том, что игрок разыграл карту
         emit gameEvent(PLAYER_MOVED);
+        currentGameEvent = PLAYER_MOVED;
     }
 }
 
@@ -318,6 +346,32 @@ const QMap<PlayerPosition, CardKit>& ServerGameState::getPlayerHands() const
 void ServerGameState::setPlayerHands(const QMap<PlayerPosition, CardKit> &playerHands)
 {
     this->playerHands = playerHands;
+}
+
+void ServerGameState::doTrickDelay()
+{
+    switch (variantEnd)
+    {
+    case 0: {
+        emit gameEvent(TRICK_START);
+        currentGameEvent = TRICK_START;
+        emit nexPlayerTurn();
+        break;
+    }
+
+    case 1: {
+        emit gameEvent(PLAY_END);
+        currentGameEvent = PLAY_END;
+        emit gameEvent(MATCH_END);
+        currentGameEvent = MATCH_END;
+    }
+    case 2: {
+        emit gameEvent(PLAY_END);
+        currentGameEvent = PLAY_END;
+        emit gameEvent(BID_START);
+        currentGameEvent = BID_START;
+    }
+    }
 }
 
 // Проверяем, действительна ли новая ставка с учетом текущей ставки. Передача nullptr в качестве текущей ставки

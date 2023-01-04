@@ -81,7 +81,11 @@ void Lobby::rxMoveSelected(Card card)
 
             gameState->updatePlayState(card);
             moveComplete = true;
-            nextPlayerTurn();
+            qInfo() << "NOTIFY";
+            if (gameState->getCurrentGameEvent() != GameEvent::TRICK_END)
+            {
+                nextPlayerTurn();
+            }
         }
         else
         {
@@ -486,7 +490,7 @@ void Lobby::startMatch()
     gameHistory.setPlayer_W_alias(players[PlayerPosition::WEST]->getAlias());
 
     gameState = new ServerGameState();
-
+    connect(gameState, &ServerGameState::nexPlayerTurn, this, &Lobby::nextPlayerTurn);
     if (this->maxRubber <= 0)
 
     {

@@ -305,7 +305,7 @@ void LobbyManager::closeLobby(const QUuid &uuidLobby, ClientNetwork *const sende
                 else
                 {
 
-                    if (lobby->deletePlayer(sender->getTeam(), sender))
+                    if (lobby->deletePlayer(sender->getTeam(), sender) ||)
                     {
 
                         sender->setTeam(Team::NONE_TEAM);
@@ -803,6 +803,7 @@ void LobbyManager::addFriend(QString login, ClientNetwork *const sender)
                     if (db->addFriend(sender, login))
                     {
 
+                sender->setClientFriendLogins(db->getFriendsList(sender));
                 data["successful"] = true;
                 data["error"] = "";
                 qInfo() << "Server: client --->" << sender->getUuid().toString() << "--->" << sender->getName()
@@ -812,7 +813,7 @@ void LobbyManager::addFriend(QString login, ClientNetwork *const sender)
                     {
 
                 data["successful"] = false;
-                data["error"] = "Не удалось добавить данного клиента в друзья! (такой клиент не зарегистрирован)";
+                data["error"] = "Данный клиент уже в друзьях!";
                 qInfo() << "Server: client --->" << sender->getUuid().toString() << "--->" << sender->getName()
                         << "try to add client --->" << login << "to friend (fail)";
                     }
