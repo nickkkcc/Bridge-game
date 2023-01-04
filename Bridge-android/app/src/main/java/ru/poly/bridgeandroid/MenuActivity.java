@@ -9,7 +9,9 @@ import androidx.fragment.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -103,7 +105,29 @@ public class MenuActivity extends AppCompatActivity {
             public void onClick(View v) {
                 //закомментить код ниже
                 //написано для теста диалогового окна
-//                runOnUiThread(() -> {
+                runOnUiThread(() -> {
+//                    TextView textview = new TextView(MenuActivity.this);
+//                    textview.setText("\nИгра окончена!");
+//                    textview.setTextSize(26);
+//                    textview.setTypeface(null, Typeface.BOLD);
+//                    textview.setGravity(Gravity.CENTER);
+//                    textview.setTextColor(getResources().getColor(R.color.menu_yellow));
+//
+//                    AlertDialog.Builder builder = new AlertDialog.Builder(MenuActivity.this, R.style.CustomDialogTheme);
+//                    builder.setCustomTitle(textview);
+//                    View view = LayoutInflater.from(MenuActivity.this).inflate(R.layout.fragment_scores, findViewById(R.id.score_layout));
+//                    builder.setView(view);
+//                    builder.setNegativeButton("Выход", new DialogInterface.OnClickListener() {
+//                        public void onClick(DialogInterface dialog, int id) {
+//                            Intent intent = new Intent(MenuActivity.this, MenuActivity.class);
+//                            startActivity(intent);
+//                            finish();
+//                        }
+//                    });
+//                    final AlertDialog alertDialog = builder.create();
+//                    alertDialog.setCanceledOnTouchOutside(false);
+//                    alertDialog.show();
+                    //
 //                    AlertDialog.Builder builder = new AlertDialog.Builder(MenuActivity.this, R.style.CustomDialogTheme);
 //
 //                    builder.setTitle("Новое приглашение");
@@ -124,7 +148,7 @@ public class MenuActivity extends AppCompatActivity {
 //                    AlertDialog dialog = builder.create();
 //                    dialog.setCanceledOnTouchOutside(false);
 //                    dialog.show();
-//                });
+                });
             }
         });
 

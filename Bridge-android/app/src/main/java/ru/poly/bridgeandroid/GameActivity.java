@@ -3,8 +3,10 @@ package ru.poly.bridgeandroid;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -784,8 +786,16 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void showScoresGameEndDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Игра окончена");
+        TextView textview = new TextView(GameActivity.this);
+        textview.setText("\nИгра окончена!");
+        textview.setTextSize(26);
+        textview.setTypeface(null, Typeface.BOLD);
+        textview.setGravity(Gravity.CENTER);
+        textview.setTextColor(getResources().getColor(R.color.menu_yellow));
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(GameActivity.this, R.style.CustomDialogTheme);
+        //builder.setTitle("Игра окончена!");
+        builder.setCustomTitle(textview);
         View view = LayoutInflater.from(this).inflate(R.layout.fragment_scores, findViewById(R.id.score_layout));
         builder.setView(view);
 

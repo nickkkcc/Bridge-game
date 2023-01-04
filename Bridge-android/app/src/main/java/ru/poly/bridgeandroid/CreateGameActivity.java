@@ -143,7 +143,7 @@ public class CreateGameActivity extends AppCompatActivity {
                     tvSwitchPlayers.setTextColor(getResources().getColor(R.color.white));
                 } else {
                     tvSwitchFriends.setTextColor(getResources().getColor(R.color.white));
-                    tvSwitchPlayers.setTextColor(getResources().getColor(R.color.yellow));
+                    tvSwitchPlayers.setTextColor(getResources().getColor(R.color.menu_yellow));
                 }
                 updateListViewAdapter(isFriends);
             }
