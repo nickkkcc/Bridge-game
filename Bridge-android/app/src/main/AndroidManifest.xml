@@ -74,6 +74,18 @@
         </activity>
 
         <activity
+            android:name=".HistoryActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:exported="true"
+            android:label="@string/title_activity_login"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.BridgeAndroid.FullscreenGameNoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
+        </activity>
+
+        <activity
             android:name=".WaitGameActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:exported="true"

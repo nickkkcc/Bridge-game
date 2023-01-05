@@ -11,7 +11,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.view.Gravity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -24,6 +24,8 @@ import com.google.gson.JsonObject;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -38,6 +40,8 @@ import ru.poly.bridgeandroid.model.menu.InvitePlayersToClient;
 import ru.poly.bridgeandroid.model.menu.JoinToClient;
 import ru.poly.bridgeandroid.model.menu.JoinToServer;
 import ru.poly.bridgeandroid.model.Message;
+import ru.poly.bridgeandroid.model.menu.RequestHistoryToClient;
+import ru.poly.bridgeandroid.model.menu.RequestScoreToClient;
 import ru.poly.bridgeandroid.model.menu.SelectTeamToClient;
 import ru.poly.bridgeandroid.ui.login.LoginActivity;
 
@@ -56,6 +60,7 @@ public class MenuActivity extends AppCompatActivity {
     private ProgressBar loadingProgressBar;
     private SharedPreferences sharedPreferences;
     private Intent gameIntent;
+    private Intent historyIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,52 +108,11 @@ public class MenuActivity extends AppCompatActivity {
         previousGames.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //закомментить код ниже
-                //написано для теста диалогового окна
-                runOnUiThread(() -> {
-//                    TextView textview = new TextView(MenuActivity.this);
-//                    textview.setText("\nИгра окончена!");
-//                    textview.setTextSize(26);
-//                    textview.setTypeface(null, Typeface.BOLD);
-//                    textview.setGravity(Gravity.CENTER);
-//                    textview.setTextColor(getResources().getColor(R.color.menu_yellow));
-//
-//                    AlertDialog.Builder builder = new AlertDialog.Builder(MenuActivity.this, R.style.CustomDialogTheme);
-//                    builder.setCustomTitle(textview);
-//                    View view = LayoutInflater.from(MenuActivity.this).inflate(R.layout.fragment_scores, findViewById(R.id.score_layout));
-//                    builder.setView(view);
-//                    builder.setNegativeButton("Выход", new DialogInterface.OnClickListener() {
-//                        public void onClick(DialogInterface dialog, int id) {
-//                            Intent intent = new Intent(MenuActivity.this, MenuActivity.class);
-//                            startActivity(intent);
-//                            finish();
-//                        }
-//                    });
-//                    final AlertDialog alertDialog = builder.create();
-//                    alertDialog.setCanceledOnTouchOutside(false);
-//                    alertDialog.show();
-                    //
-//                    AlertDialog.Builder builder = new AlertDialog.Builder(MenuActivity.this, R.style.CustomDialogTheme);
-//
-//                    builder.setTitle("Новое приглашение");
-//                    builder.setMessage("\nИгрок " + "№000" + " отправил Вам приглашение.\n" + "Присоединиться в лобби?");
-//                    View view = LayoutInflater.from(MenuActivity.this).inflate(R.layout.fragment_invitation,
-//                            findViewById(R.id.invite_layout));
-//                    builder.setView(view);
-//                    builder.setNegativeButton("Нет", new DialogInterface.OnClickListener() {
-//                        public void onClick(DialogInterface dialog, int id) {
-//                            isAccepted = false;
-//                        }
-//                    });
-//                    builder.setPositiveButton("Да", new DialogInterface.OnClickListener() {
-//                        public void onClick(DialogInterface dialog, int id) {
-//                            isAccepted = true;
-//                        }
-//                    });
-//                    AlertDialog dialog = builder.create();
-//                    dialog.setCanceledOnTouchOutside(false);
-//                    dialog.show();
-                });
+                Message messageScore = new Message(token, "request_score");
+                EventBus.getDefault().post(gson.toJson(messageScore));
+
+                Message messageHistory = new Message(token, "request_history_list");
+                EventBus.getDefault().post(gson.toJson(messageHistory));
             }
         });
 
@@ -176,7 +140,7 @@ public class MenuActivity extends AppCompatActivity {
         super.onStop();
     }
 
-    @Subscribe
+    @Subscribe(threadMode = ThreadMode.MAIN_ORDERED)
     public void onMessage(Message message) {
         switch (message.getType()) {
             case "create_lobby":
@@ -319,6 +283,16 @@ public class MenuActivity extends AppCompatActivity {
                 startActivity(gameIntent);
                 finish();
                 break;
+            case "request_score":
+                RequestScoreToClient requestScore = message.getData(RequestScoreToClient.class);
+                historyIntent = new Intent(MenuActivity.this, HistoryActivity.class);
+                historyIntent.putExtra("score", requestScore);
+                break;
+            case "request_history_list":
+                RequestHistoryToClient requestHistory = message.getData(RequestHistoryToClient.class);
+                historyIntent.putParcelableArrayListExtra("historyList", requestHistory.getHistoryList());
+                startActivity(historyIntent);
+                break;
             default:
                 throw new RuntimeException();
         }
@@ -327,12 +301,10 @@ public class MenuActivity extends AppCompatActivity {
     private void switchLoadingVisibility() {
         if (readyToJoin) {
             runOnUiThread(() -> {
-//                loadingTextView.setVisibility(View.VISIBLE);
                 loadingProgressBar.setVisibility(View.VISIBLE);
             });
         } else {
             runOnUiThread(() -> {
-//                loadingTextView.setVisibility(View.INVISIBLE);
                 loadingProgressBar.setVisibility(View.INVISIBLE);
             });
         }

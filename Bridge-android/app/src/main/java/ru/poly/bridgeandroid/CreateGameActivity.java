@@ -1,11 +1,13 @@
 package ru.poly.bridgeandroid;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -27,6 +29,10 @@ import java.util.List;
 
 import ru.poly.bridgeandroid.model.game.PlayerGameState;
 import ru.poly.bridgeandroid.model.game.UpdateGameState;
+import ru.poly.bridgeandroid.model.menu.AddFriendToClient;
+import ru.poly.bridgeandroid.model.menu.AddFriendToServer;
+import ru.poly.bridgeandroid.model.menu.DeleteFriendToClient;
+import ru.poly.bridgeandroid.model.menu.DeleteFriendToServer;
 import ru.poly.bridgeandroid.model.menu.ExitLobbyToClient;
 import ru.poly.bridgeandroid.model.menu.ExitLobbyToServer;
 import ru.poly.bridgeandroid.model.menu.InvitePlayersToServer;
@@ -118,10 +124,9 @@ public class CreateGameActivity extends AppCompatActivity {
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //view.setBackgroundColor(getResources().getColor(R.color.yellow));
-                String login = isFriends ? friends.get(position).getLogin() :
+                String loginToInvite = isFriends ? friends.get(position).getLogin() :
                         players.get(position).getLogin();
-                InvitePlayersToServer invitePlayers = new InvitePlayersToServer(lobbyId, login);
+                InvitePlayersToServer invitePlayers = new InvitePlayersToServer(lobbyId, loginToInvite);
                 JsonObject jsonObject = (JsonObject) gson.toJsonTree(invitePlayers);
                 Message message = new Message(token, "invite_players", jsonObject);
                 EventBus.getDefault().post(gson.toJson(message));
@@ -131,6 +136,53 @@ public class CreateGameActivity extends AppCompatActivity {
                 Toast toast = Toast.makeText(getBaseContext(), alias + " приглашён в лобби", Toast.LENGTH_SHORT);
                 toast.show();
             }
+        });
+
+        listView.setLongClickable(true);
+        listView.setOnItemLongClickListener((parent, view, position, id) -> {
+            String loginLongClick = isFriends ? friends.get(position).getLogin() :
+                    players.get(position).getLogin();
+            String alias = isFriends ? friends.get(position).getAlias() :
+                    players.get(position).getAlias();
+            AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.CustomDialogTheme);
+            if (isFriends) {
+                builder.setTitle("Удаление из друзей");
+                builder.setMessage("Удалить из друзей " + alias + "?");
+                View viewDeleteFriend = LayoutInflater.from(this).inflate(R.layout.fragment_invitation,
+                        findViewById(R.id.invite_layout));
+                builder.setView(viewDeleteFriend);
+                builder.setNegativeButton("Нет", (dialog, idNegative) -> {
+                    // Ничего не делать
+                });
+                builder.setPositiveButton("Да", (dialog, idPositive) -> {
+                    DeleteFriendToServer deleteFriend = new DeleteFriendToServer(loginLongClick);
+                    JsonObject jsonObject = (JsonObject) gson.toJsonTree(deleteFriend);
+                    Message message = new Message(token, "delete_friend", jsonObject);
+                    EventBus.getDefault().post(gson.toJson(message));
+                });
+                AlertDialog dialog = builder.create();
+                dialog.setCanceledOnTouchOutside(false);
+                dialog.show();
+            } else {
+                builder.setTitle("Добавление в друзья");
+                builder.setMessage("Добавить в друзья " + alias + "?");
+                View viewAddFriend = LayoutInflater.from(this).inflate(R.layout.fragment_invitation,
+                        findViewById(R.id.invite_layout));
+                builder.setView(viewAddFriend);
+                builder.setNegativeButton("Нет", (dialog, idNegative) -> {
+                    // Ничего не делать
+                });
+                builder.setPositiveButton("Да", (dialog, idPositive) -> {
+                    AddFriendToServer addFriend = new AddFriendToServer(loginLongClick);
+                    JsonObject jsonObject = (JsonObject) gson.toJsonTree(addFriend);
+                    Message message = new Message(token, "add_friend", jsonObject);
+                    EventBus.getDefault().post(gson.toJson(message));
+                });
+                AlertDialog dialog = builder.create();
+                dialog.setCanceledOnTouchOutside(false);
+                dialog.show();
+            }
+            return true;
         });
 
         switchOnOff.setOnClickListener(new View.OnClickListener() {
@@ -238,6 +290,22 @@ public class CreateGameActivity extends AppCompatActivity {
                 gameIntent.putExtra("notifyBidTurn", true);
                 startActivity(gameIntent);
                 finish();
+                break;
+            case "add_friend":
+                AddFriendToClient addFriend = message.getData(AddFriendToClient.class);
+                if (addFriend.isSuccessful()) {
+                    runOnUiThread(() -> Toast.makeText(getBaseContext(), "Добавлен новый друг", Toast.LENGTH_SHORT).show());
+                } else {
+                    runOnUiThread(() -> Toast.makeText(getBaseContext(), addFriend.getError(), Toast.LENGTH_SHORT).show());
+                }
+                break;
+            case "delete_friend":
+                DeleteFriendToClient deleteFriend = message.getData(DeleteFriendToClient.class);
+                if (deleteFriend.isSuccessful()) {
+                    runOnUiThread(() -> Toast.makeText(getBaseContext(), "Друг удалён", Toast.LENGTH_SHORT).show());
+                } else {
+                    runOnUiThread(() -> Toast.makeText(getBaseContext(), deleteFriend.getError(), Toast.LENGTH_SHORT).show());
+                }
                 break;
             default:
                 throw new RuntimeException();
