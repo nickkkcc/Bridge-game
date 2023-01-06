@@ -1,6 +1,5 @@
 package ru.poly.bridgeandroid.ui.login;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -18,7 +17,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -35,9 +33,9 @@ import java.util.List;
 
 import ru.poly.bridgeandroid.MenuActivity;
 import ru.poly.bridgeandroid.R;
+import ru.poly.bridgeandroid.model.Message;
 import ru.poly.bridgeandroid.model.menu.LoginToClient;
 import ru.poly.bridgeandroid.model.menu.LoginToServer;
-import ru.poly.bridgeandroid.model.Message;
 import ru.poly.bridgeandroid.model.menu.Question;
 import ru.poly.bridgeandroid.model.menu.RegistrationToClient;
 import ru.poly.bridgeandroid.model.menu.RegistrationToServer;
@@ -54,6 +52,7 @@ public class RegistrationActivity extends AppCompatActivity {
     private EditText passwordEditText;
     private Button registrationButton;
     private int questionIndex;
+    private boolean isQuestionSelected;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -86,6 +85,7 @@ public class RegistrationActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                 questionIndex = position;
+                isQuestionSelected = true;
             }
         });
 
@@ -102,26 +102,9 @@ public class RegistrationActivity extends AppCompatActivity {
                 if (loginFormState.getPasswordError() != null) {
                     passwordEditText.setError(getString(loginFormState.getPasswordError()));
                 }
-            }
-        });
-
-        loginViewModel.getLoginResult().observe(this, new Observer<LoginResult>() {
-            @Override
-            public void onChanged(@Nullable LoginResult loginResult) {
-                if (loginResult == null) {
-                    return;
+                if (loginFormState.getAnswerError() != null) {
+                    answerEditText.setError(getString(loginFormState.getAnswerError()));
                 }
-                loadingProgressBar.setVisibility(View.GONE);
-                if (loginResult.getError() != null) {
-                    showLoginFailed(loginResult.getError());
-                }
-                if (loginResult.getSuccess() != null) {
-                    updateUiWithUser(loginResult.getSuccess());
-                }
-                setResult(Activity.RESULT_OK);
-
-                //Complete and destroy login activity once successful
-                finish();
             }
         });
 
@@ -138,12 +121,13 @@ public class RegistrationActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-                loginViewModel.loginDataChanged(usernameEditText.getText().toString(),
-                        passwordEditText.getText().toString());
+                loginViewModel.registrationDataChanged(usernameEditText.getText().toString(),
+                        passwordEditText.getText().toString(), answerEditText.getText().toString());
             }
         };
         usernameEditText.addTextChangedListener(afterTextChangedListener);
         passwordEditText.addTextChangedListener(afterTextChangedListener);
+        answerEditText.addTextChangedListener(afterTextChangedListener);
         passwordEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 
             @Override
@@ -159,16 +143,22 @@ public class RegistrationActivity extends AppCompatActivity {
         registrationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                loadingProgressBar.setVisibility(View.VISIBLE);
+                if (isQuestionSelected) {
+                    loadingProgressBar.setVisibility(View.VISIBLE);
 
-                RegistrationToServer registrationToServer = new RegistrationToServer(
-                        usernameEditText.getText().toString(),
-                        passwordEditText.getText().toString(),
-                        questions.get(questionIndex).getQuestionId(),
-                        answerEditText.getText().toString());
-                JsonObject jsonObject = (JsonObject) gson.toJsonTree(registrationToServer);
-                Message message = new Message("0", "registration", jsonObject);
-                EventBus.getDefault().post(gson.toJson(message));
+                    RegistrationToServer registrationToServer = new RegistrationToServer(
+                            usernameEditText.getText().toString(),
+                            passwordEditText.getText().toString(),
+                            questions.get(questionIndex).getQuestionId(),
+                            answerEditText.getText().toString());
+                    JsonObject jsonObject = (JsonObject) gson.toJsonTree(registrationToServer);
+                    Message message = new Message("0", "registration", jsonObject);
+                    EventBus.getDefault().post(gson.toJson(message));
+                } else {
+                    Toast toast = Toast.makeText(getBaseContext(), "Не выбран секретный вопрос",
+                            Toast.LENGTH_SHORT);
+                    toast.show();
+                }
             }
         });
     }
@@ -183,16 +173,6 @@ public class RegistrationActivity extends AppCompatActivity {
     public void onStop() {
         EventBus.getDefault().unregister(this);
         super.onStop();
-    }
-
-    private void updateUiWithUser(LoggedInUserView model) {
-        String welcome = getString(R.string.welcome) + model.getDisplayName();
-        // TODO : initiate successful logged in experience
-        Toast.makeText(getApplicationContext(), welcome, Toast.LENGTH_LONG).show();
-    }
-
-    private void showLoginFailed(@StringRes Integer errorString) {
-        Toast.makeText(getApplicationContext(), errorString, Toast.LENGTH_SHORT).show();
     }
 
     @Subscribe

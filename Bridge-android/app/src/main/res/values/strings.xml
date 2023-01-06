@@ -22,6 +22,7 @@
     <string name="registration_answer">Ответ на вопрос</string>
     <string name="invalid_password">Password must be >5 characters</string>
     <string name="invalid_username">Not a valid username</string>
+    <string name="invalid_answer">Ответ не может быть пустым</string>
     <string name="login_failed">"Login failed"</string>
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password</string>
@@ -69,4 +70,9 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="forgot_password">Восстановление пароля</string>
+    <string name="get_secret_question">Запросить секретный вопрос</string>
+    <string name="secret_question_text">Введите ответ на секретный вопрос, который Вы указывали при регистрации.</string>
+    <string name="reset_password">Сбросить пароль</string>
+    <string name="change_password">Сменить пароль</string>
 </resources>

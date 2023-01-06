@@ -41,11 +41,47 @@ public class LoginViewModel extends ViewModel {
 //        }
     }
 
+    public void registrationDataChanged(String username, String password, String answer) {
+        if (!isUserNameValid(username)) {
+            loginFormState.setValue(new LoginFormState(R.string.invalid_username, null, null));
+        } else if (!isPasswordValid(password)) {
+            loginFormState.setValue(new LoginFormState(null, R.string.invalid_password, null));
+        } else if (!isAnswerValid(answer)) {
+            loginFormState.setValue(new LoginFormState(null, null, R.string.invalid_answer));
+        } else {
+            loginFormState.setValue(new LoginFormState(true));
+        }
+    }
+
     public void loginDataChanged(String username, String password) {
         if (!isUserNameValid(username)) {
-            loginFormState.setValue(new LoginFormState(R.string.invalid_username, null));
+            loginFormState.setValue(new LoginFormState(R.string.invalid_username, null, null));
         } else if (!isPasswordValid(password)) {
-            loginFormState.setValue(new LoginFormState(null, R.string.invalid_password));
+            loginFormState.setValue(new LoginFormState(null, R.string.invalid_password, null));
+        } else {
+            loginFormState.setValue(new LoginFormState(true));
+        }
+    }
+
+    public void usernameDataChanged(String username) {
+        if (!isUserNameValid(username)) {
+            loginFormState.setValue(new LoginFormState(R.string.invalid_username, null, null));
+        } else {
+            loginFormState.setValue(new LoginFormState(true));
+        }
+    }
+
+    public void passwordDataChanged(String password) {
+        if (!isPasswordValid(password)) {
+            loginFormState.setValue(new LoginFormState(null, R.string.invalid_password, null));
+        } else {
+            loginFormState.setValue(new LoginFormState(true));
+        }
+    }
+
+    public void answerDataChanged(String answer) {
+        if (!isUserNameValid(answer)) {
+            loginFormState.setValue(new LoginFormState(null, null, R.string.invalid_answer));
         } else {
             loginFormState.setValue(new LoginFormState(true));
         }
@@ -66,5 +102,9 @@ public class LoginViewModel extends ViewModel {
     // A placeholder password validation check
     private boolean isPasswordValid(String password) {
         return password != null && password.trim().length() > 5;
+    }
+
+    private boolean isAnswerValid(String answer) {
+        return answer != null && answer.trim().length() > 0;
     }
 }

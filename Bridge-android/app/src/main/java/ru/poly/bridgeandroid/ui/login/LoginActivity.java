@@ -1,6 +1,5 @@
 package ru.poly.bridgeandroid.ui.login;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -16,7 +15,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -32,11 +30,11 @@ import ru.poly.bridgeandroid.GameActivity;
 import ru.poly.bridgeandroid.MenuActivity;
 import ru.poly.bridgeandroid.R;
 import ru.poly.bridgeandroid.enums.GameEvent;
+import ru.poly.bridgeandroid.model.Message;
 import ru.poly.bridgeandroid.model.game.PlayerGameState;
 import ru.poly.bridgeandroid.model.game.UpdateGameState;
 import ru.poly.bridgeandroid.model.menu.LoginToClient;
 import ru.poly.bridgeandroid.model.menu.LoginToServer;
-import ru.poly.bridgeandroid.model.Message;
 import ru.poly.bridgeandroid.model.menu.RegistrationQuestionsToClient;
 
 public class LoginActivity extends AppCompatActivity {
@@ -64,6 +62,7 @@ public class LoginActivity extends AppCompatActivity {
         final EditText passwordEditText = findViewById(R.id.password);
         final Button loginButton = findViewById(R.id.login);
         final Button registrationButton = findViewById(R.id.registration);
+        TextView forgotPasswordTextView = findViewById(R.id.forgot_password);
         loadingProgressBar = findViewById(R.id.loading);
 
         loginViewModel.getLoginFormState().observe(this, new Observer<LoginFormState>() {
@@ -79,26 +78,6 @@ public class LoginActivity extends AppCompatActivity {
                 if (loginFormState.getPasswordError() != null) {
                     passwordEditText.setError(getString(loginFormState.getPasswordError()));
                 }
-            }
-        });
-
-        loginViewModel.getLoginResult().observe(this, new Observer<LoginResult>() {
-            @Override
-            public void onChanged(@Nullable LoginResult loginResult) {
-                if (loginResult == null) {
-                    return;
-                }
-                loadingProgressBar.setVisibility(View.GONE);
-                if (loginResult.getError() != null) {
-                    showLoginFailed(loginResult.getError());
-                }
-                if (loginResult.getSuccess() != null) {
-                    updateUiWithUser(loginResult.getSuccess());
-                }
-                setResult(Activity.RESULT_OK);
-
-                //Complete and destroy login activity once successful
-                finish();
             }
         });
 
@@ -155,6 +134,14 @@ public class LoginActivity extends AppCompatActivity {
                 EventBus.getDefault().post(gson.toJson(message));
             }
         });
+
+        forgotPasswordTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intentMenu = new Intent(LoginActivity.this, ForgotPasswordActivity.class);
+                startActivity(intentMenu);
+            }
+        });
     }
 
     @Override
@@ -169,18 +156,9 @@ public class LoginActivity extends AppCompatActivity {
         super.onStop();
     }
 
-    private void updateUiWithUser(LoggedInUserView model) {
-        String welcome = getString(R.string.welcome) + model.getDisplayName();
-        // TODO : initiate successful logged in experience
-        Toast.makeText(getApplicationContext(), welcome, Toast.LENGTH_LONG).show();
-    }
-
-    private void showLoginFailed(@StringRes Integer errorString) {
-        Toast.makeText(getApplicationContext(), errorString, Toast.LENGTH_SHORT).show();
-    }
-
     @Subscribe(threadMode = ThreadMode.MAIN_ORDERED)
     public void onMessage(Message message) {
+        runOnUiThread(() -> loadingProgressBar.setVisibility(View.GONE));
         switch (message.getType()) {
             case "registration_questions":
                 RegistrationQuestionsToClient questions = message.getData(

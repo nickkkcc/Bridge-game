@@ -22,9 +22,14 @@ import com.google.gson.JsonObject;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 
 import ru.poly.bridgeandroid.model.Message;
 import ru.poly.bridgeandroid.model.menu.AddFriendToServer;
@@ -47,6 +52,9 @@ public class HistoryActivityAdapter extends RecyclerView.Adapter<HistoryActivity
     private Gson gson;
     private SharedPreferences sharedPreferences;
 
+    private SimpleDateFormat inputDateFormat;
+    private SimpleDateFormat outputDateFormat;
+
     HistoryActivityAdapter(List<HistoryElement> historyList, Context context) {
         this.historyList = historyList;
         this.context = context;
@@ -57,6 +65,12 @@ public class HistoryActivityAdapter extends RecyclerView.Adapter<HistoryActivity
         sharedPreferences = context.getSharedPreferences(PREFERENCE, MODE_PRIVATE);
         token = sharedPreferences.getString(TOKEN, "");
         login = sharedPreferences.getString(LOGIN, "");
+
+        inputDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX", Locale.ENGLISH);
+        inputDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+        outputDateFormat = new SimpleDateFormat("HH:mm dd.MM.yyyy", Locale.ROOT);
+        outputDateFormat.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
     }
 
     @NonNull
@@ -73,7 +87,18 @@ public class HistoryActivityAdapter extends RecyclerView.Adapter<HistoryActivity
     public void onBindViewHolder(@NonNull final HistoryActivityViewHolder holder, final int position) {
         HistoryElement historyElement = historyList.get(position);
 
-        String time = historyElement.getGameStartTime() + " - " + historyElement.getGameEndTime();
+        String startTime = "";
+        String endTime = "";
+        try {
+            Date startDate = inputDateFormat.parse(historyElement.getGameStartTime());
+            Date endDate = inputDateFormat.parse(historyElement.getGameEndTime());
+            startTime = outputDateFormat.format(startDate);
+            endTime = outputDateFormat.format(endDate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        String time = startTime + " - " + endTime;
         holder.time.setText(time);
 
         String owner;
