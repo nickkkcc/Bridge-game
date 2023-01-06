@@ -171,7 +171,7 @@ void ClientNetwork::rxAll(const QString& message)
         {
             emit rxRequestHistoryList(this);
         }
-        if (rx["type"] == "request_history_list")
+        if (rx["type"] == "request_score")
         {
             emit rxRequestScore(this);
         }

@@ -146,6 +146,16 @@ void ServerNetwork::validateClientText(const QString &message)
                 tempSocket->abort();
             }
         }
+        else if (rxTxObj["type"] == "forgot_password" || rxTxObj["type"] == "secret_question" ||
+                 rxTxObj["type"] == "change_password")
+        {
+            if (!msgHandler->tryChangePassword(rxTxObj))
+            {
+                qWarning() << "Server: client --->"
+                           << tempSocket->peerAddress().toString() + ":" + QString::number(tempSocket->peerPort())
+                           << rxTxObj["data"].toObject()["error"].toString();
+            }
+        }
         else
         {
 

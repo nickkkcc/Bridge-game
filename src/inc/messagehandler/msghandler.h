@@ -24,13 +24,14 @@ class MsgHandler : public QObject
   public:
     bool checkTryReg(QJsonObject &obj);
     bool tryLogin(QJsonObject &obj);
+    bool tryChangePassword(QJsonObject &obj);
     explicit MsgHandler(DataBase *base, bool *bAllowNewClientConnection, int *maxPlayers, int *maxLoginLength,
                         int *minLoginLength, QVector<ClientNetwork *> *clients, QObject *parent);
     ~MsgHandler();
 
   private:
     QJsonObject generateAnswer(const MsgType &type, bool successful = true, const QString &error = "",
-                               const QString &uid = "0");
+                               const QString &uid = "0", QString question = "", QString login = "");
 };
 
 #endif // MSGHANDLER_H

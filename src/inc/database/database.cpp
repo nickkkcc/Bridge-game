@@ -164,15 +164,17 @@ bool DataBase::addHistory(ClientNetwork *const client, const History &history, b
             if (winner)
             {
                 users_ptr->setWin_game_count(users_ptr->getWin_game_count() + 1);
-                client->setWinGameCount(users_ptr->getWin_game_count() + 1);
+                client->setWinGameCount(users_ptr->getWin_game_count());
             }
 
             // Сетаем общее количество игр. И Среднее количество выигранных игр.
             users_ptr->setAll_game_count(users_ptr->getAll_game_count() + 1);
-            client->setAllGameCount(users_ptr->getAll_game_count() + 1);
+            client->setAllGameCount(users_ptr->getAll_game_count());
 
-            users_ptr->setScore(users_ptr->getWin_game_count() / users_ptr->getAll_game_count() * 100);
-            client->setScore(users_ptr->getWin_game_count() / users_ptr->getAll_game_count() * 100);
+            users_ptr->setScore((static_cast<double>(users_ptr->getWin_game_count()) /
+                                 static_cast<double>(users_ptr->getAll_game_count())) *
+                                100.);
+            client->setScore(users_ptr->getScore());
 
             QVector<QSharedPointer<Users>> usersList;
             usersList.append(users_ptr);
@@ -234,10 +236,10 @@ bool DataBase::deleteClient(ClientNetwork *const client)
 // Удаляет из друзей указанного клиента.
 bool DataBase::deleteFriend(QString login, ClientNetwork *const sender)
 {
-    if (readUserFromBase(sender->getName()))
+    if (readUserFromBase(sender->getName()) && sender->getClientFriendLogins().keys().contains(login))
     {
         qx_query query;
-        query.where("t_friends.users_id").isEqualTo(QVariant::fromValue(users_ptr->getUsers_id()));
+        query.where("t_friends.login").isEqualTo(login);
         QSqlError err = qx::dao::delete_by_query<Friends>(query);
         switch (err.type())
         {
@@ -251,6 +253,27 @@ bool DataBase::deleteFriend(QString login, ClientNetwork *const sender)
             return false;
         }
         return true;
+    }
+    return false;
+}
+
+bool DataBase::updatePassword(QString newPassword)
+{
+    if (users_ptr)
+    {
+        users_ptr->setPassword(newPassword);
+        QSqlError err = qx::dao::update(users_ptr);
+        switch (err.type())
+        {
+        case QSqlError::NoError:
+            return true;
+        case QSqlError::ConnectionError:
+        case QSqlError::StatementError:
+        case QSqlError::TransactionError:
+        case QSqlError::UnknownError:
+            qWarning() << "Server:@updatePassword ---> ERROR:" << err.text();
+            return false;
+        }
     }
     return false;
 }
@@ -289,34 +312,31 @@ double DataBase::getUserScore()
 // Функция считывает указанного клиента из базы данных и дает историю его игр в виде Json объекта.
 const QJsonArray DataBase::getHistory(ClientNetwork *const user)
 {
-    if (user->getName() != users_ptr->getLogin())
-    {
-
         if (!readUserFromBaseWithRelations(user->getName()))
         {
             return QJsonArray();
         }
-    }
     QJsonArray history_list;
     QJsonObject history_obj;
     for (const QSharedPointer<History> &history : users_ptr->getlist_of_History())
     {
-        history_obj["game_start"] = history->getGame_start().toString();
-        history_obj["game_end"] = history->getGame_end().toString();
-        history_obj["owner_login"] = history->getOwner_login();
-        history_obj["owner_alias"] = history->getOwner_alias().toString(QUuid::WithoutBraces);
-        history_obj["winner_team"] = history->getWinner_team();
-        history_obj["player_n_login"] = history->getPlayer_N_login();
-        history_obj["player_n_alias"] = history->getPlayer_N_alias().toString(QUuid::WithoutBraces);
-        history_obj["player_s_login"] = history->getPlayer_S_login();
-        history_obj["player_s_alias"] = history->getPlayer_S_alias().toString(QUuid::WithoutBraces);
-        history_obj["player_e_login"] = history->getPlayer_E_login();
-        history_obj["player_e_alias"] = history->getPlayer_E_alias().toString(QUuid::WithoutBraces);
-        history_obj["player_w_login"] = history->getPlayer_W_login();
-        history_obj["player_w_alias"] = history->getPlayer_W_alias().toString(QUuid::WithoutBraces);
-        history_obj["total_score_ns"] = history->getTotal_score_NS();
-        history_obj["total_score_ew"] = history->getTotal_score_EW();
-        history_list.append(history_obj);
+
+            history_obj["game_start"] = history->getGame_start().toUTC().toString("yyyy-MM-ddThh:mm:ssZ");
+            history_obj["game_end"] = history->getGame_end().toUTC().toString("yyyy-MM-ddThh:mm:ssZ");
+            history_obj["owner_login"] = history->getOwner_login();
+            history_obj["owner_alias"] = history->getOwner_alias().toString(QUuid::WithoutBraces);
+            history_obj["winner_team"] = history->getWinner_team();
+            history_obj["player_n_login"] = history->getPlayer_N_login();
+            history_obj["player_n_alias"] = history->getPlayer_N_alias().toString(QUuid::WithoutBraces);
+            history_obj["player_s_login"] = history->getPlayer_S_login();
+            history_obj["player_s_alias"] = history->getPlayer_S_alias().toString(QUuid::WithoutBraces);
+            history_obj["player_e_login"] = history->getPlayer_E_login();
+            history_obj["player_e_alias"] = history->getPlayer_E_alias().toString(QUuid::WithoutBraces);
+            history_obj["player_w_login"] = history->getPlayer_W_login();
+            history_obj["player_w_alias"] = history->getPlayer_W_alias().toString(QUuid::WithoutBraces);
+            history_obj["total_score_ns"] = history->getTotal_score_NS();
+            history_obj["total_score_ew"] = history->getTotal_score_EW();
+            history_list.append(history_obj);
     }
     return history_list;
 }
@@ -344,6 +364,11 @@ const unsigned long DataBase::getAllGameCount() const
 const unsigned long DataBase::getWinGameCount() const
 {
     return users_ptr->getWin_game_count();
+}
+
+const QString DataBase::getUserQuestion(const QStringList &questions) const
+{
+    return questions.at(users_ptr->getQuestion_type());
 }
 
 DataBase::~DataBase()

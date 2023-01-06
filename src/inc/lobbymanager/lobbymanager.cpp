@@ -305,7 +305,7 @@ void LobbyManager::closeLobby(const QUuid &uuidLobby, ClientNetwork *const sende
                 else
                 {
 
-                    if (lobby->deletePlayer(sender->getTeam(), sender) ||)
+                    if (lobby->deletePlayer(sender->getTeam(), sender))
                     {
 
                         sender->setTeam(Team::NONE_TEAM);
@@ -315,6 +315,15 @@ void LobbyManager::closeLobby(const QUuid &uuidLobby, ClientNetwork *const sende
                         tx["id"] = sender->getUuid().toString(QUuid::WithoutBraces);
                         qInfo() << "Server: client --->" << sender->getUuid().toString() << "--->" << sender->getName()
                                 << "exit from lobby --->" << uuidLobby.toString();
+                    }
+                    else if (lobby->getTempPlayers().remove(sender))
+                    {
+                        data["successful"] = true;
+                        data["error"] = "";
+                        tx["data"] = data;
+                        tx["id"] = sender->getUuid().toString(QUuid::WithoutBraces);
+                        qInfo() << "Server: client --->" << sender->getUuid().toString() << "--->" << sender->getName()
+                                << "exit from lobby (as tempclient) --->" << uuidLobby.toString();
                     }
                     else
                     {
@@ -838,6 +847,7 @@ void LobbyManager::deleteFriend(QString login, ClientNetwork *const sender)
                 data["error"] = "";
                 qInfo() << "Server: client" << sender->getUuid().toString(QUuid::WithoutBraces) << "--->"
                         << sender->getName() << "deleted friend --->" << login;
+                sender->setClientFriendLogins(db->getFriendsList(sender));
             }
             else
             {

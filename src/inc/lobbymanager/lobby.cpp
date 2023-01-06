@@ -183,7 +183,7 @@ void Lobby::gameEventOccured(GameEvent event)
     {
 
         sendUpdatedGameStateToClients(event);
-        gameHistory.setGame_end(QDateTime::currentDateTime());
+        gameHistory.setGame_end(QDateTime::currentDateTime().toUTC());
         gameHistory.setWinner_team(gameState->getScore().getGameWinner());
         gameHistory.setTotal_score_NS(gameState->getScore().getTotalScore(Team::N_S));
         gameHistory.setTotal_score_EW(gameState->getScore().getTotalScore(Team::E_W));

@@ -22,6 +22,7 @@ class DataBase : public QObject
     bool addHistory(ClientNetwork *const client, const History &history, bool winner);
     bool deleteClient(ClientNetwork *const client);
     bool deleteFriend(QString login, ClientNetwork *const sender);
+    bool updatePassword(QString newPassword);
 
     const QString getUserLogin() const;
     const QString getUserPassword() const;
@@ -33,6 +34,7 @@ class DataBase : public QObject
     const QHash<QString, QUuid> getFriendsList(ClientNetwork *const user);
     const unsigned long getAllGameCount() const;
     const unsigned long getWinGameCount() const;
+    const QString getUserQuestion(const QStringList &questions) const;
 
     ~DataBase();
 

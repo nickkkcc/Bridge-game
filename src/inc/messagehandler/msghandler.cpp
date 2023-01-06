@@ -109,7 +109,64 @@ bool MsgHandler::tryLogin(QJsonObject &obj)
     }
 }
 
-QJsonObject MsgHandler::generateAnswer(const MsgType &type, bool successful, const QString &error, const QString &uid)
+bool MsgHandler::tryChangePassword(QJsonObject &obj)
+{
+    if (obj["type"] == "forgot_password")
+    {
+        if (base->readUserFromBaseWithRelations(obj["data"].toObject()["login"].toString()))
+        {
+            obj = generateAnswer(MsgType::FORGOTTEN_PASSWORD, true, "", "0", base->getUserQuestion(questions),
+                                 base->getUserLogin());
+        }
+        else
+            obj = generateAnswer(MsgType::FORGOTTEN_PASSWORD, false, "Такого логина нет в базе данных!", "0", "", "");
+        {
+        }
+    }
+    if (obj["type"] == "secret_question")
+    {
+        if (base->readUserFromBaseWithRelations(obj["data"].toObject()["login"].toString()))
+        {
+            if (base->getUseranswer() == obj["data"].toObject()["answer"].toString())
+            {
+                obj = generateAnswer(MsgType::SECRET_QUESTION, true, "", "0", "", base->getUserLogin());
+            }
+            else
+            {
+                obj = generateAnswer(MsgType::SECRET_QUESTION, false, "Ответ на вопрос неверен!", "0", "",
+                                     base->getUserLogin());
+            }
+        }
+        else
+        {
+            obj = generateAnswer(MsgType::SECRET_QUESTION, false, "Такого логина нет в базе данных!", "0", "", "");
+        }
+    }
+    if (obj["type"] == "change_password")
+    {
+        if (base->readUserFromBaseWithRelations(obj["data"].toObject()["login"].toString()))
+        {
+            if (base->updatePassword(obj["data"].toObject()["new_password"].toString()))
+            {
+                obj = generateAnswer(MsgType::CHANGE_PASSWORD, true, "", "0", "", base->getUserLogin());
+            }
+            else
+            {
+                obj = generateAnswer(MsgType::CHANGE_PASSWORD, false, "Не получилось обновить пароль!", "0", "",
+                                     base->getUserLogin());
+            }
+        }
+        else
+        {
+            obj = generateAnswer(MsgType::CHANGE_PASSWORD, false, "Такого логина нет в базе данных!", "0", "",
+                                 base->getUserLogin());
+        }
+    }
+    return false;
+}
+
+QJsonObject MsgHandler::generateAnswer(const MsgType &type, bool successful, const QString &error, const QString &uid,
+                                       QString question, QString login)
 {
 
     QJsonObject answer;
@@ -155,6 +212,34 @@ QJsonObject MsgHandler::generateAnswer(const MsgType &type, bool successful, con
         answer["id"] = "0";
         answer["type"] = "registration";
 
+        data["successful"] = successful;
+        data["error"] = error;
+        answer["data"] = data;
+        break;
+    }
+    case FORGOTTEN_PASSWORD: {
+        answer["id"] = "0";
+        answer["type"] = "forgot_password";
+        data["login"] = login;
+        data["successful"] = successful;
+        data["error"] = error;
+        data["question"] = question;
+        answer["data"] = data;
+        break;
+    }
+    case SECRET_QUESTION: {
+        answer["id"] = "0";
+        answer["type"] = "secret_question";
+        data["login"] = login;
+        data["successful"] = successful;
+        data["error"] = error;
+        answer["data"] = data;
+        break;
+    }
+    case CHANGE_PASSWORD: {
+        answer["id"] = "0";
+        answer["type"] = "change_password";
+        data["login"] = login;
         data["successful"] = successful;
         data["error"] = error;
         answer["data"] = data;
