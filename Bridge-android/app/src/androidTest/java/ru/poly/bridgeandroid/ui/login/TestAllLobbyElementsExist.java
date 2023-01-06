@@ -49,7 +49,7 @@ public class TestAllLobbyElementsExist {
                                                 0)),
                                 1),
                         isDisplayed()));
-        appCompatEditText.perform(replaceText("testBot"), closeSoftKeyboard());
+        appCompatEditText.perform(replaceText("testBot1"), closeSoftKeyboard());
 
         ViewInteraction appCompatEditText2 = onView(
                 allOf(withId(R.id.password),
@@ -60,7 +60,7 @@ public class TestAllLobbyElementsExist {
                                                 0)),
                                 2),
                         isDisplayed()));
-        appCompatEditText2.perform(replaceText("testBot"), closeSoftKeyboard());
+        appCompatEditText2.perform(replaceText("testBot1"), closeSoftKeyboard());
 
         ViewInteraction appCompatButton = onView(
                 allOf(withId(R.id.login),
@@ -94,23 +94,11 @@ public class TestAllLobbyElementsExist {
         appCompatButton3.perform(click());
 
         ViewInteraction textView = onView(
-                allOf(withId(R.id.textView3),
+                allOf(withId(R.id.textView3), withText("Выбор игроков"),
                         withParent(allOf(withId(R.id.registration_container),
                                 withParent(withId(android.R.id.content)))),
                         isDisplayed()));
         textView.check(matches(isDisplayed()));
-
-        ViewInteraction textView2 = onView(
-                allOf(withId(R.id.tvSwitchPlayers),
-                        withParent(withParent(withId(R.id.relativeLayout))),
-                        isDisplayed()));
-        textView2.check(matches(isDisplayed()));
-
-        ViewInteraction textView3 = onView(
-                allOf(withId(R.id.tvSwitchFriends),
-                        withParent(withParent(withId(R.id.relativeLayout))),
-                        isDisplayed()));
-        textView3.check(matches(isDisplayed()));
 
         ViewInteraction listView = onView(
                 allOf(withId(R.id.listView),
@@ -118,6 +106,18 @@ public class TestAllLobbyElementsExist {
                                 withParent(withId(android.R.id.content)))),
                         isDisplayed()));
         listView.check(matches(isDisplayed()));
+
+        ViewInteraction textView2 = onView(
+                allOf(withId(R.id.tvSwitchFriends), withText("Друзья"),
+                        withParent(withParent(withId(R.id.relativeLayout))),
+                        isDisplayed()));
+        textView2.check(matches(isDisplayed()));
+
+        ViewInteraction textView3 = onView(
+                allOf(withId(R.id.tvSwitchPlayers), withText("Игроки"),
+                        withParent(withParent(withId(R.id.relativeLayout))),
+                        isDisplayed()));
+        textView3.check(matches(isDisplayed()));
 
         ViewInteraction button = onView(
                 allOf(withId(R.id.start_game),
