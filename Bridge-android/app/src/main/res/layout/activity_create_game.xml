@@ -17,7 +17,7 @@
         android:paddingTop="16dp"
         android:paddingBottom="20dp"
         android:text="Выбор игроков"
-        android:textColor="@color/title_text_color"
+        android:textColor="@color/white"
         android:textSize="30dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"

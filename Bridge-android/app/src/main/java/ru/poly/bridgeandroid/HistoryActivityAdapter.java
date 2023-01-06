@@ -83,19 +83,19 @@ public class HistoryActivityAdapter extends RecyclerView.Adapter<HistoryActivity
             owner = "Создатель лобби: " + historyElement.getOwnerAlias();
         }
         Spannable spannableOwner = new SpannableString(owner);
-        spannableOwner.setSpan(new ForegroundColorSpan(ResourcesCompat.getColor(context.getResources(),
-                R.color.yellow, null)), 17, owner.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+//        spannableOwner.setSpan(new ForegroundColorSpan(ResourcesCompat.getColor(context.getResources(),
+//                R.color.yellow, null)), 17, owner.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         holder.lobbyOwner.setText(spannableOwner, TextView.BufferType.SPANNABLE);
 
         String winnerTeam;
         if (historyElement.getWinnerTeam() == 0) {
-            winnerTeam = "Выиграла команда: Север-Юг";
+            winnerTeam = "Команда-победитель: Север-Юг";
         } else {
-            winnerTeam = "Выиграла команда: Запад-Восток";
+            winnerTeam = "Команда-победитель: Запад-Восток";
         }
         Spannable spannableWinnerTeam = new SpannableString(winnerTeam);
-        spannableWinnerTeam.setSpan(new ForegroundColorSpan(ResourcesCompat.getColor(context.getResources(),
-                R.color.yellow, null)), 18, winnerTeam.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+//        spannableWinnerTeam.setSpan(new ForegroundColorSpan(ResourcesCompat.getColor(context.getResources(),
+//                R.color.yellow, null)), 18, winnerTeam.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         holder.winnerTeam.setText(spannableWinnerTeam, TextView.BufferType.SPANNABLE);
 
         String team1 = "Север-Юг: " + historyElement.getTotalScoreNorthSouth();

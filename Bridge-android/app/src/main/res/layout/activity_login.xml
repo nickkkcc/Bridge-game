@@ -16,7 +16,7 @@
         android:background="@drawable/text_background"
         android:gravity="center"
         android:text="@string/login_title"
-        android:textColor="@color/title_text_color"
+        android:textColor="@color/darker_white"
         android:textSize="30dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

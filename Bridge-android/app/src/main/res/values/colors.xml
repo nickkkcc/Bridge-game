@@ -11,8 +11,10 @@
     <color name="green">#00FF00</color>
     <color name="black">#cc121212</color>
     <color name="black_navigation_bar">#000000</color>
+    <color name="black_background">#f8121212</color>
     <color name="white">#eeeeee</color>
-    <color name="title_text_color">#bbbbbb</color>
+    <color name="darker_white">#bbbbbb</color>
+    <color name="_white_divider">#999999</color>
     <color name="black_overlay">#66000000</color>
     <color name="black_overlay_cards">#DF000000</color>
     <color name="shadow">#A8A8A8</color>

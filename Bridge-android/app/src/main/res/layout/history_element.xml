@@ -7,18 +7,21 @@
     android:layout_height="wrap_content"
     android:background="@drawable/table_background"
     android:orientation="vertical"
-    android:layout_marginTop="16dp"
-    android:layout_marginBottom="16dp">
+    android:paddingBottom="22dp"
+    android:layout_marginBottom="32dp">
 
     <TextView
         android:id="@+id/history_element_time"
         android:layout_width="match_parent"
-        android:layout_height="20dp"
+        android:layout_height="wrap_content"
         android:gravity="center"
+        android:textStyle="bold"
+        android:paddingLeft="8dp"
+        android:layout_marginTop="32dp"
         android:text="01.01.2023 12:00 - 01.01.2023 12:20"
         android:textColor="@color/white"
         app:autoSizeTextType="uniform"
-        app:autoSizeMinTextSize="12sp"
+        app:autoSizeMinTextSize="18sp"
         app:autoSizeMaxTextSize="100sp"
         app:autoSizeStepGranularity="2sp"/>
 
@@ -26,11 +29,13 @@
         android:id="@+id/history_element_owner"
         android:layout_width="match_parent"
         android:layout_height="20dp"
-        android:gravity="center"
+        android:paddingLeft="12dp"
+        android:layout_marginTop="22dp"
+        android:gravity="left"
         android:text="Создатель лобби: alias"
         android:textColor="@color/white"
         app:autoSizeTextType="uniform"
-        app:autoSizeMinTextSize="12sp"
+        app:autoSizeMinTextSize="14sp"
         app:autoSizeMaxTextSize="100sp"
         app:autoSizeStepGranularity="2sp"/>
 
@@ -38,21 +43,28 @@
         android:id="@+id/history_element_winner_team"
         android:layout_width="match_parent"
         android:layout_height="20dp"
-        android:gravity="center"
-        android:text="Выиграла команда: Север-Юг"
+        android:paddingLeft="12dp"
+        android:layout_marginTop="16dp"
+        android:gravity="left"
+        android:text="Команда-победитель: Север-Юг"
         android:textColor="@color/white"
         app:autoSizeTextType="uniform"
-        app:autoSizeMinTextSize="12sp"
+        app:autoSizeMinTextSize="14sp"
         app:autoSizeMaxTextSize="100sp"
         app:autoSizeStepGranularity="2sp"/>
 
     <TableLayout
         android:layout_width="match_parent"
         android:layout_height="180dp"
+        android:layout_marginTop="22dp"
+        android:showDividers="middle"
+        android:divider="@drawable/table_divider"
         android:stretchColumns="*">
 
         <TableRow
             android:layout_width="match_parent"
+            android:divider="@drawable/table_divider"
+            android:showDividers="middle"
             android:layout_height="20dp">
 
             <TextView
@@ -64,7 +76,7 @@
                 android:text="Север-Юг: 500"
                 android:textColor="@color/white"
                 app:autoSizeTextType="uniform"
-                app:autoSizeMinTextSize="12sp"
+                app:autoSizeMinTextSize="14sp"
                 app:autoSizeMaxTextSize="100sp"
                 app:autoSizeStepGranularity="2sp"
                 android:padding="10dp"/>
@@ -78,7 +90,7 @@
                 android:text="Запад-Восток: 600"
                 android:textColor="@color/white"
                 app:autoSizeTextType="uniform"
-                app:autoSizeMinTextSize="12sp"
+                app:autoSizeMinTextSize="14sp"
                 app:autoSizeMaxTextSize="100sp"
                 app:autoSizeStepGranularity="2sp"
                 android:padding="10dp"/>
@@ -87,6 +99,8 @@
         <TableRow
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:divider="@drawable/table_divider"
+            android:showDividers="middle"
             android:layout_weight="1">
 
             <Button
@@ -123,6 +137,8 @@
         <TableRow
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:divider="@drawable/table_divider"
+            android:showDividers="middle"
             android:layout_weight="1">
 
             <Button

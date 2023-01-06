@@ -15,7 +15,7 @@
         android:background="@drawable/text_background"
         android:gravity="center"
         android:text="@string/game_title"
-        android:textColor="@color/title_text_color"
+        android:textColor="@color/darker_white"
         android:textSize="@dimen/title_text_size"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -30,7 +30,6 @@
         android:background="@drawable/button"
         android:textAllCaps="false"
         android:textSize="@dimen/text_size"
-
         android:layout_marginBottom="24dp"
         android:textColor="@color/white"
         app:layout_constraintBottom_toTopOf="@+id/join_button"
