@@ -49,7 +49,7 @@ public class TestAllMainMenuElementsExist {
                                                 0)),
                                 1),
                         isDisplayed()));
-        appCompatEditText.perform(replaceText("testBot"), closeSoftKeyboard());
+        appCompatEditText.perform(replaceText("testBot1"), closeSoftKeyboard());
 
         ViewInteraction appCompatEditText2 = onView(
                 allOf(withId(R.id.password),
@@ -60,7 +60,7 @@ public class TestAllMainMenuElementsExist {
                                                 0)),
                                 2),
                         isDisplayed()));
-        appCompatEditText2.perform(replaceText("testBot"), closeSoftKeyboard());
+        appCompatEditText2.perform(replaceText("testBot1"), closeSoftKeyboard());
 
         ViewInteraction appCompatButton = onView(
                 allOf(withId(R.id.login),
