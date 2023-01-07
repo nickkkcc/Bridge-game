@@ -34,19 +34,6 @@ public class HistoryActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history);
 
-        ActivityManager am = null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-            am = (ActivityManager)this.getSystemService(Context.ACTIVITY_SERVICE);
-        }
-
-        int sizeStack =  am.getRunningTasks(2).size();
-
-        for (int i = 0; i < sizeStack; i++) {
-
-            int numActivities = am.getRunningTasks(2).get(i).numActivities;
-            Log.d("HistoryActivity", String.valueOf(numActivities));
-        }
-
         final TextView allGames = findViewById(R.id.history_all_games);
         final TextView winGames = findViewById(R.id.history_win_games);
         final TextView winRate = findViewById(R.id.history_win_rate);

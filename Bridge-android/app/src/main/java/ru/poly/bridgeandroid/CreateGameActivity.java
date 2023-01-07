@@ -73,19 +73,6 @@ public class CreateGameActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_game);
 
-        ActivityManager am = null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-            am = (ActivityManager)this.getSystemService(Context.ACTIVITY_SERVICE);
-        }
-
-        int sizeStack =  am.getRunningTasks(2).size();
-
-        for (int i = 0; i < sizeStack; i++) {
-
-            int numActivities = am.getRunningTasks(2).get(i).numActivities;
-            Log.d("CreateGameActivity", String.valueOf(numActivities));
-        }
-
         sharedPreferences = getSharedPreferences(PREFERENCE, MODE_PRIVATE);
         token = sharedPreferences.getString(TOKEN, "");
         lobbyId = sharedPreferences.getString(LOBBY, "");

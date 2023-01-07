@@ -55,19 +55,6 @@ public class ChoosePlaceActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choose_place);
 
-        ActivityManager am = null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-            am = (ActivityManager)this.getSystemService(Context.ACTIVITY_SERVICE);
-        }
-
-        int sizeStack =  am.getRunningTasks(2).size();
-
-        for (int i = 0; i < sizeStack; i++) {
-
-            int numActivities = am.getRunningTasks(2).get(i).numActivities;
-            Log.d("ChoosePlaceActivity", String.valueOf(numActivities));
-        }
-
         firstTeamButton = findViewById(R.id.NS);
         secondTeamButton = findViewById(R.id.EW);
 

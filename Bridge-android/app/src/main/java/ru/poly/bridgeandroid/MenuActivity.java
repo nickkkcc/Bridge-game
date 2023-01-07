@@ -73,19 +73,6 @@ public class MenuActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu);
 
-        ActivityManager am = null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-            am = (ActivityManager)this.getSystemService(Context.ACTIVITY_SERVICE);
-        }
-
-        int sizeStack =  am.getRunningTasks(2).size();
-
-        for (int i = 0; i < sizeStack; i++) {
-
-            int numActivities = am.getRunningTasks(2).get(i).numActivities;
-            Log.d("MenuActivity", String.valueOf(numActivities));
-        }
-
         final Button createButton = findViewById(R.id.create_button);
         final Button joinButton = findViewById(R.id.join_button);
         final Button previousGames = findViewById(R.id.previous_games);
