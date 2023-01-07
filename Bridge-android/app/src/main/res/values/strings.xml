@@ -71,8 +71,8 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="forgot_password">Восстановление пароля</string>
-    <string name="get_secret_question">Запросить секретный вопрос</string>
+    <string name="get_secret_question">Сменить пароль</string>
     <string name="secret_question_text">Введите ответ на секретный вопрос, который Вы указывали при регистрации.</string>
-    <string name="reset_password">Сбросить пароль</string>
+    <string name="reset_password">Подтвердить</string>
     <string name="change_password">Сменить пароль</string>
 </resources>

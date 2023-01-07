@@ -13,7 +13,6 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:layout_marginBottom="28dp"
         android:background="@drawable/text_background"
         android:stretchColumns="*">
 
@@ -115,6 +114,7 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/history_recycler_view"
         android:layout_width="match_parent"
+        android:layout_marginTop="20dp"
         android:layout_height="0dp"
         android:layout_weight="7"/>
 </LinearLayout>
