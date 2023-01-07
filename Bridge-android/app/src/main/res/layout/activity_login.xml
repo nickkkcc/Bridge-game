@@ -116,9 +116,10 @@
         android:text="Забыли пароль?"
         android:textColor="@color/darker_white"
         android:textSize="18sp"
-        app:layout_constraintBottom_toTopOf="@+id/login"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/password"
         app:layout_constraintStart_toStartOf="@+id/password"
-        app:layout_constraintTop_toBottomOf="@+id/password" />
+        app:layout_constraintTop_toBottomOf="@+id/registration"
+        app:layout_constraintVertical_bias="0.26999998" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

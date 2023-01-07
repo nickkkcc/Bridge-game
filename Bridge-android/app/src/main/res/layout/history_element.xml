@@ -17,7 +17,7 @@
         android:gravity="center"
         android:textStyle="bold"
         android:paddingLeft="8dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="26dp"
         android:text="01.01.2023 12:00 - 01.01.2023 12:20"
         android:textColor="@color/white"
         app:autoSizeTextType="uniform"
