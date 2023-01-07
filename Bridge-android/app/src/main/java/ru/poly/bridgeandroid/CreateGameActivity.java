@@ -4,9 +4,13 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
 
+import android.app.ActivityManager;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +26,7 @@ import com.google.gson.JsonObject;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -50,6 +55,8 @@ public class CreateGameActivity extends AppCompatActivity {
     private static final String LOGIN = "login";
     private static final String PREFERENCE = "preference";
     private Gson gson;
+    private String token;
+    private String lobbyId;
     private List<Player> friends;
     private List<Player> players;
     private ListView listView;
@@ -66,9 +73,22 @@ public class CreateGameActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_game);
 
+        ActivityManager am = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            am = (ActivityManager)this.getSystemService(Context.ACTIVITY_SERVICE);
+        }
+
+        int sizeStack =  am.getRunningTasks(2).size();
+
+        for (int i = 0; i < sizeStack; i++) {
+
+            int numActivities = am.getRunningTasks(2).get(i).numActivities;
+            Log.d("CreateGameActivity", String.valueOf(numActivities));
+        }
+
         sharedPreferences = getSharedPreferences(PREFERENCE, MODE_PRIVATE);
-        String token = sharedPreferences.getString(TOKEN, "");
-        String lobbyId = sharedPreferences.getString(LOBBY, "");
+        token = sharedPreferences.getString(TOKEN, "");
+        lobbyId = sharedPreferences.getString(LOBBY, "");
         login = sharedPreferences.getString(LOGIN, "");
 
         Intent myIntent = getIntent();
@@ -214,7 +234,34 @@ public class CreateGameActivity extends AppCompatActivity {
         super.onStop();
     }
 
-    @Subscribe
+    @Override
+    public void onBackPressed() {
+        runOnUiThread(() -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.CustomDialogTheme);
+            builder.setTitle("Выйти из лобби");
+            builder.setMessage("Вы уверены, что хотите выйти из лобби?");
+            View view = LayoutInflater.from(this).inflate(R.layout.fragment_invitation, findViewById(R.id.invite_layout));
+            builder.setView(view);
+            builder.setNegativeButton("Нет", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    // Ничего не делать
+                }
+            });
+            builder.setPositiveButton("Да", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    ExitLobbyToServer exitGame = new ExitLobbyToServer(lobbyId, true);
+                    JsonObject jsonObject = (JsonObject) gson.toJsonTree(exitGame);
+                    Message message = new Message(token, "exit_lobby", jsonObject);
+                    EventBus.getDefault().post(gson.toJson(message));
+                }
+            });
+            AlertDialog dialog = builder.create();
+            dialog.setCanceledOnTouchOutside(false);
+            dialog.show();
+        });
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN_ORDERED)
     public void onMessage(Message message) {
         switch (message.getType()) {
             case "players_count_lobby":

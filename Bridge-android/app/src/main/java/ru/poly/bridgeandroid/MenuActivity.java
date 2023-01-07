@@ -6,6 +6,9 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.app.ActivityManager;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -62,10 +65,26 @@ public class MenuActivity extends AppCompatActivity {
     private Intent gameIntent;
     private Intent historyIntent;
 
+    private long backPressedTime;
+    private Toast backToast;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu);
+
+        ActivityManager am = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            am = (ActivityManager)this.getSystemService(Context.ACTIVITY_SERVICE);
+        }
+
+        int sizeStack =  am.getRunningTasks(2).size();
+
+        for (int i = 0; i < sizeStack; i++) {
+
+            int numActivities = am.getRunningTasks(2).get(i).numActivities;
+            Log.d("MenuActivity", String.valueOf(numActivities));
+        }
 
         final Button createButton = findViewById(R.id.create_button);
         final Button joinButton = findViewById(R.id.join_button);
@@ -138,6 +157,19 @@ public class MenuActivity extends AppCompatActivity {
     public void onStop() {
         EventBus.getDefault().unregister(this);
         super.onStop();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (backPressedTime + 2000 > System.currentTimeMillis()) {
+            backToast.cancel();
+            super.onBackPressed();
+            return;
+        } else {
+            backToast = Toast.makeText(getBaseContext(), "Нажмите ещё раз, чтобы выйти", Toast.LENGTH_SHORT);
+            backToast.show();
+        }
+        backPressedTime = System.currentTimeMillis();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN_ORDERED)

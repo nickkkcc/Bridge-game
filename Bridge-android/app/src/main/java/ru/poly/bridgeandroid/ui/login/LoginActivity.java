@@ -50,6 +50,9 @@ public class LoginActivity extends AppCompatActivity {
     private boolean isStartGame;
     private Intent gameIntent;
 
+    private long backPressedTime;
+    private Toast backToast;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -156,6 +159,19 @@ public class LoginActivity extends AppCompatActivity {
         super.onStop();
     }
 
+    @Override
+    public void onBackPressed() {
+        if (backPressedTime + 2000 > System.currentTimeMillis()) {
+            backToast.cancel();
+            super.onBackPressed();
+            return;
+        } else {
+            backToast = Toast.makeText(getBaseContext(), "Нажмите ещё раз, чтобы выйти", Toast.LENGTH_SHORT);
+            backToast.show();
+        }
+        backPressedTime = System.currentTimeMillis();
+    }
+
     @Subscribe(threadMode = ThreadMode.MAIN_ORDERED)
     public void onMessage(Message message) {
         runOnUiThread(() -> loadingProgressBar.setVisibility(View.GONE));
@@ -166,7 +182,6 @@ public class LoginActivity extends AppCompatActivity {
                 Intent intent = new Intent(LoginActivity.this, RegistrationActivity.class);
                 intent.putParcelableArrayListExtra("questions", questions.getQuestions());
                 startActivity(intent);
-                finish();
                 break;
             case "login":
                 runOnUiThread(() -> loadingProgressBar.setVisibility(View.GONE));

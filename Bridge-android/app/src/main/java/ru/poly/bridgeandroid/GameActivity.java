@@ -1,5 +1,7 @@
 package ru.poly.bridgeandroid;
 
+import android.app.ActivityManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -87,6 +89,7 @@ public class GameActivity extends AppCompatActivity {
     private boolean notifyMoveTurn;
     private boolean isBiddingPhase;
     private boolean isMatchEnded;
+    private boolean isExit;
     private int tricksToWin;
     private int enemyTricksToWin;
     private int ourTeamIndex;
@@ -141,8 +144,20 @@ public class GameActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_game);
+
+        ActivityManager am = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            am = (ActivityManager)this.getSystemService(Context.ACTIVITY_SERVICE);
+        }
+
+        int sizeStack =  am.getRunningTasks(2).size();
+
+        for (int i = 0; i < sizeStack; i++) {
+
+            int numActivities = am.getRunningTasks(2).get(i).numActivities;
+            Log.d("GameActivity", String.valueOf(numActivities));
+        }
 
         hideSystemBars();
 
@@ -220,6 +235,7 @@ public class GameActivity extends AppCompatActivity {
                         JsonObject jsonObject = (JsonObject) gson.toJsonTree(exitGame);
                         Message message = new Message(token, "exit_lobby", jsonObject);
                         EventBus.getDefault().post(gson.toJson(message));
+                        isExit = true;
                         return true;
                 }
                 return true;
@@ -297,6 +313,34 @@ public class GameActivity extends AppCompatActivity {
         super.onStop();
     }
 
+    @Override
+    public void onBackPressed() {
+        runOnUiThread(() -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.CustomDialogTheme);
+            builder.setTitle("Выйти из игры");
+            builder.setMessage("Вы уверены, что хотите выйти из игры?");
+            View view = LayoutInflater.from(this).inflate(R.layout.fragment_invitation, findViewById(R.id.invite_layout));
+            builder.setView(view);
+            builder.setNegativeButton("Нет", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    // Ничего не делать
+                }
+            });
+            builder.setPositiveButton("Да", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    ExitLobbyToServer exitGame = new ExitLobbyToServer(lobbyId, true);
+                    JsonObject jsonObject = (JsonObject) gson.toJsonTree(exitGame);
+                    Message message = new Message(token, "exit_lobby", jsonObject);
+                    EventBus.getDefault().post(gson.toJson(message));
+                    isExit = true;
+                }
+            });
+            AlertDialog dialog = builder.create();
+            dialog.setCanceledOnTouchOutside(false);
+            dialog.show();
+        });
+    }
+
     @Subscribe(threadMode = ThreadMode.MAIN_ORDERED)
     public void onMessage(Message message) {
         switch (message.getType()) {
@@ -333,14 +377,16 @@ public class GameActivity extends AppCompatActivity {
                     if (isMatchEnded) {
                         showScoresGameEndDialog();
                     } else {
-                        runOnUiThread(() -> {
-                            Toast toast = Toast.makeText(getBaseContext(),
-                                    "Один из игроков покинул игру.", Toast.LENGTH_SHORT);
-                            toast.show();
-                            if (dialog != null) {
-                                dialog.dismiss();
-                            }
-                        });
+                        if (!isExit) {
+                            runOnUiThread(() -> {
+                                Toast toast = Toast.makeText(getBaseContext(),
+                                        "Один из игроков покинул игру.", Toast.LENGTH_SHORT);
+                                toast.show();
+                                if (dialog != null) {
+                                    dialog.dismiss();
+                                }
+                            });
+                        }
 
                         Intent intent = new Intent(GameActivity.this, MenuActivity.class);
                         startActivity(intent);
@@ -454,6 +500,8 @@ public class GameActivity extends AppCompatActivity {
             case PLAY_STOP:
                 runOnUiThread(() -> {
                     AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    View view = LayoutInflater.from(this).inflate(R.layout.fragment_scores, findViewById(R.id.score_layout));
+                    builder.setView(view);
                     builder.setTitle("Потеряно соединение с одним из игроков.");
                     builder.setMessage("Вы можете подождать игрока некоторое время или выйти из игры.");
                     builder.setPositiveButton("Выйти из игры", new DialogInterface.OnClickListener() {
@@ -712,7 +760,7 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void changeLocalScoreTextView(int ourScores, int ourMaxScores,
-                                            int theyScores, int theyMaxScores) {
+                                          int theyScores, int theyMaxScores) {
         String scoreText = "Мы: " + ourScores + "/" + ourMaxScores + "\nОни: " +
                 theyScores + "/" + theyMaxScores;
         runOnUiThread(() -> {

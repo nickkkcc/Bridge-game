@@ -2,9 +2,12 @@ package ru.poly.bridgeandroid;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ActivityManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -20,6 +23,7 @@ import java.util.ArrayList;
 import ru.poly.bridgeandroid.model.menu.AcceptSelectTeamToClient;
 import ru.poly.bridgeandroid.model.Message;
 import ru.poly.bridgeandroid.model.menu.ExitLobbyToClient;
+import ru.poly.bridgeandroid.model.menu.ExitLobbyToServer;
 import ru.poly.bridgeandroid.model.menu.Player;
 import ru.poly.bridgeandroid.model.menu.PlayersCountLobbyToClient;
 import ru.poly.bridgeandroid.model.menu.PlayersOnlineToClient;
@@ -33,6 +37,8 @@ public class ChoosePlaceActivity extends AppCompatActivity {
     private static final String LOBBY = "lobby";
     private static final String PREFERENCE = "preference";
     private Gson gson;
+    private String token;
+    private String lobbyId;
     private boolean firstTeam;
     private boolean secondTeam;
     private boolean isAdmin;
@@ -49,12 +55,25 @@ public class ChoosePlaceActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choose_place);
 
+        ActivityManager am = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            am = (ActivityManager)this.getSystemService(Context.ACTIVITY_SERVICE);
+        }
+
+        int sizeStack =  am.getRunningTasks(2).size();
+
+        for (int i = 0; i < sizeStack; i++) {
+
+            int numActivities = am.getRunningTasks(2).get(i).numActivities;
+            Log.d("ChoosePlaceActivity", String.valueOf(numActivities));
+        }
+
         firstTeamButton = findViewById(R.id.NS);
         secondTeamButton = findViewById(R.id.EW);
 
         sharedPreferences = getSharedPreferences(PREFERENCE, MODE_PRIVATE);
-        String token = sharedPreferences.getString(TOKEN, "");
-        String lobbyId = sharedPreferences.getString(LOBBY, "");
+        token = sharedPreferences.getString(TOKEN, "");
+        lobbyId = sharedPreferences.getString(LOBBY, "");
 
         Intent myIntent = getIntent();
         firstTeam = myIntent.getBooleanExtra("firstTeam", true);
@@ -114,6 +133,17 @@ public class ChoosePlaceActivity extends AppCompatActivity {
     public void onStop() {
         EventBus.getDefault().unregister(this);
         super.onStop();
+    }
+
+    @Override
+    public void onBackPressed() {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.remove(LOBBY);
+        editor.apply();
+
+        Intent intent = new Intent(ChoosePlaceActivity.this, MenuActivity.class);
+        startActivity(intent);
+        finish();
     }
 
     @Subscribe

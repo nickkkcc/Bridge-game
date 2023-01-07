@@ -1,7 +1,11 @@
 package ru.poly.bridgeandroid;
 
+import android.app.ActivityManager;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,6 +33,19 @@ public class HistoryActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history);
+
+        ActivityManager am = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            am = (ActivityManager)this.getSystemService(Context.ACTIVITY_SERVICE);
+        }
+
+        int sizeStack =  am.getRunningTasks(2).size();
+
+        for (int i = 0; i < sizeStack; i++) {
+
+            int numActivities = am.getRunningTasks(2).get(i).numActivities;
+            Log.d("HistoryActivity", String.valueOf(numActivities));
+        }
 
         final TextView allGames = findViewById(R.id.history_all_games);
         final TextView winGames = findViewById(R.id.history_win_games);
