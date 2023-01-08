@@ -36,7 +36,7 @@ import org.junit.runner.RunWith;
 
 import ru.poly.bridgeandroid.R;
 
-@Ignore("Чтобы не насоздавал кучу юзеров")
+
 @LargeTest
 @RunWith(AndroidJUnit4.class)
 public class TestRegistration {
@@ -67,7 +67,7 @@ public class TestRegistration {
                                                 0)),
                                 1),
                         isDisplayed()));
-        appCompatEditText.perform(replaceText("testBot1"), closeSoftKeyboard());
+        appCompatEditText.perform(replaceText("testBot7"), closeSoftKeyboard());
 
         ViewInteraction appCompatEditText2 = onView(
                 allOf(withId(R.id.registration_password),
@@ -78,7 +78,7 @@ public class TestRegistration {
                                                 0)),
                                 2),
                         isDisplayed()));
-        appCompatEditText2.perform(replaceText("testBot1"), closeSoftKeyboard());
+        appCompatEditText2.perform(replaceText("testBot7"), closeSoftKeyboard());
 
         ViewInteraction materialBetterSpinner = onView(
                 allOf(withId(R.id.registration_question_spinner),
