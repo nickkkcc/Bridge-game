@@ -486,8 +486,8 @@ public class GameActivity extends AppCompatActivity {
                 break;
             case PLAY_STOP:
                 runOnUiThread(() -> {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    View view = LayoutInflater.from(this).inflate(R.layout.fragment_scores, findViewById(R.id.score_layout));
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.CustomDialogTheme);
+                    View view = LayoutInflater.from(this).inflate(R.layout.fragment_invitation, findViewById(R.id.invite_layout));
                     builder.setView(view);
                     builder.setTitle("Потеряно соединение с одним из игроков.");
                     builder.setMessage("Вы можете подождать игрока некоторое время или выйти из игры.");
@@ -753,6 +753,7 @@ public class GameActivity extends AppCompatActivity {
         runOnUiThread(() -> {
             localScoreTextView.setVisibility(View.VISIBLE);
             localScoreTextView.setText(scoreText);
+            localScoreTextView.setTextSize(12);
         });
     }
     //ScoreText
@@ -763,6 +764,7 @@ public class GameActivity extends AppCompatActivity {
         runOnUiThread(() -> {
             globalScoreTextView.setVisibility(View.VISIBLE);
             globalScoreTextView.setText(scoreText);
+            globalScoreTextView.setTextSize(12);
         });
     }
 
@@ -785,7 +787,7 @@ public class GameActivity extends AppCompatActivity {
     }
     //Alerts
     private void showScoresDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.CustomDialogTheme);
         View view = LayoutInflater.from(this).inflate(R.layout.fragment_scores, findViewById(R.id.score_layout));
         builder.setView(view);
 

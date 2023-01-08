@@ -342,6 +342,7 @@
             android:layout_weight="1"
             android:textColor="@color/black"
             android:textSize="10sp"
+            android:textStyle="bold"
             android:text="@string/contra"
             app:backgroundTint="@color/yellow"/>
 
@@ -355,6 +356,7 @@
             android:layout_marginRight="10dp"
             android:layout_weight="1"
             android:textSize="10sp"
+            android:textStyle="bold"
             android:textColor="@color/black"
             android:text="@string/recontra"
             app:backgroundTint="@color/orange" />
@@ -369,6 +371,7 @@
             android:layout_marginRight="10dp"
             android:layout_weight="1"
             android:textSize="10sp"
+            android:textStyle="bold"
             android:textColor="@color/black"
             android:text="@string/pass"
             app:backgroundTint="@color/red" />
