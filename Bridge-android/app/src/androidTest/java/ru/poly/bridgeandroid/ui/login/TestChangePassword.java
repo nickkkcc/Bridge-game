@@ -40,7 +40,7 @@ public class TestChangePassword {
 
     @Test
     public void testChangePassword() {
-        ViewInteraction appCompatTextView = onView(
+       ViewInteraction appCompatTextView = onView(
                 allOf(withId(R.id.forgot_password),
                         childAtPosition(
                                 allOf(withId(R.id.container),
