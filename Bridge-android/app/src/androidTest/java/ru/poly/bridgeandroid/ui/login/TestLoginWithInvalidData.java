@@ -49,7 +49,7 @@ public class TestLoginWithInvalidData {
                                                 0)),
                                 1),
                         isDisplayed()));
-        appCompatEditText.perform(replaceText("testBot133"), closeSoftKeyboard());
+        appCompatEditText.perform(replaceText("testUser11"), closeSoftKeyboard());
 
         ViewInteraction appCompatEditText2 = onView(
                 allOf(withId(R.id.password),
@@ -60,7 +60,7 @@ public class TestLoginWithInvalidData {
                                                 0)),
                                 2),
                         isDisplayed()));
-        appCompatEditText2.perform(replaceText("testBot133"), closeSoftKeyboard());
+        appCompatEditText2.perform(replaceText("testUser12"), closeSoftKeyboard());
 
         ViewInteraction appCompatButton = onView(
                 allOf(withId(R.id.login),

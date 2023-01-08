@@ -50,7 +50,7 @@ public class TestLoginWithValidData {
                                                 0)),
                                 1),
                         isDisplayed()));
-        appCompatEditText.perform(replaceText("testBot1"), closeSoftKeyboard());
+        appCompatEditText.perform(replaceText("testUser8"), closeSoftKeyboard());
 
         ViewInteraction appCompatEditText2 = onView(
                 allOf(withId(R.id.password),
@@ -61,7 +61,7 @@ public class TestLoginWithValidData {
                                                 0)),
                                 2),
                         isDisplayed()));
-        appCompatEditText2.perform(replaceText("testBot1"), closeSoftKeyboard());
+        appCompatEditText2.perform(replaceText("testUser8"), closeSoftKeyboard());
 
         ViewInteraction appCompatButton = onView(
                 allOf(withId(R.id.login),
