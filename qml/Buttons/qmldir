@@ -1,0 +1,5 @@
+module Buttons
+BaseButton 1.0 BaseButton.qml
+StartPageButtonGroup 1.0 StartPageButtonGroup.qml
+MainPageButtonGroup 1.0 MainPageButtonGroup.qml
+PrelobbyButtonGroup 1.0 PrelobbyButtonGroup.qml

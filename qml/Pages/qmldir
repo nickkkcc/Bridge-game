@@ -1,0 +1,13 @@
+module Pages
+StartPage 1.0 StartPage.qml
+MainPage 1.0 MainPage.qml
+BaseBackground 1.0 BaseBackground.qml
+MainPageHeader 1.0 MainPageHeader.qml
+LoginPopup 1.0 LoginPopup.qml
+FrgottenPaswordPopup 1.0 ForgottenPaswordPopup.qml
+RegisterPopup.qml 1.0 RegisterPopup.qml
+PopupHeader 1.0 PopupHeader.qml
+PrelobbyPage 1.0 PrelobbyPage.qml
+LobbyPopup 1.0 LobbyPopup.qml
+FindLobbyPopup 1.0 FindLobbyPopup.qml
+GamePage 1.0 GamePage.qml
