@@ -2,6 +2,8 @@ package ru.poly.bridgeandroid.model.game;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.Objects;
+
 import ru.poly.bridgeandroid.enums.BidCall;
 import ru.poly.bridgeandroid.enums.CardSuit;
 import ru.poly.bridgeandroid.enums.PlayerPosition;
@@ -25,6 +27,27 @@ public class Bid {
         this.bidCall = bidCall;
         this.cardSuit = cardSuit;
         this.tricksAbove = tricksAbove;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Bid bid = (Bid) o;
+        return playerPosition == bid.playerPosition &&
+                bidCall == bid.bidCall &&
+                cardSuit == bid.cardSuit &&
+                tricksAbove == bid.tricksAbove;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 31 * hash + playerPosition;
+        hash = 31 * hash + bidCall;
+        hash = 31 * hash + cardSuit;
+        hash = 31 * hash + tricksAbove;
+        return hash;
     }
 
     public PlayerPosition getPlayerPosition() {

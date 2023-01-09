@@ -47,12 +47,14 @@ import ru.poly.bridgeandroid.model.menu.PlayersCountLobbyToClient;
 import ru.poly.bridgeandroid.model.menu.PlayersOnlineToClient;
 import ru.poly.bridgeandroid.model.menu.StartGamePlayersToClient;
 import ru.poly.bridgeandroid.model.menu.StartGamePlayersToServer;
+import ru.poly.bridgeandroid.ui.login.LoginActivity;
 
 public class CreateGameActivity extends AppCompatActivity {
 
     private static final String TOKEN = "token";
     private static final String LOBBY = "lobby";
     private static final String LOGIN = "login";
+    private static final String RESTART = "restart";
     private static final String PREFERENCE = "preference";
     private Gson gson;
     private String token;
@@ -67,6 +69,8 @@ public class CreateGameActivity extends AppCompatActivity {
     private String login;
     private SharedPreferences sharedPreferences;
     private Intent gameIntent;
+
+    private boolean isInactive;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -212,12 +216,22 @@ public class CreateGameActivity extends AppCompatActivity {
     @Override
     public void onStart() {
         super.onStart();
+        if (isInactive) {
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean(RESTART, true);
+            editor.apply();
+
+            Intent intent = new Intent(CreateGameActivity.this, LoginActivity.class);
+            startActivity(intent);
+            finishAffinity();
+        }
         EventBus.getDefault().register(this);
     }
 
     @Override
     public void onStop() {
         EventBus.getDefault().unregister(this);
+        isInactive = true;
         super.onStop();
     }
 

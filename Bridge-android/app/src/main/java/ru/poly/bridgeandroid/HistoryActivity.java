@@ -4,14 +4,18 @@ import android.app.ActivityManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.gson.Gson;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -23,16 +27,25 @@ import ru.poly.bridgeandroid.model.Message;
 import ru.poly.bridgeandroid.model.menu.AddFriendToClient;
 import ru.poly.bridgeandroid.model.menu.HistoryElement;
 import ru.poly.bridgeandroid.model.menu.RequestScoreToClient;
+import ru.poly.bridgeandroid.ui.login.LoginActivity;
 
 public class HistoryActivity extends AppCompatActivity {
 
     private RequestScoreToClient requestScore;
     private List<HistoryElement> historyList;
 
+    private static final String RESTART = "restart";
+    private static final String PREFERENCE = "preference";
+    private SharedPreferences sharedPreferences;
+
+    private boolean isInactive;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history);
+
+        sharedPreferences = getSharedPreferences(PREFERENCE, MODE_PRIVATE);
 
         final TextView allGames = findViewById(R.id.history_all_games);
         final TextView winGames = findViewById(R.id.history_win_games);
@@ -58,12 +71,23 @@ public class HistoryActivity extends AppCompatActivity {
     @Override
     public void onStart() {
         super.onStart();
-        EventBus.getDefault().register(this);
+        if (isInactive) {
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean(RESTART, true);
+            editor.apply();
+
+            Intent intent = new Intent(HistoryActivity.this, LoginActivity.class);
+            startActivity(intent);
+            finishAffinity();
+        } else {
+            EventBus.getDefault().register(this);
+        }
     }
 
     @Override
     public void onStop() {
         EventBus.getDefault().unregister(this);
+        isInactive = true;
         super.onStop();
     }
 

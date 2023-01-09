@@ -85,7 +85,6 @@ public class DrawFragment extends Fragment {
         Bundle bundle = getArguments();
         gameState = bundle.getParcelable("gameState");
         newPlayerPositions = (HashMap<PlayerPosition, Integer>) bundle.getSerializable("newPlayerPositions");
-        System.out.println(newPlayerPositions);
 
         setCardsInvisible();
         updateFragmentUI();
@@ -147,16 +146,23 @@ public class DrawFragment extends Fragment {
             case PLAYER_MOVED:
                 List<Cards> cardsList = gameState.getTricks();
                 List<Card> cards = cardsList.get(cardsList.size() - 1).getCards();
-                if (cards.size() != 4) {
-                    int newCurrentPosition = newPlayerPositions.get(currentPlayerPosition);
-                    int previousPlayerNumber = newCurrentPosition == 0 ? 3 : newCurrentPosition - 1;
-                    setTrickCard(previousPlayerNumber);
-                    rotatePointer(currentPlayerPosition);
+                int newCurrentCardPosition = newPlayerPositions.get(currentPlayerPosition);
+                int previousCardPlayerPosition = newCurrentCardPosition == 0 ? 3 : newCurrentCardPosition - 1;
+                if (cards.size() < 4) {
+                    for (int i = 0; i < cards.size(); i++) {
+                        setTrickCard(previousCardPlayerPosition, i);
+                        newCurrentCardPosition = previousCardPlayerPosition;
+                        previousCardPlayerPosition = newCurrentCardPosition == 0 ? 3 : newCurrentCardPosition - 1;
+                    }
                 } else {
-                    int trickEndNewCurrentPosition = newPlayerPositions.get(currentPlayerPosition);
-                    setTrickCard(trickEndNewCurrentPosition);
-                    rotatePointer(currentPlayerPosition);
+                    for (int i = 0; i < cards.size(); i++) {
+                        setTrickCard(newCurrentCardPosition, i);
+                        newCurrentCardPosition = previousCardPlayerPosition;
+                        previousCardPlayerPosition = newCurrentCardPosition == 0 ? 3 : newCurrentCardPosition - 1;
+                    }
                 }
+
+                rotatePointer(currentPlayerPosition);
                 break;
             case TRICK_END:
                 break;
@@ -200,10 +206,37 @@ public class DrawFragment extends Fragment {
         }
     }
 
+    private void setTrickCard(int clientPlayerPosition, int cardIndex) {
+        switch (clientPlayerPosition) {
+            case 0:
+                playerCardImageView.setVisibility(View.VISIBLE);
+                playerCardImageView.setImageResource(getCardDrawableId(getTricksCard(cardIndex)));
+                break;
+            case 1:
+                enemyLeftCardImageView.setVisibility(View.VISIBLE);
+                enemyLeftCardImageView.setImageResource(getCardDrawableId(getTricksCard(cardIndex)));
+                break;
+            case 2:
+                teammateCardImageView.setVisibility(View.VISIBLE);
+                teammateCardImageView.setImageResource(getCardDrawableId(getTricksCard(cardIndex)));
+                break;
+            case 3:
+                enemyRightCardImageView.setVisibility(View.VISIBLE);
+                enemyRightCardImageView.setImageResource(getCardDrawableId(getTricksCard(cardIndex)));
+                break;
+        }
+    }
+
     private Card getLastTricksCard() {
         List<Cards> cardsList = gameState.getTricks();
         List<Card> cards = cardsList.get(cardsList.size() - 1).getCards();
         return cards.get(cards.size() - 1);
+    }
+
+    private Card getTricksCard(int index) {
+        List<Cards> cardsList = gameState.getTricks();
+        List<Card> cards = cardsList.get(cardsList.size() - 1).getCards();
+        return cards.get(cards.size() - 1 - index);
     }
 
     private int getCardDrawableId(Card card) {

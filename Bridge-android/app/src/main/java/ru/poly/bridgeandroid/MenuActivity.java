@@ -53,6 +53,7 @@ public class MenuActivity extends AppCompatActivity {
     private static final String TOKEN = "token";
     private static final String LOBBY = "lobby";
     private static final String LOGIN = "login";
+    private static final String RESTART = "restart";
     private static final String PREFERENCE = "preference";
     private String token;
     private String login;
@@ -67,6 +68,9 @@ public class MenuActivity extends AppCompatActivity {
 
     private long backPressedTime;
     private Toast backToast;
+
+    private boolean isInactive;
+    private boolean isInStack;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,10 +129,13 @@ public class MenuActivity extends AppCompatActivity {
         exitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putString(LOGIN, "");
+                editor.apply();
+
                 Intent intent = new Intent(MenuActivity.this, LoginActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
-                finish();
                 Runtime.getRuntime().exit(0);
             }
         });
@@ -137,12 +144,25 @@ public class MenuActivity extends AppCompatActivity {
     @Override
     public void onStart() {
         super.onStart();
-        EventBus.getDefault().register(this);
+        if (isInactive) {
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean(RESTART, true);
+            editor.apply();
+
+            Intent intent = new Intent(MenuActivity.this, LoginActivity.class);
+            startActivity(intent);
+            finishAffinity();
+        } else {
+            EventBus.getDefault().register(this);
+        }
     }
 
     @Override
     public void onStop() {
         EventBus.getDefault().unregister(this);
+        if (!isInStack) {
+            isInactive = true;
+        }
         super.onStop();
     }
 
@@ -267,41 +287,6 @@ public class MenuActivity extends AppCompatActivity {
                 }
                 switchLoadingVisibility();
                 break;
-            case "update_game_state":
-                UpdateGameState updateGameState = message.getData(UpdateGameState.class);
-                PlayerGameState gameState = updateGameState.getGameState();
-                if (gameState.getGameEvent().equals(GameEvent.PLAY_CONTINUES)) {
-                    isStartGame = true;
-                    runOnUiThread(() -> {
-                        Toast toast = Toast.makeText(getBaseContext(), "Игра продолжается.", Toast.LENGTH_SHORT);
-                        toast.show();
-                    });
-                    return;
-                }
-                if (!isStartGame) {
-                    runOnUiThread(() -> {
-                        Toast toast = Toast.makeText(getBaseContext(), "update_game_state error", Toast.LENGTH_SHORT);
-                        toast.show();
-                    });
-                }
-                gameIntent = new Intent(MenuActivity.this, GameActivity.class);
-                gameIntent.putExtra("gameState", gameState);
-                if (!gameState.getPlayerTurn().equals(gameState.getPlayerPositionForLogin(login))) {
-                    startActivity(gameIntent);
-                    finish();
-                }
-                break;
-            case "notify_bid_turn":
-                if (!isStartGame) {
-                    runOnUiThread(() -> {
-                        Toast toast = Toast.makeText(getBaseContext(), "notify_bid_turn error", Toast.LENGTH_SHORT);
-                        toast.show();
-                    });
-                }
-                gameIntent.putExtra("notifyBidTurn", true);
-                startActivity(gameIntent);
-                finish();
-                break;
             case "request_score":
                 RequestScoreToClient requestScore = message.getData(RequestScoreToClient.class);
                 historyIntent = new Intent(MenuActivity.this, HistoryActivity.class);
@@ -310,6 +295,7 @@ public class MenuActivity extends AppCompatActivity {
             case "request_history_list":
                 RequestHistoryToClient requestHistory = message.getData(RequestHistoryToClient.class);
                 historyIntent.putParcelableArrayListExtra("historyList", requestHistory.getHistoryList());
+                isInStack = true;
                 startActivity(historyIntent);
                 break;
             default:

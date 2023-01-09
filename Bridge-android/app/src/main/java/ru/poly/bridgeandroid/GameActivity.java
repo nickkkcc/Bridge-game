@@ -1,16 +1,14 @@
 package ru.poly.bridgeandroid;
 
-import android.app.ActivityManager;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -36,39 +34,41 @@ import androidx.fragment.app.FragmentTransaction;
 import com.google.android.material.navigation.NavigationView;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.StringJoiner;
 
-import ru.poly.bridgeandroid.enums.BidCall;
 import ru.poly.bridgeandroid.enums.CardSuit;
 import ru.poly.bridgeandroid.enums.GamePhase;
 import ru.poly.bridgeandroid.enums.PlayerPosition;
 import ru.poly.bridgeandroid.model.Message;
 import ru.poly.bridgeandroid.model.game.Bid;
-import ru.poly.bridgeandroid.model.game.BidSelected;
 import ru.poly.bridgeandroid.model.game.Card;
 import ru.poly.bridgeandroid.model.game.MoveSelected;
 import ru.poly.bridgeandroid.model.game.PlayerGameState;
 import ru.poly.bridgeandroid.model.game.UpdateGameState;
-import ru.poly.bridgeandroid.model.menu.AcceptInvitePlayersToServer;
 import ru.poly.bridgeandroid.model.menu.ExitLobbyToClient;
 import ru.poly.bridgeandroid.model.menu.ExitLobbyToServer;
+import ru.poly.bridgeandroid.ui.login.LoginActivity;
 
 public class GameActivity extends AppCompatActivity {
 
     private static final String TOKEN = "token";
     private static final String LOBBY = "lobby";
     private static final String LOGIN = "login";
+    private static final String LAST_BID = "lastBid";
+    private static final String LAST_BIDS = "lastBids";
+    private static final String RESTART_GAME = "restartGame";
     private static final String PREFERENCE = "preference";
 
     private static final int NORTH_SOUTH_ROWS_COUNT = 2;
@@ -87,7 +87,6 @@ public class GameActivity extends AppCompatActivity {
     private PlayerPosition mainPlayerPosition;
     private boolean notifyBidTurn;
     private boolean notifyMoveTurn;
-    private boolean isBiddingPhase;
     private boolean isMatchEnded;
     private boolean isExit;
     private int tricksToWin;
@@ -106,11 +105,18 @@ public class GameActivity extends AppCompatActivity {
     private ImageView contractBidImageView;
     private TextView localScoreTextView;
     private TextView globalScoreTextView;
+    private Map<Integer, LinearLayout> playersBackground = new HashMap<>(4);
+    private HashMap<Integer, String> lastBids = new HashMap<>(4);
 
     private List<Card> playerCards = new ArrayList<>(13);
     private List<Card> teammateCards = new ArrayList<>(13);
 
     AlertDialog dialog;
+
+    private boolean isInactive;
+    private boolean isRestartGame;
+
+    private Bid lastBid = new Bid(0, 0, 0, 0);
 
     private final Map<Integer, String> suitDrawableNames = new HashMap<Integer, String>() {{
         put(0, "c");
@@ -152,13 +158,16 @@ public class GameActivity extends AppCompatActivity {
         token = sharedPreferences.getString(TOKEN, "");
         lobbyId = sharedPreferences.getString(LOBBY, "");
         login = sharedPreferences.getString(LOGIN, "");
+        String lastBidString = sharedPreferences.getString(LAST_BID, "");
+        String lastBidsString = sharedPreferences.getString(LAST_BIDS, "");
 
         gson = new Gson();
 
         Intent myIntent = getIntent();
         gameState = myIntent.getParcelableExtra("gameState");
         notifyBidTurn = myIntent.getBooleanExtra("notifyBidTurn", false);
-        isBiddingPhase = true;
+        notifyMoveTurn = myIntent.getBooleanExtra("notifyMoveTurn", false);
+        isRestartGame = myIntent.getBooleanExtra("restartGame", false);
 
         drawerLayout = findViewById(R.id.game_drawer_layout);
         navigationView = findViewById(R.id.game_navigation_view);
@@ -168,6 +177,11 @@ public class GameActivity extends AppCompatActivity {
         contractBidImageView = findViewById(R.id.game_table_contract_bid);
         localScoreTextView = findViewById(R.id.local_score);
         globalScoreTextView = findViewById(R.id.global_score);
+
+        playersBackground.put(0, (LinearLayout) findViewById(R.id.game_table_player));
+        playersBackground.put(1, (LinearLayout) findViewById(R.id.game_table_enemy_left));
+        playersBackground.put(2, (LinearLayout) findViewById(R.id.game_table_teammate));
+        playersBackground.put(3, (LinearLayout) findViewById(R.id.game_table_enemy_right));
 
         // Player
         for (int i = 0; i < NORTH_SOUTH_ROWS_COUNT; i++) {
@@ -201,7 +215,11 @@ public class GameActivity extends AppCompatActivity {
             }
         }
 
-        loadFragment(BargainingFragment.newInstance(gameState, notifyBidTurn));
+        if (gameState.getPhase().equals(GamePhase.BIDDING)) {
+            loadFragment(BargainingFragment.newInstance(gameState, notifyBidTurn, isRestartGame));
+        } else {
+            loadFragment(DrawFragment.newInstance(gameState, newPlayerPositions));
+        }
 
         drawerLayout.addDrawerListener(actionBarDrawerToggleMenu);
         actionBarDrawerToggleMenu.syncState();
@@ -212,10 +230,6 @@ public class GameActivity extends AppCompatActivity {
                     case R.id.nav_scores:
                         // TODO: таблица очков
                         showScoresDialog();
-                        return true;
-                    case R.id.nav_settings:
-                        // TODO: настройки или вообще убрать
-                        Log.i("onOptionsItemSelected", "Settings");
                         return true;
                     case R.id.nav_exit:
                         ExitLobbyToServer exitGame = new ExitLobbyToServer(lobbyId, true);
@@ -272,12 +286,68 @@ public class GameActivity extends AppCompatActivity {
                 mainPlayerPosition.equals(PlayerPosition.SOUTH) ? 0 : 1;
         theyTeamIndex = 1 - ourTeamIndex;
 
+        if (isRestartGame) {
+            Type typeLastBid = new TypeToken<Bid>(){}.getType();
+            lastBid = gson.fromJson(lastBidString, typeLastBid);
+            Type typeLastBids = new TypeToken<HashMap<Integer, String>>(){}.getType();
+            lastBids = gson.fromJson(lastBidsString, typeLastBids);
+        } else {
+            lastBids.put(0, "none");
+            lastBids.put(1, "none");
+            lastBids.put(2, "none");
+            lastBids.put(3, "none");
+        }
+
         updateGameUI();
+
+        if (isRestartGame) {
+            for (PlayerPosition playerPosition : PlayerPosition.values()) {
+                changeCardsVisibility(playerPosition, gameState.getPlayerCardCountMap().get(playerPosition));
+            }
+            showCards(true, true);
+
+            if (notifyMoveTurn) {
+                if (gameState.getHandToPlay().equals(mainPlayerPosition)) {
+                    playerCards = getSortedCards(true);
+                } else {
+                    teammateCards = getSortedCards(false);
+                }
+                setClickableCards(!gameState.getHandToPlay().equals(mainPlayerPosition), true);
+            }
+
+            if (gameState.getPhase().equals(GamePhase.CARD_PLAY)) {
+                contractBidImageView.setImageResource(getBidDrawableId(
+                        gameState.getContractBid().getCardSuit(),
+                        gameState.getContractBid().getTricksAbove()));
+
+                if (newPlayerPositions.get(gameState.getContractBid().getPlayerPosition()) == 0 ||
+                        newPlayerPositions.get(gameState.getContractBid().getPlayerPosition()) == 2) {
+                    tricksToWin = 6 + gameState.getContractBid().getTricksAbove();
+                    enemyTricksToWin = 14 - tricksToWin;
+                } else {
+                    enemyTricksToWin = 6 + gameState.getContractBid().getTricksAbove();
+                    tricksToWin = 14 - enemyTricksToWin;
+                }
+                Map<PlayerPosition, Integer> tricksWon = gameState.getTricksWon();
+                int ourScores = 0;
+                int theyScores = 0;
+                for (int i = 0; i < newPlayerPositions.size(); i++) {
+                    if (i % 2 == 0) {
+                        ourScores += tricksWon.get(getKey(newPlayerPositions, i));
+                    } else {
+                        theyScores += tricksWon.get(getKey(newPlayerPositions, i));
+                    }
+                }
+                changeLocalScoreTextView(ourScores, tricksToWin, theyScores, enemyTricksToWin);
+            }
+        }
 
         int ourTeamScores = gameState.getScore().getAllScores(ourTeamIndex);
         int theyTeamScores = gameState.getScore().getAllScores(theyTeamIndex);
         changeGlobalScoreTextView(ourTeamScores, theyTeamScores, gameState.getDealNumber(),
                 gameState.getGameNumber(), gameState.getRubberNumber());
+
+        isRestartGame = false;
     }
 
     @Override
@@ -291,12 +361,26 @@ public class GameActivity extends AppCompatActivity {
     @Override
     public void onStart() {
         super.onStart();
-        EventBus.getDefault().register(this);
+        if (isInactive) {
+            Intent intent = new Intent(GameActivity.this, LoginActivity.class);
+            finishAffinity();
+            startActivity(intent);
+        } else {
+            EventBus.getDefault().register(this);
+        }
     }
 
     @Override
     public void onStop() {
         EventBus.getDefault().unregister(this);
+        isInactive = true;
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean(RESTART_GAME, true);
+        String jsonLastBids = gson.toJson(lastBids);
+        editor.putString(LAST_BIDS, jsonLastBids);
+        String jsonLastBid = gson.toJson(lastBid);
+        editor.putString(LAST_BID, jsonLastBid);
+        editor.apply();
         super.onStop();
     }
 
@@ -394,14 +478,16 @@ public class GameActivity extends AppCompatActivity {
     private void updateGameUI() {
         switch (gameState.getGameEvent()) {
             case BID_START:
-                if (!isBiddingPhase) {
+                if (!isRestartGame) {
                     loadFragment(BargainingFragment.newInstance(gameState,
-                            gameState.getPlayerTurn().equals(gameState.getPlayerPositionForLogin(login))));
+                            gameState.getPlayerTurn().equals(gameState.getPlayerPositionForLogin(login)), isRestartGame));
+                    isRestartGame = false;
                 }
                 for (PlayerPosition playerPosition : PlayerPosition.values()) {
                     changeCardsVisibility(playerPosition, gameState.getPlayerCardCountMap().get(playerPosition));
                 }
                 highlightPlayer(gameState.getPlayerTurn());
+                resetPlayersBackground();
                 showCards(true, true);
                 break;
             case BID_RESTART:
@@ -409,10 +495,13 @@ public class GameActivity extends AppCompatActivity {
                     changeCardsVisibility(playerPosition, gameState.getPlayerCardCountMap().get(playerPosition));
                 }
                 highlightPlayer(gameState.getPlayerTurn());
+                resetPlayersBackground();
                 showCards(true, true);
                 break;
             case PLAYER_BID:
                 highlightPlayer(gameState.getPlayerTurn());
+                updateLastBids();
+                updatePlayersBackground();
                 break;
             case BID_END:
                 runOnUiThread(() -> {
@@ -421,7 +510,7 @@ public class GameActivity extends AppCompatActivity {
                             gameState.getContractBid().getTricksAbove()));
                     Toast.makeText(this, "Торги закончены", Toast.LENGTH_SHORT).show();
                 });
-                isBiddingPhase = false;
+                resetPlayersBackground();
                 break;
             case PLAY_START:
                 if (newPlayerPositions.get(gameState.getContractBid().getPlayerPosition()) == 0 ||
@@ -515,7 +604,6 @@ public class GameActivity extends AppCompatActivity {
                 });
                 break;
         }
-        // TODO: изменение всего UI игры
     }
 
     private void highlightPlayer(PlayerPosition playerPosition) {
@@ -716,6 +804,64 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
+    private void updateLastBids() {
+        PlayerPosition currentPlayerPosition = gameState.getPlayerTurn();
+        Bid currentBid = gameState.getCurrentBid();
+        int newCurrentPosition = newPlayerPositions.get(currentPlayerPosition);
+        int previousPlayerPosition = newCurrentPosition == 0 ? 3 : newCurrentPosition - 1;
+        if (lastBid.equals(currentBid)) {
+            lastBids.put(previousPlayerPosition, "pass");
+        } else {
+            lastBid = currentBid;
+            switch (currentBid.getBidCall()) {
+                case BID:
+                    lastBids.put(previousPlayerPosition, "bid");
+                    break;
+                case DOUBLE_BID:
+                    lastBids.put(previousPlayerPosition, "contra");
+                    break;
+                case REDOUBLE_BID:
+                    lastBids.put(previousPlayerPosition, "recontra");
+                    break;
+                case PASS:
+                    lastBids.put(previousPlayerPosition, "pass");
+                    break;
+            }
+        }
+    }
+
+    private void updatePlayersBackground() {
+        for (Map.Entry<Integer, String> bidEntry : lastBids.entrySet()) {
+            String backgroundName = "";
+            switch (bidEntry.getValue()) {
+                case "bid":
+                    backgroundName = "card_background_bid";
+                    break;
+                case "contra":
+                    backgroundName = "card_background_contra";
+                    break;
+                case "recontra":
+                    backgroundName = "card_background_recontra";
+                    break;
+                case "pass":
+                    backgroundName = "card_background_pass";
+                    break;
+                case "none":
+                    backgroundName = "table_background";
+                    break;
+            }
+            playersBackground.get(bidEntry.getKey()).setBackgroundResource(
+                    getResources().getIdentifier(backgroundName, "drawable", getPackageName()));
+        }
+    }
+
+    private void resetPlayersBackground() {
+        for (int i = 0; i < 4; i++) {
+            lastBids.put(i, "none");
+        }
+        updatePlayersBackground();
+    }
+
     private void hideSystemBars() {
         WindowInsetsControllerCompat windowInsetsController =
                 ViewCompat.getWindowInsetsController(getWindow().getDecorView());
@@ -759,7 +905,7 @@ public class GameActivity extends AppCompatActivity {
     //ScoreText
     private void changeGlobalScoreTextView(int ourScores, int theyScores, int dealNumber,
                                            int gameNumber, int rubberNumber) {
-        String scoreText = "Мы: " + ourScores+ "\nОни: " + theyScores + "\nСделка: " + dealNumber +
+        String scoreText = "Мы: " + ourScores+ "\nОни: " + theyScores + "\nПартия: " + dealNumber +
                 "\nГейм: " + gameNumber + "\nРоббер: " + rubberNumber;
         runOnUiThread(() -> {
             globalScoreTextView.setVisibility(View.VISIBLE);

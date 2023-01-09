@@ -33,12 +33,14 @@ import ru.poly.bridgeandroid.model.menu.ExitLobbyToServer;
 import ru.poly.bridgeandroid.model.Message;
 import ru.poly.bridgeandroid.model.menu.PlayersCountLobbyToClient;
 import ru.poly.bridgeandroid.model.menu.StartGamePlayersToClient;
+import ru.poly.bridgeandroid.ui.login.LoginActivity;
 
 public class WaitGameActivity extends AppCompatActivity {
 
     private static final String TOKEN = "token";
     private static final String LOBBY = "lobby";
     private static final String LOGIN = "login";
+    private static final String RESTART = "restart";
     private static final String PREFERENCE = "preference";
     private String token;
     private String lobbyId;
@@ -49,6 +51,8 @@ public class WaitGameActivity extends AppCompatActivity {
     private TextView playersCountTextView;
     private SharedPreferences sharedPreferences;
     private Intent gameIntent;
+
+    private boolean isInactive;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,12 +88,22 @@ public class WaitGameActivity extends AppCompatActivity {
     @Override
     public void onStart() {
         super.onStart();
+        if (isInactive) {
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean(RESTART, true);
+            editor.apply();
+
+            Intent intent = new Intent(WaitGameActivity.this, LoginActivity.class);
+            startActivity(intent);
+            finishAffinity();
+        }
         EventBus.getDefault().register(this);
     }
 
     @Override
     public void onStop() {
         EventBus.getDefault().unregister(this);
+        isInactive = true;
         super.onStop();
     }
 

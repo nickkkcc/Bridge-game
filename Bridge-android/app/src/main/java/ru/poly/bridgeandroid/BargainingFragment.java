@@ -21,11 +21,13 @@ import androidx.fragment.app.Fragment;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -49,6 +51,7 @@ public class BargainingFragment extends Fragment {
     private static final String TOKEN = "token";
     private static final String LOBBY = "lobby";
     private static final String LOGIN = "login";
+    private static final String BIDS_STATES = "bidsStates";
     private static final String PREFERENCE = "preference";
 
     private static final int ROWS_COUNT = 7;
@@ -64,6 +67,7 @@ public class BargainingFragment extends Fragment {
     private Button recontraButton;
     private Button passButton;
     private final List<ImageView> bidsImageView = new ArrayList<>(35);
+    private List<String> bidsStates = new ArrayList<>(35);
 
     private final Map<Integer, String> suitNames = new HashMap<Integer, String>() {{
         put(0, "c");
@@ -78,6 +82,8 @@ public class BargainingFragment extends Fragment {
     private boolean notifyBidTurn;
     private Bid contractBid;
 
+    private boolean isRestartGame;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -87,6 +93,7 @@ public class BargainingFragment extends Fragment {
         token = sharedPreferences.getString(TOKEN, "");
         lobbyId = sharedPreferences.getString(LOBBY, "");
         login = sharedPreferences.getString(LOGIN, "");
+        String bidsStatesString = sharedPreferences.getString(BIDS_STATES, "");
 
         gson = new Gson();
 
@@ -104,6 +111,16 @@ public class BargainingFragment extends Fragment {
         Bundle bundle = getArguments();
         gameState = bundle.getParcelable("gameState");
         notifyBidTurn = bundle.getBoolean("notifyBidTurn");
+        isRestartGame = bundle.getBoolean("restartGame");
+
+        if (isRestartGame) {
+            Type type = new TypeToken<List<String>>(){}.getType();
+            bidsStates = gson.fromJson(bidsStatesString, type);
+        } else {
+            for (int i = 0; i < ROWS_COUNT * COLUMNS_COUNT; i++) {
+                bidsStates.add("");
+            }
+        }
 
         mainPlayerPosition = gameState.getPlayerPositionForLogin(login);
 
@@ -168,6 +185,10 @@ public class BargainingFragment extends Fragment {
         contraButton.setEnabled(false);
         recontraButton.setEnabled(false);
 
+        if (isRestartGame) {
+            updateFragmentUI();
+        }
+
         if (notifyBidTurn) {
             setClickableBidsFromIndex(0);
         } else {
@@ -186,15 +207,21 @@ public class BargainingFragment extends Fragment {
     @Override
     public void onStop() {
         EventBus.getDefault().unregister(this);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        String json = gson.toJson(bidsStates);
+        editor.putString(BIDS_STATES, json);
+        editor.apply();
         super.onStop();
     }
 
-    public static BargainingFragment newInstance(PlayerGameState playerGameState, boolean notifyBidTurn) {
+    public static BargainingFragment newInstance(PlayerGameState playerGameState, boolean notifyBidTurn,
+                                                 boolean isRestartGame) {
         BargainingFragment bargainingFragment = new BargainingFragment();
 
         Bundle args = new Bundle();
         args.putParcelable("gameState", playerGameState);
         args.putBoolean("notifyBidTurn", notifyBidTurn);
+        args.putBoolean("restartGame", isRestartGame);
         bargainingFragment.setArguments(args);
 
         return bargainingFragment;
@@ -284,18 +311,21 @@ public class BargainingFragment extends Fragment {
                 currentBid.getCardSuit().getSuitIndex();
         switch (currentBid.getBidCall()) {
             case BID:
+                bidsStates.set(currentBidIndex, "bid");
                 getActivity().runOnUiThread(() -> {
                     bidsImageView.get(currentBidIndex).setBackground(ContextCompat.getDrawable(
                             getActivity(), R.drawable.table_background_contract_bid));
                 });
                 break;
             case DOUBLE_BID:
+                bidsStates.set(currentBidIndex, "contra");
                 getActivity().runOnUiThread(() -> {
                     bidsImageView.get(currentBidIndex).setBackground(ContextCompat.getDrawable(
                             getActivity(), R.drawable.table_background_contra_bid));
                 });
                 break;
             case REDOUBLE_BID:
+                bidsStates.set(currentBidIndex, "recontra");
                 getActivity().runOnUiThread(() -> {
                     bidsImageView.get(currentBidIndex).setBackground(ContextCompat.getDrawable(
                             getActivity(), R.drawable.table_background_recontra_bid));
@@ -314,28 +344,45 @@ public class BargainingFragment extends Fragment {
             getActivity().runOnUiThread(() -> {
                 ImageView bidImageView = bidsImageView.get(bidIndex);
                 bidImageView.setColorFilter(ContextCompat.getColor(getActivity(), R.color.black_overlay_cards));
-                if (compareDrawable(bidImageView.getBackground(), Objects.requireNonNull(ContextCompat.getDrawable(
-                        getActivity(), R.drawable.table_background_contract_bid))) ||
-                        compareDrawable(bidImageView.getBackground(), Objects.requireNonNull(ContextCompat.getDrawable(
-                                getActivity(), R.drawable.table_background_contract_bid_darkened)))) {
-                    bidImageView.setBackground(ContextCompat.getDrawable(
-                            getActivity(), R.drawable.table_background_contract_bid_darkened));
-                } else if (compareDrawable(bidImageView.getBackground(), Objects.requireNonNull(ContextCompat.getDrawable(
-                        getActivity(), R.drawable.table_background_contra_bid))) ||
-                        compareDrawable(bidImageView.getBackground(), Objects.requireNonNull(ContextCompat.getDrawable(
-                                getActivity(), R.drawable.table_background_contra_bid_darkened)))) {
-                    bidImageView.setBackground(ContextCompat.getDrawable(
-                            getActivity(), R.drawable.table_background_contra_bid_darkened));
-                } else if (compareDrawable(bidImageView.getBackground(), Objects.requireNonNull(ContextCompat.getDrawable(
-                        getActivity(), R.drawable.table_background_recontra_bid))) ||
-                        compareDrawable(bidImageView.getBackground(), Objects.requireNonNull(ContextCompat.getDrawable(
-                                getActivity(), R.drawable.table_background_recontra_bid_darkened)))) {
-                    bidImageView.setBackground(ContextCompat.getDrawable(
-                            getActivity(), R.drawable.table_background_recontra_bid_darkened));
-                } else {
-                    bidImageView.setBackground(ContextCompat.getDrawable(
-                            getActivity(), R.drawable.table_background));
+                switch (bidsStates.get(bidIndex)) {
+                    case "bid":
+                        bidImageView.setBackground(ContextCompat.getDrawable(
+                                getActivity(), R.drawable.table_background_contract_bid_darkened));
+                        break;
+                    case "contra":
+                        bidImageView.setBackground(ContextCompat.getDrawable(
+                                getActivity(), R.drawable.table_background_contra_bid_darkened));
+                        break;
+                    case "recontra":
+                        bidImageView.setBackground(ContextCompat.getDrawable(
+                                getActivity(), R.drawable.table_background_recontra_bid_darkened));
+                        break;
+                    default:
+                        bidImageView.setBackground(ContextCompat.getDrawable(
+                                getActivity(), R.drawable.table_background));
                 }
+//                if (compareDrawable(bidImageView.getBackground(), Objects.requireNonNull(ContextCompat.getDrawable(
+//                        getActivity(), R.drawable.table_background_contract_bid))) ||
+//                        compareDrawable(bidImageView.getBackground(), Objects.requireNonNull(ContextCompat.getDrawable(
+//                                getActivity(), R.drawable.table_background_contract_bid_darkened)))) {
+//                    bidImageView.setBackground(ContextCompat.getDrawable(
+//                            getActivity(), R.drawable.table_background_contract_bid_darkened));
+//                } else if (compareDrawable(bidImageView.getBackground(), Objects.requireNonNull(ContextCompat.getDrawable(
+//                        getActivity(), R.drawable.table_background_contra_bid))) ||
+//                        compareDrawable(bidImageView.getBackground(), Objects.requireNonNull(ContextCompat.getDrawable(
+//                                getActivity(), R.drawable.table_background_contra_bid_darkened)))) {
+//                    bidImageView.setBackground(ContextCompat.getDrawable(
+//                            getActivity(), R.drawable.table_background_contra_bid_darkened));
+//                } else if (compareDrawable(bidImageView.getBackground(), Objects.requireNonNull(ContextCompat.getDrawable(
+//                        getActivity(), R.drawable.table_background_recontra_bid))) ||
+//                        compareDrawable(bidImageView.getBackground(), Objects.requireNonNull(ContextCompat.getDrawable(
+//                                getActivity(), R.drawable.table_background_recontra_bid_darkened)))) {
+//                    bidImageView.setBackground(ContextCompat.getDrawable(
+//                            getActivity(), R.drawable.table_background_recontra_bid_darkened));
+//                } else {
+//                    bidImageView.setBackground(ContextCompat.getDrawable(
+//                            getActivity(), R.drawable.table_background));
+//                }
             });
         }
     }

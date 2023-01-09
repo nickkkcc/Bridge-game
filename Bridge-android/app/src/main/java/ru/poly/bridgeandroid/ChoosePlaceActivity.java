@@ -30,11 +30,13 @@ import ru.poly.bridgeandroid.model.menu.PlayersOnlineToClient;
 import ru.poly.bridgeandroid.model.menu.SelectTeamAdminToServer;
 import ru.poly.bridgeandroid.model.menu.SelectTeamToClient;
 import ru.poly.bridgeandroid.model.menu.SelectTeamToServer;
+import ru.poly.bridgeandroid.ui.login.LoginActivity;
 
 public class ChoosePlaceActivity extends AppCompatActivity {
 
     private static final String TOKEN = "token";
     private static final String LOBBY = "lobby";
+    private static final String RESTART = "restart";
     private static final String PREFERENCE = "preference";
     private Gson gson;
     private String token;
@@ -49,6 +51,8 @@ public class ChoosePlaceActivity extends AppCompatActivity {
     private ArrayList<Player> friends;
     private Integer playersCount;
     private SharedPreferences sharedPreferences;
+
+    private boolean isInactive;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,12 +117,23 @@ public class ChoosePlaceActivity extends AppCompatActivity {
     @Override
     public void onStart() {
         super.onStart();
-        EventBus.getDefault().register(this);
+        if (isInactive) {
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean(RESTART, true);
+            editor.apply();
+
+            Intent intent = new Intent(ChoosePlaceActivity.this, LoginActivity.class);
+            startActivity(intent);
+            finishAffinity();
+        } else {
+            EventBus.getDefault().register(this);
+        }
     }
 
     @Override
     public void onStop() {
         EventBus.getDefault().unregister(this);
+        isInactive = true;
         super.onStop();
     }
 
@@ -177,8 +192,8 @@ public class ChoosePlaceActivity extends AppCompatActivity {
                 secondTeam = selectTeam.getSecondTeam() < 2;
 
                 runOnUiThread(() -> {
-                    firstTeamButton.setVisibility(firstTeam ? View.VISIBLE : View.INVISIBLE);
-                    secondTeamButton.setVisibility(secondTeam ? View.VISIBLE : View.INVISIBLE);
+                    firstTeamButton.setEnabled(firstTeam);
+                    secondTeamButton.setEnabled(secondTeam);
                 });
                 break;
             case "players_count_lobby":
