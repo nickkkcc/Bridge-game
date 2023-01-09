@@ -18,21 +18,21 @@
         android:layout_marginRight="16dp"
 
         android:text="@string/game_title"
-        android:textColor="@color/black"
+        android:textColor="@color/absolute_black"
         android:textSize="38dp"
         app:autoSizeMaxTextSize="44sp"
-        app:autoSizeMinTextSize="38sp"
+        app:autoSizeMinTextSize="34sp"
         app:autoSizeStepGranularity="2sp"
         app:autoSizeTextType="uniform"
         app:layout_constraintBottom_toTopOf="@+id/create_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageView"
-        app:layout_constraintVertical_bias="0.3" />
+        app:layout_constraintVertical_bias="0.16000003" />
 
     <ImageView
         android:id="@+id/imageView"
-        android:layout_width="180dp"
+        android:layout_width="160dp"
         android:layout_height="180dp"
         android:layout_marginStart="20dp"
         android:layout_marginLeft="20dp"
@@ -40,9 +40,10 @@
         android:tint="@color/absolute_black"
         app:layout_constraintBottom_toTopOf="@+id/create_button"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.502"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.3" />
+        app:layout_constraintVertical_bias="0.26" />
 
     <Button
         android:id="@+id/create_button"
@@ -72,15 +73,15 @@
         android:background="@drawable/button"
         android:text="@string/join_team"
         android:textAllCaps="false"
-        android:textStyle="bold"
         android:textColor="@color/absolute_black"
         android:textSize="@dimen/text_size"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintHorizontal_bias="0.507"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.69" />
+        app:layout_constraintVertical_bias="0.65999997" />
 
     <Button
         android:id="@+id/previous_games"
