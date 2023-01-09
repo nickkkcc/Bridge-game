@@ -10,11 +10,11 @@
     </style>
 
     <style name="LoginEditText">
-        <item name="colorControlNormal">@color/white</item>
-        <item name="statusBarBackground">@color/white</item>
+        <item name="colorControlNormal">@color/menu_yellow</item>
+        <item name="statusBarBackground">@color/absolute_black</item>
         <item name="colorControlActivated">@color/menu_yellow</item>
-        <item name="colorControlHighlight">@color/white</item>
-        <item name="android:textColorHint">@color/white</item>
+        <item name="colorControlHighlight">@color/menu_yellow</item>
+        <item name="android:textColorHint">@color/absolute_black</item>
     </style>
 
     <style name="CustomDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
@@ -26,8 +26,8 @@
         <item name="android:windowBackground">@drawable/background_dialog</item>
     </style>
 
-    <style name="Text">
-        <item name="textFillColor">@color/white</item>
+    <style name="text_btn">
+        <item name="textFillColor">@color/absolute_black</item>
     </style>
 
 

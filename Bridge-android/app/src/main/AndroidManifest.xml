@@ -8,9 +8,9 @@
     <application
         android:name=".BridgeApplication"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/icon_create_game"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@drawable/icon_create_game"
         android:supportsRtl="true"
         android:theme="@style/Theme.BridgeAndroid">
         <activity
@@ -42,7 +42,6 @@
             android:theme="@style/Theme.BridgeAndroid.FullscreenGameNoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

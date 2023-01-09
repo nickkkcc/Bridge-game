@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black_transparent">#aa1E1E1E</color>
+    <color name="black_transparent">#551E1E1E</color>
     <color name="dark_red">#ff31070A</color>
     <color name="dark_grey">#ff222222</color>
     <color name="menu_yellow">#D1BC00</color>
     <color name="yellow">#FFFF00</color>
     <color name="yellow_transparent">#aaFFFF00</color>
+    <color name="yellow_transparent_btn">#55FFFF00</color>
     <color name="orange">#FFA500</color>
     <color name="red">#FF0000</color>
     <color name="green">#00FF00</color>
     <color name="black">#cc121212</color>
-    <color name="black_navigation_bar">#000000</color>
+    <color name="absolute_black">#000000</color>
     <color name="black_background">#f8121212</color>
     <color name="white">#eeeeee</color>
     <color name="darker_white">#bbbbbb</color>

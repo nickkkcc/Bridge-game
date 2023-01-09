@@ -14,10 +14,9 @@
         android:layout_height="wrap_content"
         android:background="@drawable/text_background"
         android:gravity="center"
-        android:paddingTop="16dp"
-        android:paddingBottom="20dp"
+        android:paddingVertical="22dp"
         android:text="Выбор игроков"
-        android:textColor="@color/white"
+        android:textColor="@color/darker_white"
         android:textSize="30dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -40,13 +39,12 @@
         android:id="@+id/create_game_players_count"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="6dp"
-        android:layout_marginRight="6dp"
+        android:layout_marginTop="16dp"
         android:text="Игроков в лобби: 2"
         android:textColor="@color/yellow_transparent"
-        android:textSize="16sp"
+        android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView3" />
 
     <RelativeLayout
@@ -106,14 +104,15 @@
 
     <Button
         android:id="@+id/start_game"
-        android:layout_width="@dimen/button_width"
+        android:layout_width="@dimen/small_button_width"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginBottom="24dp"
+        android:layout_marginBottom="20dp"
         android:background="@drawable/button"
         android:text="Начать игру"
+        android:textStyle="bold"
         android:textAllCaps="false"
-        android:textColor="@color/white"
+        android:textColor="@color/absolute_black"
         android:textSize="@dimen/text_size"
         app:layout_constraintBottom_toTopOf="@+id/exit_lobby"
         app:layout_constraintEnd_toEndOf="parent"
@@ -124,16 +123,17 @@
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:background="@drawable/button"
+        android:background="@drawable/button_no_stroke"
         android:text="Выйти"
+        android:textStyle="bold"
         android:textAllCaps="false"
-        android:textColor="@color/white"
+        android:textColor="@color/absolute_black"
         android:textSize="@dimen/text_size"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.89" />
+        app:layout_constraintVertical_bias="0.9" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

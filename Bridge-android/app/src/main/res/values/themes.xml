@@ -2,8 +2,8 @@
     <!-- Base application theme. -->
 
     <style name="Theme.BridgeAndroid.FullscreenGameNoActionBar" parent="Theme.AppCompat.DayNight.NoActionBar">
-        <item name="android:navigationBarColor">@color/black_navigation_bar</item>
-        <item name="android:colorPrimaryDark">@color/black_navigation_bar</item>
+        <item name="android:navigationBarColor">@color/absolute_black</item>
+        <item name="android:colorPrimaryDark">@color/absolute_black</item>
         <item name="background">@color/black_background</item>
         <item name="popupMenuBackground">@color/black_background</item>
         <item name="android:windowNoTitle">true</item>

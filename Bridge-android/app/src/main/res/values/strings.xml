@@ -13,7 +13,7 @@
     <string name="chat">Чат</string>
 
     <!--Login Activity-->
-    <string name="title_activity_login">LoginActivity</string>
+    <string name="title_activity_login">Bridge</string>
     <string name="login_title">Вход в аккаунт</string>
     <string name="login_login">Логин</string>
     <string name="login_password">Пароль</string>

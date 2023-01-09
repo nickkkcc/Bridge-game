@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid
-        android:color="@color/menu_yellow"/>
+
     <corners
         android:radius="@dimen/activity_corner_radius"/>
     <padding
@@ -9,4 +8,6 @@
         android:bottom="@dimen/activity_vertical_padding"
         android:right="@dimen/activity_horizontal_padding"
         android:left="@dimen/activity_horizontal_padding"/>
+    <stroke android:color="@color/menu_yellow"
+        android:width="2dp"/>
 </shape>
