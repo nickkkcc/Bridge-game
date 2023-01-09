@@ -10,14 +10,13 @@
 
     <TextView
         android:id="@+id/textView3"
+        android:text="Выбор игроков"
+        android:textSize="@dimen/title_text_size"
+        android:textColor="@color/darker_white"
+        android:gravity="center"
+        android:background="@drawable/text_background"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/text_background"
-        android:gravity="center"
-        android:paddingVertical="22dp"
-        android:text="Выбор игроков"
-        android:textColor="@color/darker_white"
-        android:textSize="30dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.07"
@@ -25,51 +24,50 @@
 
     <ListView
         android:id="@+id/listView"
+        android:textColor="@color/white"
+        android:background="@color/black_transparent"
+        android:paddingTop="40dp"
+        android:paddingBottom="60dp"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:paddingTop="30dp"
-        android:paddingBottom="60dp"
         android:layout_marginBottom="36dp"
-        android:background="@color/black_transparent"
-        android:textColor="@color/white"
         app:layout_constraintBottom_toTopOf="@+id/start_game"
         app:layout_constraintTop_toBottomOf="@+id/textView3" />
 
     <TextView
         android:id="@+id/create_game_players_count"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
         android:text="Игроков в лобби: 2"
         android:textColor="@color/yellow_transparent"
         android:textSize="18sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView3" />
 
     <RelativeLayout
         android:id="@+id/relativeLayout"
+        android:background="@drawable/bg_switch"
+        android:paddingVertical="2dp"
         android:layout_width="300dp"
         android:layout_height="40dp"
+        android:layout_marginBottom="12dp"
         android:layout_centerHorizontal="true"
-        android:paddingVertical="2dp"
-        android:layout_marginBottom="6dp"
-        android:background="@drawable/bg_switch"
         app:layout_constraintBottom_toBottomOf="@+id/listView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-
         <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/switch_list"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
+            android:textColor="@color/white"
             android:checked="true"
             android:paddingHorizontal="8dp"
-            android:textColor="@color/white"
             android:thumb="@drawable/thumb_selector"
-            app:track="@drawable/track_selector" />
+            app:track="@drawable/track_selector"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -104,31 +102,29 @@
 
     <Button
         android:id="@+id/start_game"
+        android:text="Начать игру"
+        android:textAllCaps="false"
+        android:textSize="@dimen/text_size"
+        android:textColor="@color/white"
+        android:background="@drawable/button"
         android:layout_width="@dimen/small_button_width"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginBottom="20dp"
-        android:background="@drawable/button"
-        android:text="Начать игру"
-        android:textStyle="bold"
-        android:textAllCaps="false"
-        android:textColor="@color/absolute_black"
-        android:textSize="@dimen/text_size"
         app:layout_constraintBottom_toTopOf="@+id/exit_lobby"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/exit_lobby"
+        android:text="Выйти"
+        android:textAllCaps="false"
+        android:textSize="@dimen/text_size"
+        android:textColor="@color/white"
+        android:background="@drawable/button_no_stroke"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:background="@drawable/button_no_stroke"
-        android:text="Выйти"
-        android:textStyle="bold"
-        android:textAllCaps="false"
-        android:textColor="@color/absolute_black"
-        android:textSize="@dimen/text_size"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

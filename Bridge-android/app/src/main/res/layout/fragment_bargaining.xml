@@ -333,25 +333,26 @@
 
         <Button
             android:id="@+id/button_contra"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginStart="10dp"
             android:layout_marginLeft="10dp"
             android:layout_marginEnd="10dp"
             android:layout_marginRight="10dp"
             android:layout_weight="1"
+            android:maxEms="6"
+            android:text="@string/contra"
             android:textColor="@color/black"
             android:textSize="10sp"
-            app:autoSizeTextType="uniform"
-            app:autoSizeMinTextSize="8sp"
             app:autoSizeMaxTextSize="18sp"
+            app:autoSizeMinTextSize="8sp"
             app:autoSizeStepGranularity="1sp"
-            android:text="@string/contra"
-            app:backgroundTint="@color/yellow"/>
+            app:autoSizeTextType="uniform"
+            app:backgroundTint="@color/yellow" />
 
         <Button
             android:id="@+id/button_recontra"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginStart="10dp"
             android:layout_marginLeft="10dp"
@@ -359,6 +360,7 @@
             android:layout_marginRight="10dp"
             android:layout_weight="1"
             android:textSize="10sp"
+            android:maxEms="6"
             app:autoSizeTextType="uniform"
             app:autoSizeMinTextSize="8sp"
             app:autoSizeMaxTextSize="18sp"
@@ -369,13 +371,14 @@
 
         <Button
             android:id="@+id/button_pass"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginStart="10dp"
             android:layout_marginLeft="10dp"
             android:layout_marginEnd="10dp"
             android:layout_marginRight="10dp"
             android:layout_weight="1"
+            android:maxEms="6"
             app:autoSizeTextType="uniform"
             app:autoSizeMinTextSize="8sp"
             app:autoSizeMaxTextSize="18sp"

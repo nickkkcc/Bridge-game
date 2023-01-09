@@ -3,6 +3,7 @@
 
     <corners
         android:radius="@dimen/activity_corner_radius"/>
+    <solid android:color="#10D1BC00"/>
     <padding
         android:top="@dimen/activity_vertical_padding"
         android:bottom="@dimen/activity_vertical_padding"

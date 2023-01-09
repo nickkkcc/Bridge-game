@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black_transparent">#551E1E1E</color>
+    <color name="black_transparent">#661E1E1E</color>
     <color name="dark_red">#ff31070A</color>
     <color name="dark_grey">#ff222222</color>
     <color name="menu_yellow">#D1BC00</color>
@@ -14,7 +14,7 @@
     <color name="absolute_black">#000000</color>
     <color name="black_background">#f8121212</color>
     <color name="white">#eeeeee</color>
-    <color name="darker_white">#bbbbbb</color>
+    <color name="darker_white">#c0bbbb</color>
     <color name="_white_divider">#999999</color>
     <color name="black_overlay">#66000000</color>
     <color name="black_overlay_cards">#DF000000</color>
