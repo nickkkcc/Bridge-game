@@ -39,7 +39,7 @@ import org.junit.runner.RunWith;
 
 import ru.poly.bridgeandroid.R;
 
-
+@Ignore("Чтобы не насоздавал кучу юзеров")
 @LargeTest
 @RunWith(AndroidJUnit4.class)
 public class TestRegistration {

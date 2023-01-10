@@ -34,7 +34,6 @@ import org.junit.runner.RunWith;
 
 import ru.poly.bridgeandroid.R;
 
-
 @LargeTest
 @RunWith(AndroidJUnit4.class)
 public class TestRegistrationWithoutAnswerAndQuestion {

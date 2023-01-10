@@ -63,7 +63,7 @@ public class TestChangePassword {
                                                 0)),
                                 2),
                         isDisplayed()));
-        appCompatEditText.perform(replaceText("testBot1"), closeSoftKeyboard());
+        appCompatEditText.perform(replaceText("Anya"), closeSoftKeyboard());
 
         ViewInteraction appCompatButton = onView(
                 allOf(withId(R.id.forgot_password_button),
@@ -85,7 +85,7 @@ public class TestChangePassword {
                                                 0)),
                                 3),
                         isDisplayed()));
-        appCompatEditText2.perform(replaceText("test"), closeSoftKeyboard());
+        appCompatEditText2.perform(replaceText("123456"), closeSoftKeyboard());
 
         ViewInteraction appCompatButton2 = onView(
                 allOf(withId(R.id.secret_question_button),
@@ -107,7 +107,7 @@ public class TestChangePassword {
                                                 0)),
                                 2),
                         isDisplayed()));
-        appCompatEditText3.perform(replaceText("testBot1"), closeSoftKeyboard());
+        appCompatEditText3.perform(replaceText("123456"), closeSoftKeyboard());
 
         ViewInteraction appCompatButton3 = onView(
                 allOf(withId(R.id.change_password_button),
@@ -129,7 +129,7 @@ public class TestChangePassword {
                                                 0)),
                                 1),
                         isDisplayed()));
-        appCompatEditText4.perform(replaceText("testBot1"), closeSoftKeyboard());
+        appCompatEditText4.perform(replaceText("Anya"), closeSoftKeyboard());
 
         ViewInteraction appCompatEditText5 = onView(
                 allOf(withId(R.id.password),
@@ -140,7 +140,7 @@ public class TestChangePassword {
                                                 0)),
                                 2),
                         isDisplayed()));
-        appCompatEditText5.perform(replaceText("testBot1"), closeSoftKeyboard());
+        appCompatEditText5.perform(replaceText("123456"), closeSoftKeyboard());
 
         ViewInteraction appCompatButton4 = onView(
                 allOf(withId(R.id.login),
