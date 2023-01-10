@@ -361,28 +361,6 @@ public class BargainingFragment extends Fragment {
                         bidImageView.setBackground(ContextCompat.getDrawable(
                                 getActivity(), R.drawable.table_background));
                 }
-//                if (compareDrawable(bidImageView.getBackground(), Objects.requireNonNull(ContextCompat.getDrawable(
-//                        getActivity(), R.drawable.table_background_contract_bid))) ||
-//                        compareDrawable(bidImageView.getBackground(), Objects.requireNonNull(ContextCompat.getDrawable(
-//                                getActivity(), R.drawable.table_background_contract_bid_darkened)))) {
-//                    bidImageView.setBackground(ContextCompat.getDrawable(
-//                            getActivity(), R.drawable.table_background_contract_bid_darkened));
-//                } else if (compareDrawable(bidImageView.getBackground(), Objects.requireNonNull(ContextCompat.getDrawable(
-//                        getActivity(), R.drawable.table_background_contra_bid))) ||
-//                        compareDrawable(bidImageView.getBackground(), Objects.requireNonNull(ContextCompat.getDrawable(
-//                                getActivity(), R.drawable.table_background_contra_bid_darkened)))) {
-//                    bidImageView.setBackground(ContextCompat.getDrawable(
-//                            getActivity(), R.drawable.table_background_contra_bid_darkened));
-//                } else if (compareDrawable(bidImageView.getBackground(), Objects.requireNonNull(ContextCompat.getDrawable(
-//                        getActivity(), R.drawable.table_background_recontra_bid))) ||
-//                        compareDrawable(bidImageView.getBackground(), Objects.requireNonNull(ContextCompat.getDrawable(
-//                                getActivity(), R.drawable.table_background_recontra_bid_darkened)))) {
-//                    bidImageView.setBackground(ContextCompat.getDrawable(
-//                            getActivity(), R.drawable.table_background_recontra_bid_darkened));
-//                } else {
-//                    bidImageView.setBackground(ContextCompat.getDrawable(
-//                            getActivity(), R.drawable.table_background));
-//                }
             });
         }
     }

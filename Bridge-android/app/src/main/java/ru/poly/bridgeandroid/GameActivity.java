@@ -192,10 +192,10 @@ public class GameActivity extends AppCompatActivity {
         }
 
         // Left enemy
-        for (int i = 0; i < WEST_EAST_ROWS_COUNT; i++) {
-            for (int j = 0; j < WEST_EAST_COLUMNS_COUNT; j++) {
-                leftEnemyCardsImageView.add(findViewById(getResources().getIdentifier("game_table_row" + (i + 1)
-                        + "_enemy_left_card" + (j + 1), "id", GameActivity.this.getPackageName())));
+        for (int i = 0; i < WEST_EAST_COLUMNS_COUNT; i++) {
+            for (int j = 0; j < WEST_EAST_ROWS_COUNT; j++) {
+                leftEnemyCardsImageView.add(findViewById(getResources().getIdentifier("game_table_row" + (j + 1)
+                        + "_enemy_left_card" + (i + 1), "id", GameActivity.this.getPackageName())));
             }
         }
 
@@ -208,10 +208,10 @@ public class GameActivity extends AppCompatActivity {
         }
 
         // Right enemy
-        for (int i = 0; i < WEST_EAST_ROWS_COUNT; i++) {
-            for (int j = 0; j < WEST_EAST_COLUMNS_COUNT; j++) {
-                rightEnemyCardsImageView.add(findViewById(getResources().getIdentifier("game_table_row" + (i + 1)
-                        + "_enemy_right_card" + (j + 1), "id", GameActivity.this.getPackageName())));
+        for (int i = 0; i < WEST_EAST_COLUMNS_COUNT; i++) {
+            for (int j = 0; j < WEST_EAST_ROWS_COUNT; j++) {
+                rightEnemyCardsImageView.add(findViewById(getResources().getIdentifier("game_table_row" + (j + 1)
+                        + "_enemy_right_card" + (i + 1), "id", GameActivity.this.getPackageName())));
             }
         }
 

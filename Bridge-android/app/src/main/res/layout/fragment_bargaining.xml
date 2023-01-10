@@ -340,14 +340,17 @@
             android:layout_marginEnd="10dp"
             android:layout_marginRight="10dp"
             android:layout_weight="1"
+            android:minEms="6"
             android:maxEms="6"
             android:text="@string/contra"
             android:textColor="@color/black"
             android:textSize="10sp"
             app:autoSizeMaxTextSize="18sp"
-            app:autoSizeMinTextSize="8sp"
+            app:autoSizeMinTextSize="10sp"
             app:autoSizeStepGranularity="1sp"
             app:autoSizeTextType="uniform"
+            android:maxLines="1"
+            android:background="@drawable/button_game_contra"
             app:backgroundTint="@color/yellow" />
 
         <Button
@@ -360,13 +363,16 @@
             android:layout_marginRight="10dp"
             android:layout_weight="1"
             android:textSize="10sp"
+            android:minEms="6"
             android:maxEms="6"
             app:autoSizeTextType="uniform"
-            app:autoSizeMinTextSize="8sp"
+            app:autoSizeMinTextSize="10sp"
             app:autoSizeMaxTextSize="18sp"
             app:autoSizeStepGranularity="1sp"
             android:textColor="@color/black"
             android:text="@string/recontra"
+            android:maxLines="1"
+            android:background="@drawable/button_game_recontra"
             app:backgroundTint="@color/orange" />
 
         <Button
@@ -378,14 +384,17 @@
             android:layout_marginEnd="10dp"
             android:layout_marginRight="10dp"
             android:layout_weight="1"
+            android:minEms="6"
             android:maxEms="6"
             app:autoSizeTextType="uniform"
-            app:autoSizeMinTextSize="8sp"
+            app:autoSizeMinTextSize="10sp"
             app:autoSizeMaxTextSize="18sp"
             app:autoSizeStepGranularity="1sp"
             android:textStyle="bold"
             android:textColor="@color/black"
             android:text="@string/pass"
+            android:maxLines="1"
+            android:background="@drawable/button_game_pass"
             app:backgroundTint="@color/red" />
     </LinearLayout>
 
